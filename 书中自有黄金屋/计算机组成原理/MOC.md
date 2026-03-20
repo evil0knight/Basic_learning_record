@@ -6,35 +6,38 @@
 
 ---
 
-## 核心章节
+<details>
+<summary><h3 style="display:inline">第一部分：基础概念</h3></summary>
 
-### 第一部分：基础概念
-- <!-- [计算机基本组成](./01-基本组成.md) -->
+</details>
 
-### 第二部分：运算器
-- <!-- [定点运算](./02-定点运算.md) -->
+<details>
+<summary><h3 style="display:inline">第二部分：运算器</h3></summary>
 
-### 第三部分：存储器
-- <!-- [存储器层次结构](./03-存储层次.md) -->
-- <!-- [Cache](./03-Cache.md) -->
+</details>
 
-### 第四部分：指令系统
-- <!-- [指令格式与寻址](./04-指令系统.md) -->
+<details>
+<summary><h3 style="display:inline">第三部分：存储器</h3></summary>
 
-### 第五部分：CPU
-- <!-- [CPU结构与功能](./05-CPU.md) -->
-- <!-- [指令流水线](./05-流水线.md) -->
+</details>
 
-### 第六部分：总线与I/O
-- <!-- [总线](./06-总线.md) -->
-- <!-- [I/O系统](./06-IO.md) -->
+<details>
+<summary><h3 style="display:inline">第四部分：指令系统</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">第五部分：CPU</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">第六部分：总线与 I/O</h3></summary>
+
+</details>
 
 ---
 
 ## 高频考点
 
-<!-- 在这里列出容易考的知识点 -->
-
 ## 错题 / 难点
-
-<!-- 链接到刷题笔记中的相关题目 -->

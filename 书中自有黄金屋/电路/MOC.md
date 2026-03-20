@@ -6,23 +6,21 @@
 
 ---
 
-## 核心章节
+<details>
+<summary><h3 style="display:inline">直流电路</h3></summary>
 
-### 直流电路
-- <!-- [基尔霍夫定律（KCL / KVL）](./直流-基尔霍夫.md) -->
-- <!-- [戴维南 / 诺顿定理](./直流-等效定理.md) -->
-- <!-- [叠加定理](./直流-叠加.md) -->
+</details>
 
-### 交流电路
-- <!-- [正弦量与相量](./交流-相量.md) -->
-- <!-- [RLC 电路](./交流-RLC.md) -->
-- <!-- [谐振电路](./交流-谐振.md) -->
+<details>
+<summary><h3 style="display:inline">交流电路</h3></summary>
 
-### 动态电路
-- <!-- [一阶电路暂态分析](./动态-一阶.md) -->
+</details>
+
+<details>
+<summary><h3 style="display:inline">动态电路</h3></summary>
+
+</details>
 
 ---
 
 ## 高频考点
-
-<!-- 电路分析方法、换路定则等 -->

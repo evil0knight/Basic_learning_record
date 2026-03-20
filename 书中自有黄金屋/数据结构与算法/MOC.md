@@ -8,35 +8,44 @@
 
 ## 数据结构
 
-### 线性结构
-- <!-- [数组 / 链表](./线性-数组链表.md) -->
-- <!-- [栈与队列](./线性-栈队列.md) -->
+<details>
+<summary><h3 style="display:inline">线性结构</h3></summary>
 
-### 树形结构
-- <!-- [二叉树](./树-二叉树.md) -->
-- <!-- [二叉搜索树 / AVL / 红黑树](./树-BST.md) -->
-- <!-- [堆](./树-堆.md) -->
+</details>
 
-### 图
-- <!-- [图的表示与遍历](./图-基础.md) -->
-- <!-- [最短路径](./图-最短路径.md) -->
-- <!-- [最小生成树](./图-MST.md) -->
+<details>
+<summary><h3 style="display:inline">树形结构</h3></summary>
 
-### 散列表
-- <!-- [哈希表](./散列表.md) -->
+</details>
+
+<details>
+<summary><h3 style="display:inline">图</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">散列表</h3></summary>
+
+</details>
 
 ---
 
 ## 算法
 
-### 排序
-- <!-- [各排序算法对比](./排序总结.md) -->
+<details>
+<summary><h3 style="display:inline">排序</h3></summary>
 
-### 动态规划
-- <!-- [DP 入门](./DP.md) -->
+</details>
 
-### 贪心 / 分治 / 回溯
-- <!-- [基本框架](./算法范式.md) -->
+<details>
+<summary><h3 style="display:inline">动态规划</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">贪心 / 分治 / 回溯</h3></summary>
+
+</details>
 
 ---
 

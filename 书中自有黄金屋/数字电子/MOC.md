@@ -6,29 +6,26 @@
 
 ---
 
-## 核心章节
+<details>
+<summary><h3 style="display:inline">数制与编码</h3></summary>
 
-### 数制与编码
-- <!-- [二进制 / 十六进制](./数制编码.md) -->
-- <!-- [补码 / 反码](./补码.md) -->
+</details>
 
-### 逻辑代数
-- <!-- [逻辑门](./逻辑门.md) -->
-- <!-- [布尔代数与化简](./布尔代数.md) -->
-- <!-- [卡诺图](./卡诺图.md) -->
+<details>
+<summary><h3 style="display:inline">逻辑代数</h3></summary>
 
-### 组合逻辑
-- <!-- [编码器 / 译码器](./组合-编译码.md) -->
-- <!-- [多路选择器](./组合-MUX.md) -->
-- <!-- [加法器](./组合-加法器.md) -->
+</details>
 
-### 时序逻辑
-- <!-- [触发器（RS / D / JK / T）](./时序-触发器.md) -->
-- <!-- [寄存器](./时序-寄存器.md) -->
-- <!-- [计数器](./时序-计数器.md) -->
+<details>
+<summary><h3 style="display:inline">组合逻辑</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">时序逻辑</h3></summary>
+
+</details>
 
 ---
 
 ## 高频考点
-
-<!-- 如：时序电路分析、状态机设计 -->

@@ -6,30 +6,31 @@
 
 ---
 
-## 核心章节
+<details>
+<summary><h3 style="display:inline">半导体器件</h3></summary>
 
-### 半导体器件
-- <!-- [二极管](./器件-二极管.md) -->
-- <!-- [双极型晶体管（BJT）](./器件-BJT.md) -->
-- <!-- [场效应管（MOSFET）](./器件-MOSFET.md) -->
+</details>
 
-### 放大电路
-- <!-- [共射 / 共基 / 共集放大](./放大-基本组态.md) -->
-- <!-- [静态工作点（Q点）](./放大-Q点.md) -->
-- <!-- [多级放大](./放大-多级.md) -->
+<details>
+<summary><h3 style="display:inline">放大电路</h3></summary>
 
-### 反馈
-- <!-- [反馈的概念与分类](./反馈.md) -->
+</details>
 
-### 运算放大器
-- <!-- [理想运放特性](./运放-基础.md) -->
-- <!-- [运放应用电路](./运放-应用.md) -->
+<details>
+<summary><h3 style="display:inline">反馈</h3></summary>
 
-### 功率放大
-- <!-- [功率放大电路](./功率放大.md) -->
+</details>
+
+<details>
+<summary><h3 style="display:inline">运算放大器</h3></summary>
+
+</details>
+
+<details>
+<summary><h3 style="display:inline">功率放大</h3></summary>
+
+</details>
 
 ---
 
 ## 高频考点
-
-<!-- 如：BJT 工作状态判断、运放虚短虚断、负反馈类型 -->

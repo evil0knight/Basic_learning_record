@@ -9,43 +9,43 @@
 > **写笔记的规则：**
 > - 内容少 → 直接新建一个 `.md` 文件，在下面加一行链接
 > - 内容多 → 新建**同名子文件夹**，文件夹里放 `index.md` 作为小目录，再在这里链一行 `index.md`
->
-> 示例：
-> ```
-> 操作系统/
-> ├── MOC.md
-> ├── 进程基础.md            ← 内容少，直接一个文件
-> ├── 死锁/                  ← 内容多，开子文件夹
-> │   ├── index.md
-> │   ├── 死锁概念.md
-> │   └── 死锁检测与解除.md
-> └── 调度算法.md
-> ```
 
 ---
 
-## 笔记目录
+<details>
+<summary><h3 style="display:inline">一、进程与线程</h3></summary>
 
-### 一、进程与线程
+</details>
 
+<details>
+<summary><h3 style="display:inline">二、进程同步与互斥</h3></summary>
 
-### 二、进程同步与互斥
+</details>
 
+<details>
+<summary><h3 style="display:inline">三、死锁</h3></summary>
 
-### 三、死锁
+</details>
 
+<details>
+<summary><h3 style="display:inline">四、内存管理</h3></summary>
 
-### 四、内存管理
+</details>
 
+<details>
+<summary><h3 style="display:inline">五、文件系统</h3></summary>
 
-### 五、文件系统
+</details>
 
+<details>
+<summary><h3 style="display:inline">六、I/O 管理</h3></summary>
 
-### 六、I/O 管理
+</details>
 
+<details>
+<summary><h3 style="display:inline">七、调度算法</h3></summary>
 
-### 七、调度算法
-
+</details>
 
 ---
 

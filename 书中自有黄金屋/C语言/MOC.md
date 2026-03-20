@@ -6,41 +6,36 @@
 
 ---
 
-## 语言基础
+<details>
+<summary><h3 style="display:inline">语言基础</h3></summary>
 
-- <!-- [数据类型与运算符](./基础-数据类型.md) -->
-- <!-- [控制流](./基础-控制流.md) -->
-- <!-- [函数](./基础-函数.md) -->
+</details>
 
-## 指针（重点）
+<details>
+<summary><h3 style="display:inline">指针（重点）</h3></summary>
 
-- <!-- [指针基础](./指针-基础.md) -->
-- <!-- [指针与数组](./指针-数组.md) -->
-- <!-- [函数指针](./指针-函数指针.md) -->
-- <!-- [多级指针](./指针-多级.md) -->
+</details>
 
-## 内存管理
+<details>
+<summary><h3 style="display:inline">内存管理</h3></summary>
 
-- <!-- [栈 vs 堆](./内存-栈堆.md) -->
-- <!-- [malloc / free](./内存-动态分配.md) -->
-- <!-- [常见内存错误](./内存-错误.md) -->
+</details>
 
-## 结构体 / 联合体 / 枚举
+<details>
+<summary><h3 style="display:inline">结构体 / 联合体 / 枚举</h3></summary>
 
-- <!-- [struct](./结构体.md) -->
-- <!-- [union & enum](./联合枚举.md) -->
+</details>
 
-## 文件操作
+<details>
+<summary><h3 style="display:inline">文件操作</h3></summary>
 
-- <!-- [文件读写](./文件操作.md) -->
+</details>
 
-## 预处理 / 编译
+<details>
+<summary><h3 style="display:inline">预处理 / 编译</h3></summary>
 
-- <!-- [宏与头文件](./预处理.md) -->
-- <!-- [编译过程](./编译.md) -->
+</details>
 
 ---
 
 ## 高频陷阱 / 面试考点
-
-<!-- 记录容易出错的地方，比如 sizeof、指针运算、未定义行为 -->
