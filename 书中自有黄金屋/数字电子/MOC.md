@@ -7,22 +7,22 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">数制与编码</h3></summary>
+<summary><h3 style="display:inline">🔴数制与编码</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">逻辑代数</h3></summary>
+<summary><h3 style="display:inline">🔴逻辑代数</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">组合逻辑</h3></summary>
+<summary><h3 style="display:inline">🔴组合逻辑</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">时序逻辑</h3></summary>
+<summary><h3 style="display:inline">🔴时序逻辑</h3></summary>
 
 </details>
 

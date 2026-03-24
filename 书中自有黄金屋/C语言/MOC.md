@@ -7,32 +7,32 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">语言基础</h3></summary>
+<summary><h3 style="display:inline">🔴语言基础</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">指针（重点）</h3></summary>
+<summary><h3 style="display:inline">🔴指针（重点）</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">内存管理</h3></summary>
+<summary><h3 style="display:inline">🔴内存管理</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">结构体 / 联合体 / 枚举</h3></summary>
+<summary><h3 style="display:inline">🔴结构体 / 联合体 / 枚举</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">文件操作</h3></summary>
+<summary><h3 style="display:inline">🔴文件操作</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">预处理 / 编译</h3></summary>
+<summary><h3 style="display:inline">🔴预处理 / 编译</h3></summary>
 
 </details>
 

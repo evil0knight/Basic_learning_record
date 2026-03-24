@@ -9,7 +9,7 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">第 1 章 词法陷阱</h3></summary>
+<summary><h3 style="display:inline">🔴第 1 章 词法陷阱</h3></summary>
 
 &和|是按位运算符，&&和||是逻辑运算符
 
@@ -35,7 +35,7 @@
 </details>
 
 <details>
-<summary><h3 style="display:inline">第 2 章 语法陷阱</h3></summary>
+<summary><h3 style="display:inline">🔴第 2 章 语法陷阱</h3></summary>
 
 [1.函数声明与函数指针，请说明 (*(void( * )( ) )0)();如果你不能理解，就点进去](第2章-函数声明与函数指针.md)
 
@@ -68,7 +68,7 @@ if(x==0){
 </details>
 
 <details>
-<summary><h3 style="display:inline">第 3 章 语义陷阱</h3></summary>
+<summary><h3 style="display:inline">🔴第 3 章 语义陷阱</h3></summary>
 
 [1.指针与数组,二维数组的名称是指向[0][0]的还是指向[0]的](指针与数组.md)?
 
@@ -81,7 +81,7 @@ if(x==0){
 </details>
 
 <details>
-<summary><h3 style="display:inline">第 4 章 链接</h3></summary>
+<summary><h3 style="display:inline">🔴第 4 章 链接</h3></summary>
 
 [1.什么是链接器](什么是链接器.MD)?
 
@@ -94,7 +94,6 @@ extern关键字:extern int a说明了a的存储空间是在程序的其他地方
 
 <details>
 <summary><style="display:inline">3.static修饰符的2个作用,你还记得吗</summary>
-</details>
 
 1局部变量:使变量在函数外不能使用,且变为永久性的
 
@@ -103,7 +102,7 @@ extern关键字:extern int a说明了a的存储空间是在程序的其他地方
 </details>
 
 <details>
-<summary><style="display:inline">头文件</summary>
+<summary><style="display:inline">4.头文件</summary>
 
 对于声明,可以所有外部对象只在一个地方(.h)声明
 
@@ -115,8 +114,11 @@ extern关键字:extern int a说明了a的存储空间是在程序的其他地方
 
 </details>
 
+</details>
+
+
 <details>
-<summary><h3 style="display:inline">第 5 章 库函数</h3></summary>
+<summary><h3 style="display:inline">🔴第 5 章 库函数</h3></summary>
 
 [返回整数的getchar函数,getchar的返回值能否用char类型的变量接取]()?
 
@@ -124,23 +126,21 @@ extern关键字:extern int a说明了a的存储空间是在程序的其他地方
 
 [缓冲输出与内存分配,setbuf库函数的使用方法?]()
 
-
 </details>
 
 <details>
-<summary><h3 style="display:inline">第 6 章 预处理器</h3></summary>
+<summary><h3 style="display:inline">🔴第 6 章 预处理器</h3></summary>
 
 1.宏不是函数,现代编程规范严禁使用宏来定义类型,应该用typedef
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">第 7 章 可移植性缺陷</h3></summary>
+<summary><h3 style="display:inline">🔴第 7 章 可移植性缺陷</h3></summary>
 
 [1.int,long之类的到底是几位的,为什么会在&#34;可移植性缺陷&#34;这一章出现?](可移植性缺陷.md)
 
 [2.负数除法取整?](除法运算时发生的截断.md)
-
 
 </details>
 

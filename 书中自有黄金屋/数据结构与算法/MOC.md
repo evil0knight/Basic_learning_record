@@ -9,22 +9,22 @@
 ## 数据结构
 
 <details>
-<summary><h3 style="display:inline">线性结构</h3></summary>
+<summary><h3 style="display:inline">🔴线性结构</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">树形结构</h3></summary>
+<summary><h3 style="display:inline">🔴树形结构</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">图</h3></summary>
+<summary><h3 style="display:inline">🔴图</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">散列表</h3></summary>
+<summary><h3 style="display:inline">🔴散列表</h3></summary>
 
 </details>
 
@@ -33,17 +33,17 @@
 ## 算法
 
 <details>
-<summary><h3 style="display:inline">排序</h3></summary>
+<summary><h3 style="display:inline">🔴排序</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">动态规划</h3></summary>
+<summary><h3 style="display:inline">🔴动态规划</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">贪心 / 分治 / 回溯</h3></summary>
+<summary><h3 style="display:inline">🔴贪心 / 分治 / 回溯</h3></summary>
 
 </details>
 

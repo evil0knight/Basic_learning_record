@@ -12,6 +12,7 @@
 - [数据结构与算法](./数据结构与算法/MOC.md)
 - [C 语言](./C语言/MOC.md)
 - [C 陷阱与缺陷](./C陷阱与缺陷/MOC.md)
+- [C++ Primer Plus](./C++PrimerPlus/MOC.md)
 - [操作系统](./操作系统/MOC.md)
 
 ### 电子电路

@@ -12,8 +12,8 @@
 | ------ | ------------ | ----------------------- |
 | Git    | 版本控制     | [Git 笔记](./git.md)       |
 | Modbus | 工业通信协议 | [Modbus 笔记](./Modbus.md) |
-| RTOS   | 实时操作系统 | [RTOS 笔记](./RTOS.md)     |
-| AD     | AD 相关技术  | [AD 笔记](./AD.md)         |
+| freeRTOS   | 实时操作系统 | [freeRTOS 笔记](./freeRTOS.md)     |
+| RS485  | 差分串行通信物理层标准，含RS232对比 | [RS485/RS232 笔记](./RS485-RS232.md)   |
 
 ---
 
