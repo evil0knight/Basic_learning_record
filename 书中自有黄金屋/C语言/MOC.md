@@ -9,6 +9,8 @@
 <details>
 <summary><h3 style="display:inline">🔴语言基础</h3></summary>
 
+🟢C语言定义的时候不可以连续赋值,因为要先定义后使用
+
 </details>
 
 <details>
