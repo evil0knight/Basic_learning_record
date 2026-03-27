@@ -175,6 +175,66 @@
       color: #b2bec3;
       margin-bottom: 2px;
     }
+
+    /* 词根词缀行 */
+    .card-roots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 5px;
+    }
+
+    .root-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.72rem;
+      border-radius: 4px;
+      padding: 1px 5px;
+      line-height: 1.5;
+    }
+
+    /* 前缀：蓝紫色 */
+    .root-chip.prefix {
+      background: #eef0ff;
+      color: #5352ed;
+    }
+
+    /* 词根：绿色 */
+    .root-chip.root {
+      background: #e8f8f0;
+      color: #00b894;
+    }
+
+    /* 未知词干：灰色 */
+    .root-chip.stem {
+      background: #f0f3f5;
+      color: #636e72;
+    }
+
+    /* 后缀：橙色 */
+    .root-chip.suffix {
+      background: #fff4e6;
+      color: #e17055;
+    }
+
+    .root-chip .chip-text {
+      font-weight: 600;
+      font-family: "Consolas", "Monaco", monospace;
+    }
+
+    .root-chip .chip-meaning {
+      color: inherit;
+      opacity: 0.75;
+      font-size: 0.68rem;
+    }
+
+    /* 分隔符 + */
+    .root-plus {
+      font-size: 0.7rem;
+      color: #b2bec3;
+      align-self: center;
+    }
   </style>
 </head>
 <body>
@@ -197,6 +257,7 @@
 </main>
 
 <script src="words.js"></script>
+<script src="roots.js"></script>
 <script>
   const START_DATE = new Date("2026-03-27T00:00:00");
   const WORDS_PER_DAY = 100;
@@ -282,6 +343,36 @@
       phonetic.className = "card-phonetic";
       phonetic.textContent = w.phonetic || "";
 
+      // 词根分析
+      const rootsEl = document.createElement("div");
+      rootsEl.className = "card-roots";
+      if (typeof analyzeWord === "function") {
+        const parts = analyzeWord(w.en);
+        if (parts && parts.length >= 2) {
+          parts.forEach((part, idx) => {
+            if (idx > 0) {
+              const plus = document.createElement("span");
+              plus.className = "root-plus";
+              plus.textContent = "+";
+              rootsEl.appendChild(plus);
+            }
+            const chip = document.createElement("span");
+            chip.className = `root-chip ${part.type}`;
+            const textSpan = document.createElement("span");
+            textSpan.className = "chip-text";
+            textSpan.textContent = part.text;
+            chip.appendChild(textSpan);
+            if (part.meaning) {
+              const meanSpan = document.createElement("span");
+              meanSpan.className = "chip-meaning";
+              meanSpan.textContent = part.meaning;
+              chip.appendChild(meanSpan);
+            }
+            rootsEl.appendChild(chip);
+          });
+        }
+      }
+
       const zh = document.createElement("div");
       zh.className = "card-zh";
       zh.textContent = w.zh;
@@ -289,6 +380,7 @@
       left.appendChild(num);
       left.appendChild(en);
       left.appendChild(phonetic);
+      left.appendChild(rootsEl);
       left.appendChild(zh);
 
       const btn = document.createElement("button");
