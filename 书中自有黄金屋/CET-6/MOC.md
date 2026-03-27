@@ -1,6 +1,6 @@
 # CET-6 — 知识地图
 
-[← 学科总览](../MOC.md) | [← 主页](../../README.md)
+[← 学科总览](../MOC.md) | [← 主页](../../README.md) | [📖 词汇练习应用](./vocab-app/index.html)
 
 > 状态：⏳ 待学
 
