@@ -15,6 +15,9 @@
 - [C++ Primer Plus](./C++PrimerPlus/MOC.md)
 - [操作系统](./操作系统/MOC.md)
 
+### 英语
+- [CET-6](./CET-6/MOC.md)
+
 ### 电子电路
 - [电路](./电路/MOC.md)
 - [数字电子](./数字电子/MOC.md)
