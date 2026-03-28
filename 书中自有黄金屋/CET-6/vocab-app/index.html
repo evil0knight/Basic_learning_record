@@ -260,8 +260,8 @@
 <script src="roots.js"></script>
 <script>
   const START_DATE = new Date("2026-03-27T00:00:00");
-  const WORDS_PER_DAY = 100;
-  const PHASE1_DAYS = 25;
+  const WORDS_PER_DAY = 30;
+  const PHASE1_DAYS = 29;
 
   let allShown = false;
 
@@ -306,7 +306,7 @@
     }
 
     const dayNum = dayIdx + 1;
-    document.getElementById("dayTitle").textContent = `Day ${dayNum} · 今日单词（100个）`;
+    document.getElementById("dayTitle").textContent = `Day ${dayNum} · 今日单词（30个）`;
 
     // 进度条
     const progressPct = (dayNum / PHASE1_DAYS * 100).toFixed(1);
