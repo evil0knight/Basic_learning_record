@@ -63,16 +63,987 @@ C已经学了
 <details>
 <summary><h3 style="display:inline">🔴第 3 章 处理数据</h3></summary>
 
+程序存储数据需要记录三件事：**存在哪里、存什么值、存什么类型**。
+
+---
+
+<details>
+<summary><style="display:inline">🔺变量命名规则</summary>
+
+- 只能用字母、数字、下划线
+- 第一个字符**不能是数字**
+- **不能以两个下划线开头**，也不能以**下划线 + 大写字母**开头
+  - 原因：这类名称**保留给编译器实现**（标准库内部大量使用 `__xxx` / `_Xxx` 形式），用了可能产生冲突或未定义行为
+- C++ 对名称长度没有限制；C99 只有**前 63 个字符**有效
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺初始化方式</summary>
+
+```cpp
+int a = 5;    // 传统 C 风格
+int b(5);     // 构造函数风格
+int c = {5};  // C++11 列表初始化
+int d{5};     // C++11 列表初始化（推荐）
+int e{};      // 初始化为 0
+```
+
+C++11 推荐用 `{}` 大括号初始化，好处是**防止窄化转换**：把 `double` 赋给 `int` 会直接**报错**，而不是悄悄截断。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺整型：short / int / long / long long</summary>
+
+保证：`short` ≤ `int` ≤ `long` ≤ `long long`，`short` 至少 16 位，`long` 至少 32 位。
+
+| 类型          | 最小宽度 | 典型宽度（64 位） |
+| ------------- | -------- | ----------------- |
+| `short`     | 16 位    | 16 位             |
+| `int`       | 16 位    | 32 位             |
+| `long`      | 32 位    | 32/64 位          |
+| `long long` | 64 位    | 64 位             |
+
+`sizeof` 返回类型占用的**字节数**（1 字节 = 8 位）：
+
+```cpp
+sizeof(int)     // 典型值 4
+sizeof(long)    // 典型值 4 或 8
+```
+
+**`#include <climits>`** 提供各整型的极限常量，写可移植代码必备：
+
+```cpp
+INT_MAX     // 2147483647
+INT_MIN     // -2147483648
+SHRT_MAX    // 32767
+LLONG_MAX   // 9223372036854775807
+UINT_MAX    // 4294967295（无符号 int 最大值）
+```
+
+**字面值进制与后缀：**
+
+```cpp
+int a = 42;     // 十进制
+int b = 042;    // 八进制（0 开头）
+int c = 0x2A;   // 十六进制（0x 开头）
+
+42L    // long
+42LL   // long long
+42U    // unsigned int
+42UL   // unsigned long
+```
+
+**cout 输出进制**（设置后**持续生效**直到显式切换）：
+
+```cpp
+cout << hex << 255;   // ff
+cout << oct << 255;   // 377
+cout << dec << 255;   // 255（切回默认十进制）
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺char 类型与宽字符</summary>
+
+`char` 本质是整型，存储字符对应的编码值（通常 ASCII，0~127）。`char` 是否有符号**由实现决定**，需要时显式写 `signed char` 或 `unsigned char`。
+
+```cpp
+char ch = 'A';       // 存储 65
+cout << ch;          // 输出字符 A
+cout << (int)ch;     // 输出 65
+```
+
+**`cout.put(ch)`**：专门输出单个字符，无论参数是什么整型，都按字符显示：
+
+```cpp
+cout.put('A');   // 输出 A
+cout.put(65);    // 也输出 A
+// 对比：cout << 65 输出的是数字 65
+```
+
+**一般的字节是 8 位**，但国际编程可能用到更大的字符集（如 Unicode），因此有些实现使用 16 位甚至 32 位。C++ 提供了三种宽字符类型：
+
+| 类型         | 宽度                      | 字面值前缀 |
+| ------------ | ------------------------- | ---------- |
+| `wchar_t`  | 实现定义（通常 16/32 位） | `L`      |
+| `char16_t` | 16 位（C++11）            | `u`      |
+| `char32_t` | 32 位（C++11）            | `U`      |
+
+```cpp
+wchar_t  w  = L'中';//这里普通的char只有8位,存储不了'中',所以用wchar_t,char16_t,char32_t来存储
+char16_t c16 = u'中';
+char32_t c32 = U'中';
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺bool 类型</summary>
+
+```cpp
+bool flag = true;
+bool done = false;
+```
+
+- 任何**非零**整数 → `true`；`0` → `false`
+- `true` → `1`，`false` → `0`（参与算术时自动转换）
+- `true` / `false` 是 C++ 关键字（C 语言需要 `<stdbool.h>` 才有）
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺const 限定符</summary>
+
+```cpp
+const int MONTHS = 12;   // 必须在声明时初始化，之后不可修改
+```
+
+比 `#define` 好：有**类型检查**、有**作用域**、调试器能看到名字。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺浮点数：float / double / long double</summary>
+
+| 类型            | 有效十进制位数       | 典型范围        |
+| --------------- | -------------------- | --------------- |
+| `float`       | 6~7 位               | ±3.4×10³⁸   |
+| `double`      | 15~16 位             | ±1.8×10³⁰⁸ |
+| `long double` | 18~19 位（实现定义） | —              |
+
+```cpp
+3.14      // double（默认，没有后缀的小数是 double）
+3.14f     // float（后缀 f/F）
+3.14L     // long double（后缀 l/L）
+3.14e2    // 科学计数法 = 314.0//这里是C++独有的e表示法
+1.5e-3	  // 0.0015
+.5e4	  // 5,000
+7.2E+10	  // 72,000,000,000
+```
+
+`#include <cfloat>` 提供浮点极限（类比 `climits`）：`FLT_MAX`、`DBL_DIG` 等。
+
+[存储浮点数](../计算机组成原理/存储浮点数.md)
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺算术运算与类型转换</summary>
+
+五种运算符：`+`、`-`、`*`、`/`、`%`（取余，**仅整型**）
+
+整数除法直接截断：`7 / 2 = 3`（不是 3.5）
+
+混合运算时较小类型自动提升：`char/short → int → long → long long`，浮点：`float → double → long double`，整型 + 浮点 → 浮点。
+
+详见 → [类型转换详解](./类型转换.md)
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺auto 关键字（C++11）</summary>
+
+让编译器根据初始值**自动推导类型**：
+
+```cpp
+auto n  = 100;    // int
+auto x  = 3.14;   // double
+auto y  = 3.14f;  // float
+auto ch = 'A';    // char
+```
+
+适合类型名很长的场景（如迭代器 `std::vector<int>::iterator`），简单类型手动写更清晰。
+
+在 C++11 之前，你必须显式地写出迭代器的完整类型，这在处理容器（尤其是嵌套容器）时非常痛苦。
+
+```
+std::vector<double> scores;
+// 必须手动写出冗长的类型名称
+std::vector<double>::iterator pv = scores.begin(); 
+```
+
+使用 `auto` 关键字后，编译器会自动根据 `scores.begin()` 的返回值推导出 `pv` 的类型。
+
+```
+std::vector<double> scores;
+// 编译器自动推导类型，代码更简洁、易读
+auto pv = scores.begin(); 
+```
+
+</details>
 
 </details>
 
 <details>
 <summary><h3 style="display:inline">🔴第 4 章 复合类型</h3></summary>
 
+复合类型是基于基本类型构建的更复杂的类型，包括数组、字符串、结构、共用体、枚举、指针等。
+
+---
+
+<details>
+<summary><style="display:inline">🔺数组</summary>
+
+数组是同类型元素的有序集合，声明格式：`类型名 数组名[元素个数]`
+
+```cpp
+int arr[5];               // 声明，5个int，未初始化
+int arr[5] = {1,2,3,4,5}; // 声明+初始化
+int arr[5] = {1,2,3};     // 部分初始化，其余补0
+int arr[] = {1,2,3};      // 编译器自动推断长度为3
+int arr[5] = {};          // 全部初始化为0（C++11）
+```
+
+- 下标从 **0** 开始，`arr[5]` 访问第6个元素（**越界！**）
+- C++ **不检查越界**，越界是未定义行为，但会悄悄执行
+- 数组名是**第一个元素的地址**（不能赋值，不能自增）
+- `sizeof(arr)` 返回整个数组的字节数；`sizeof(arr)/sizeof(arr[0])` 得元素个数
+
+**C++11 列表初始化同样适用数组，且禁止窄化：**
+
+```cpp
+double arr[3] = {1, 2, 3};  // OK，int 提升为 double
+int arr2[3] = {1.5, 2, 3};  // 错误！double→int 窄化
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺字符串（C 风格）</summary>
+
+C 风格字符串是以**空字符 `\0`（ASCII 0）结尾**的 `char` 数组，这是 C++ 从 C 继承的。
+
+```cpp
+char str1[6] = {'H','e','l','l','o','\0'}; // 显式加\0
+char str2[6] = "Hello";   // 编译器自动加\0，实际占6字节
+char str3[]  = "Hello";   // 自动推断长度（6）
+```
+
+🔺`"Hello"` 是字符串字面量，**隐式包含 `\0`**，所以长度=字符数+1。
+
+🔺`char str[5] = "Hello"` 是**错误**的：5个字节放不下5字符+1个 `\0`。
+
+**常用字符串处理函数（`#include <cstring>`）：**
+
+```cpp
+strlen(str)           // 返回字符串长度（不含\0）
+strcpy(dest, src)     // 复制字符串
+strncpy(dest, src, n) // 安全复制，最多复制n个字符
+strcat(dest, src)     // 拼接字符串
+strcmp(s1, s2)        // 比较：相等返回0，s1<s2返回负数
+```
+
+🔺不能直接用 `=` 给 char 数组赋值（只能初始化时用），必须用 `strcpy`；不能用 `==` 比较字符串，必须用 `strcmp`。
+
+**`cin` 读取字符串的问题：**
+
+```cpp
+char word[20];
+cin >> word;         // 遇空格/换行就停止，不读空格
+cin.getline(word, 20);  // 读整行（含空格），丢弃换行符
+cin.get(word, 20);   // 读整行，保留换行符在缓冲区
+```
+
+<details>
+<summary><style="display:inline">🔺cin >> 遗留换行符问题</summary>
+
+键盘输入流在你按下 Enter 后长这样：`25\n`
+
+`cin >>` 是**按词读取**，读到空白字符就停下来，但**不消耗那个空白字符**，`\n` 还留在缓冲区里。
+
+**问题复现：**
+
+```cpp
+int age;
+char name[20];
+
+cin >> age;            // 输入 25 回车 → 读走 "25"，\n 留在缓冲区
+cin.getline(name, 20); // 立刻读到 \n，认为一行已结束，name 得到空字符串！
+```
+
+**解决方法：**
+
+```cpp
+cin >> age;
+cin.get();             // 吃掉那个 \n
+
+// 或者
+cin.ignore(1000, '\n'); // 忽略最多1000个字符，直到遇到 \n（更安全）
+
+// 或者链式写法
+(cin >> age).get();
+
+cin.getline(name, 20); // 现在才能正确读到下一行
+```
+
+**各函数对 `\n` 的处理方式：**
+
+| 函数                    | 遇到 `\n` 的行为      | 缓冲区还剩 `\n`？ |
+| ----------------------- | ----------------------- | ------------------- |
+| `cin >>`              | 停止读取，不消耗 `\n` | ✅ 还剩             |
+| `cin.get(arr, n)`     | 停止读取，不消耗 `\n` | ✅ 还剩             |
+| `cin.getline(arr, n)` | 读取并丢弃 `\n`       | ❌ 已清除           |
+| `cin.get()`           | 读取并丢弃那一个字符    | ❌ 已清除           |
+
+口诀：**只要看到 `cin >>` 后面跟着读整行，就要先清一下缓冲区。**
+
+</details>
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺string 类（C++ 风格）</summary>
+
+`#include <string>` 后可用 `std::string`，比 C 风格字符串更安全方便。
+
+```cpp
+string s1 = "Hello";
+string s2("World");
+string s3 = s1 + " " + s2;  // 拼接，直接用 +
+string s4;
+getline(cin, s4);            // 读整行（含空格）
+```
+
+| 操作   | C 风格               | string 类           |
+| ------ | -------------------- | ------------------- |
+| 赋值   | `strcpy(a, b)`     | `a = b`           |
+| 拼接   | `strcat(a, b)`     | `a + b`           |
+| 比较   | `strcmp(a, b)`     | `a == b`          |
+| 长度   | `strlen(a)`        | `a.size()`        |
+| 读整行 | `cin.getline(a,n)` | `getline(cin, a)` |
+
+🔺`string` 会**自动管理内存**，不用担心数组越界或手动分配空间。
+
+🔺`s.size()` 返回类型是 `size_t`（无符号整型），与 `int` 混用时注意。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺结构（struct）</summary>
+
+结构可以把**不同类型**的数据组合成一个自定义类型。
+
+```cpp
+struct Person {
+    string name;
+    int age;
+    double height;
+};
+
+Person p1 = {"Alice", 20, 1.65};  // 列表初始化
+Person p2;
+p2.name = "Bob";   // 用 . 访问成员
+p2.age  = 25;
+```
+
+🔺C++ 中声明结构变量**不需要加 `struct` 关键字**（C 语言需要）：`Person p;` 而非 `struct Person p;`
+
+🔺结构可以作为函数参数和返回值，也可以赋值（`p2 = p1` 是逐成员复制）。
+
+**位字段（了解即可）：** 用于节省内存，指定成员占几个 bit：
+
+```cpp
+struct Flags {
+    unsigned int a : 1;  // 占1位
+    unsigned int b : 2;  // 占2位
+};
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺共用体（union）</summary>
+
+共用体的所有成员**共享同一块内存**，大小等于最大成员的大小，同一时刻只有一个成员有效。
+
+```cpp
+union Data {
+    int    i;
+    double d;
+    char   c;
+};
+
+Data x;
+x.i = 10;    // 使用 int
+x.d = 3.14;  // 改用 double，i 的值已被覆盖（未定义）
+```
+
+🔺用途：节省内存（如网络协议解析），或在不同类型间复用同一存储。不是常规需求，了解即可。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺枚举（enum）</summary>
+
+枚举创建一组命名的整型常量，默认从 0 开始依次递增。
+
+```cpp
+enum Color { RED, GREEN, BLUE };    // RED=0, GREEN=1, BLUE=2
+enum Color { RED=1, GREEN=5, BLUE }; // RED=1, GREEN=5, BLUE=6
+
+Color c = GREEN;
+```
+
+🔺枚举变量**只能被赋同枚举的值**（不能直接赋整数，除非强制转换）。
+
+🔺**C++11 强枚举（`enum class`）**：避免名称污染，必须加作用域前缀：
+
+```cpp
+enum class Direction { UP, DOWN, LEFT, RIGHT };
+Direction d = Direction::UP;  // 必须写前缀
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺指针基础</summary>
+
+指针存储的是**变量的内存地址**，而非变量的值本身。
+
+```cpp
+int  a  = 10;
+int* p  = &a;   // p 存储 a 的地址，& 是取地址运算符
+cout << p;      // 输出地址（十六进制，如 0x61fe14）
+cout << *p;     // 输出 10，* 是解引用运算符（取该地址的值）
+*p = 20;        // 通过指针修改 a 的值，a 现在是 20
+```
+
+🔺**声明指针时 `*` 紧跟变量名**，不是类型的一部分：
+
+```cpp
+int* p1, p2;   // p1 是 int*，p2 是 int（常见坑！）
+int *p1, *p2;  // 两个都是 int*（推荐写法）
+```
+
+🔺指针必须在**解引用前初始化**，未初始化的指针指向随机地址，解引用是**未定义行为**（极危险）。
+
+```cpp
+int* p;
+*p = 10;  // 危险！p 指向不知道哪里
+```
+
+🔺如果要让指针指向**特定的内存地址**，需要用强制类型转换，否则编译器会报错（整数不能隐式转为指针）：
+
+```cpp
+int* p = (int*)0x61fe14;  // 强制把整数地址转为 int* 类型
+*p = 42;                  // 向该地址写入值
+```
+
+这种写法在**嵌入式/驱动开发**中操作硬件寄存器时会用到，普通程序里直接指定地址会因访问非法内存而崩溃。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺new 和 delete（动态内存）</summary>
+
+`new` 在**堆（heap）**上分配内存并返回地址；`delete` 释放该内存。
+
+```cpp
+int* p = new int;       // 在堆上分配一个 int
+*p = 42;
+delete p;               // 释放，p 变成悬空指针
+p = nullptr;            // 好习惯：释放后置空
+
+int* arr = new int[10]; // 分配10个int的数组
+arr[0] = 1;
+delete[] arr;           // 数组必须用 delete[]，不能用 delete
+arr = nullptr;
+```
+
+🔺`new` / `delete` 必须配对，`new[]` / `delete[]` 必须配对，混用是未定义行为。
+
+🔺`new` 失败时（内存不足）会抛出 `std::bad_alloc` 异常（不是返回 nullptr）。
+
+🔺`delete` 后指针变为**悬空指针**，再次解引用是未定义行为，置 `nullptr` 可避免误用。
+
+**栈 vs 堆：**
+
+| 特性     | 栈（自动存储）     | 堆（动态存储）       |
+| -------- | ------------------ | -------------------- |
+| 分配方式 | 自动（作用域）     | 手动（new/delete）   |
+| 生命周期 | 离开作用域自动销毁 | 手动释放前一直存在   |
+| 大小限制 | 小（通常几MB）     | 大（受物理内存限制） |
+| 速度     | 快                 | 相对慢               |
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺指针与数组的关系</summary>
+
+数组名本质上是**指向首元素的常量指针**，两者在很多情况下可互换。
+
+```cpp
+int arr[5] = {10, 20, 30, 40, 50};
+int* p = arr;     // p 指向 arr[0]，不需要 &
+
+cout << arr[2];   // 30
+cout << *(p + 2); // 30，指针算术：+2 跳过 2×sizeof(int) 字节
+cout << p[2];     // 30，指针也可以用下标运算符
+
+p++;              // OK：p 现在指向 arr[1]
+arr++;            // 编译错误：arr 是常量，不可修改
+```
+
+🔺**`arr++` 是编译错误**，编译器直接拒绝，报类似 `error: lvalue required as increment operand` 的错误，不会产生运行时问题。
+
+🔺**指针算术**：`p + n` 移动 `n × sizeof(*p)` 字节，而不是 n 个字节。
+
+🔺区别：数组名**不能被赋值或自增**，是常量指针；指针变量可以移动和重新指向。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺指针与字符串</summary>
+
+指针和 C 风格字符串的结合非常常见，需要单独理解。
+
+**用指针指向字符串字面量：**
+
+```cpp
+const char* p = "Hello";  // p 指向字符串首字符 'H'
+cout << p;                 // 输出 Hello（cout 遇到 char* 会一直打印到 \0）
+cout << *p;                // 输出 H（单个字符）
+cout << (void*)p;          // 输出地址（强转才能看到地址，否则 cout 把它当字符串打）
+```
+
+🔺字符串字面量 `"Hello"` 存储在程序的**只读内存区**，必须用 `const char*` 接收，不能通过指针修改：
+
+```cpp
+const char* p = "Hello";
+p[0] = 'h';   // 运行时崩溃！只读内存不可写
+p = "World";  // OK，p 本身可以指向别处
+```
+
+**与 `char[]` 的区别：**
+
+```cpp
+char arr[] = "Hello";   // 把字符串复制到栈上的数组，可修改
+const char* p = "Hello"; // p 指向只读区，不可修改
+
+arr[0] = 'h';   // OK，arr 是可写的副本
+p[0]   = 'h';   // 崩溃！p 指向只读区
+```
+
+**用指针遍历字符串：**
+
+```cpp
+const char* p = "Hello";
+while (*p != '\0') {   // 或直接写 while (*p)，\0 转布尔为 false
+    cout << *p;
+    p++;               // 移到下一个字符
+}
+```
+
+**指针与字符串函数：** `strlen`、`strcpy` 等函数的参数本质上都是 `char*`，传入数组名和传入指针效果相同：
+
+```cpp
+char arr[] = "Hello";
+char* p = arr;
+
+strlen(arr);  // 5
+strlen(p);    // 5，完全等价
+```
+
+🔺`cout << p`（`char*` 类型）输出的是**整个字符串**而不是地址；若想输出地址需强转为 `void*`：`cout << (void*)p`。其他类型的指针（如 `int*`）`cout` 输出的才是地址，`char*` 是特例。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺const 与指针</summary>
+
+`const` 和指针结合有两种不同含义，位置决定含义：
+
+```cpp
+const int* p = &a;   // 指向常量的指针：不能通过 p 修改值，但 p 本身可以指向别处
+int* const p = &a;   // 常量指针：p 不能指向别处，但可以通过 p 修改值
+const int* const p = &a; // 两者都不能改
+```
+
+记忆口诀：`const` 在 `*` 左边 → 值不变；`const` 在 `*` 右边 → 指针不变。
+
+🔺函数参数用 `const int* arr` 表示"我不会修改你传入的数组"，是良好习惯。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺模板类 vector 和 array（C++11）</summary>
+
+`vector` 和 `array` 是 C++ 标准库提供的更安全的数组替代品。
+
+**`vector`（`#include <vector>`）：** 动态大小，可增删：
+
+```cpp
+vector<int> v1(5);          // 5个元素，初始化为0
+vector<int> v2 = {1,2,3};   // 列表初始化
+v2.push_back(4);             // 末尾追加元素
+v2.size();                   // 当前元素个数
+```
+
+**`array`（`#include <array>`，C++11）：** 固定大小，但比裸数组更安全：
+
+```cpp
+array<int, 5> a = {1,2,3,4,5};
+a.size();        // 5
+a.at(10);        // 越界时抛出异常（裸数组不检查）
+```
+
+| 特性     | 裸数组 `int[]` | `array<int,N>` | `vector<int>` |
+| -------- | ---------------- | ---------------- | --------------- |
+| 大小     | 固定             | 固定             | 动态            |
+| 越界检查 | 无               | `.at()` 有     | `.at()` 有    |
+| 传参退化 | 退化为指针       | 不退化           | 不退化          |
+| 内存位置 | 栈               | 栈               | 堆              |
+
+🔺现代 C++ 推荐：固定大小用 `array`，动态大小用 `vector`，**尽量避免裸数组**。
+
+</details>
+
 </details>
 
 <details>
 <summary><h3 style="display:inline">🔴第 5 章 循环和关系表达式</h3></summary>
+
+---
+
+<details>
+<summary><style="display:inline">🔺for 循环</summary>
+
+`for` 循环适合**已知循环次数**的场景，由三部分组成：
+
+```cpp
+for (初始化表达式; 测试表达式; 更新表达式) {
+    循环体;
+}
+```
+
+执行顺序：初始化 → 测试 → 循环体 → 更新 → 测试 → …（测试为 false 时退出）
+
+```cpp
+for (int i = 0; i < 5; i++) {
+    cout << i << " ";   // 输出 0 1 2 3 4
+}
+```
+
+🔺三个表达式都可以省略，`for(;;)` 是**无限循环**（等价于 `while(true)`）。
+
+🔺`i++` 与 `++i`：对于简单变量效果相同；对于对象（如迭代器），`++i` 效率更高（`i++` 要创建临时副本），**推荐用前缀 `++i`**。
+
+🔺**逗号运算符**：`for` 的初始化和更新部分可用逗号分隔多个表达式：
+
+```cpp
+for (int i = 0, j = 10; i < j; i++, j--) {
+    cout << i << " " << j << "\n";
+}
+```
+
+逗号运算符从左到右依次求值，整个表达式的值等于**最右侧**表达式的值，优先级是所有运算符中**最低**的。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺关系运算符</summary>
+
+| 运算符 | 含义       | 示例       |
+| ------ | ---------- | ---------- |
+| `==` | 等于       | `a == b` |
+| `!=` | 不等于     | `a != b` |
+| `<`  | 小于       | `a < b`  |
+| `>`  | 大于       | `a > b`  |
+| `<=` | 小于或等于 | `a <= b` |
+| `>=` | 大于或等于 | `a >= b` |
+
+关系运算符返回 `bool`（`true` 或 `false`），优先级低于算术运算符，但**高于赋值运算符**。
+
+🔺**经典错误：`=` 写成 `==`**（反过来也是）：
+
+```cpp
+if (a = 5)   // 赋值，a 变为 5，条件永远为真！
+if (a == 5)  // 比较，正确
+
+// 防御写法：把常量写在左边，赋值会直接编译报错
+if (5 == a)  // OK
+if (5 = a)   // 编译错误，能提前发现笔误
+```
+
+🔺**浮点数不能用 `==` 直接比较**（精度问题），应比较差值的绝对值：
+
+```cpp
+double a = 0.1 + 0.2;  // 实际是 0.30000000000000004
+if (a == 0.3)          // 可能为 false！
+
+if (fabs(a - 0.3) < 1e-9)  // 正确做法，#include <cmath>
+```
+
+🔺字符串比较：`string` 类直接用 `==`；C 风格字符串（`char*`）比较的是**地址**而非内容，必须用 `strcmp()`：
+
+```cpp
+string s1 = "hello", s2 = "hello";
+s1 == s2;           // true，正确
+
+char a[] = "hello", b[] = "hello";
+a == b;             // 比较地址，错误
+strcmp(a, b) == 0;  // 正确
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺while 循环</summary>
+
+`while` 适合**不确定循环次数、依赖条件**的场景：
+
+```cpp
+while (测试表达式) {
+    循环体;
+}
+```
+
+先判断条件，条件为 false 则**一次也不执行**。
+
+```cpp
+int n = 1;
+while (n < 5) {
+    cout << n << " ";
+    n++;            // 输出 1 2 3 4
+}
+```
+
+🔺`for` 循环和 `while` 循环**完全等价**，可以互相改写。`for` 更适合计数循环，`while` 更适合事件驱动循环（比如"读到 EOF 为止"）。
+
+**用 while 实现延时（了解）：**
+
+```cpp
+clock_t start = clock();
+while (clock() - start < CLOCKS_PER_SEC) {
+    ;  // 空循环，等待 1 秒（需 #include <ctime>）
+}
+```
+
+`clock_t` 是 `<ctime>` 中定义的类型，`CLOCKS_PER_SEC` 是每秒的时钟节拍数。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺do-while 循环</summary>
+
+`do-while` 是**先执行循环体、再判断条件**，至少执行**一次**：
+
+```cpp
+do {
+    循环体;
+} while (测试表达式);   // 注意末尾有分号
+```
+
+```cpp
+int choice;
+do {
+    cout << "请输入 1~3：";
+    cin >> choice;
+} while (choice < 1 || choice > 3);  // 输入不合法就重来
+```
+
+🔺适合"先做一次，再验证"的场景，如菜单交互、输入校验。大多数情况下 `for` 或 `while` 更常用。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺基于范围的 for 循环（C++11）</summary>
+
+C++11 新增，用于**遍历容器或数组**，语法更简洁：
+
+```cpp
+for (元素类型 变量名 : 容器) {
+    循环体;
+}
+```
+
+```cpp
+int arr[] = {1, 2, 3, 4, 5};
+for (int x : arr) {
+    cout << x << " ";   // 输出 1 2 3 4 5
+}
+
+vector<string> words = {"hello", "world"};
+for (const string& w : words) {   // 引用避免拷贝
+    cout << w << " ";
+}
+```
+
+🔺用 `auto` 更简洁，用引用 `&` 避免拷贝，用 `const` 防止误修改：
+
+```cpp
+for (auto& x : arr) {
+    x *= 2;          // 引用可以修改原数据
+}
+
+for (const auto& x : arr) {
+    cout << x;       // 只读，最常见写法
+}
+```
+
+🔺普通值传递会**拷贝每个元素**；对于大对象（如 `string`、结构体）**务必用 `const auto&`**。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺break 和 continue</summary>
+
+两者都用于控制循环流程，适用于 `for`、`while`、`do-while`：
+
+```cpp
+// break：立即退出当前循环
+for (int i = 0; i < 10; i++) {
+    if (i == 5) break;
+    cout << i << " ";   // 输出 0 1 2 3 4
+}
+
+// continue：跳过本次循环剩余部分，进入下一次迭代
+for (int i = 0; i < 10; i++) {
+    if (i % 2 == 0) continue;
+    cout << i << " ";   // 输出 1 3 5 7 9（跳过偶数）
+}
+```
+
+🔺**嵌套循环中**，`break` / `continue` 只作用于**最内层**的那个循环：
+
+```cpp
+for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+        if (j == 1) break;   // 只跳出内层 for
+        cout << i << "," << j << " ";
+    }
+}
+// 输出：0,0  1,0  2,0
+```
+
+🔺C++ 有 `goto` 但几乎不用，要跳出多层嵌套循环可以用标志变量或把循环封装成函数（用 `return`）。
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺cin 与循环配合</summary>
+
+`cin` 读取失败（如输入字母却期望 int）会进入**失败状态**，后续所有读取都被跳过。
+
+```cpp
+int n;
+while (cin >> n) {         // cin >> n 成功返回 cin 对象（转 bool 为 true），失败为 false
+    cout << n * 2 << "\n";
+}
+// 输入 EOF（Windows: Ctrl+Z，Linux: Ctrl+D）或非法字符时退出循环
+```
+
+**检测并恢复失败状态：**
+
+```cpp
+if (!(cin >> n)) {
+    cin.clear();           // 清除错误标志
+    cin.ignore(1000, '\n'); // 丢弃缓冲区中残留的一行
+}
+```
+
+🔺`cin >>` 遇到 EOF 返回 `false`，这是读取文件/标准输入到结尾的标准写法：
+
+```cpp
+int sum = 0, val;
+while (cin >> val) {
+    sum += val;
+}
+cout << "总和：" << sum;
+```
+
+</details>
+
+---
+
+<details>
+<summary><style="display:inline">🔺嵌套循环与二维数组</summary>
+
+二维数组用嵌套循环遍历，外层控制行，内层控制列：
+
+```cpp
+int matrix[3][4] = {
+    {1,  2,  3,  4},
+    {5,  6,  7,  8},
+    {9, 10, 11, 12}
+};
+
+for (int row = 0; row < 3; row++) {
+    for (int col = 0; col < 4; col++) {
+        cout << matrix[row][col] << "\t";
+    }
+    cout << "\n";
+}
+```
+
+🔺声明二维数组时**第二维（列数）不能省略**（因为编译器需要知道每行多长来计算偏移）：
+
+```cpp
+void print(int arr[][4], int rows);  // 正确：列数必须给
+void print(int arr[][], int rows);   // 错误！
+```
+
+🔺`sizeof` 技巧：
+
+```cpp
+int rows = sizeof(matrix) / sizeof(matrix[0]);       // 行数 = 3
+int cols = sizeof(matrix[0]) / sizeof(matrix[0][0]); // 列数 = 4
+```
+
+</details>
 
 </details>
 

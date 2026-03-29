@@ -14,6 +14,8 @@
 | Modbus | 工业通信协议 | [Modbus 笔记](./Modbus.md) |
 | freeRTOS   | 实时操作系统 | [freeRTOS 笔记](./freeRTOS.md)     |
 | RS485  | 差分串行通信物理层标准，含RS232对比 | [RS485/RS232 笔记](./RS485-RS232.md)   |
+| AD     | AD软件使用（PCB/原理图）| [AD 笔记](./AD.md) |
+| 示波器 | 示波器基础使用 | [示波器 笔记](./示波器.md) |
 
 ---
 

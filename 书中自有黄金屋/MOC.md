@@ -14,6 +14,7 @@
 - [C 陷阱与缺陷](./C陷阱与缺陷/MOC.md)
 - [C++ Primer Plus](./C++PrimerPlus/MOC.md)
 - [操作系统](./操作系统/MOC.md)
+- [嵌入式八股资料收集](./嵌入式八股资料收集/MOC.md)
 
 ### 英语
 - [CET-6](./CET-6/MOC.md)
