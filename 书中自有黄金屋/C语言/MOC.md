@@ -11,6 +11,7 @@
 
 🟢C语言定义的时候不可以连续赋值,因为要先定义后使用
 
+
 </details>
 
 <details>
@@ -25,6 +26,8 @@
 
 <details>
 <summary><h3 style="display:inline">🔴结构体 / 联合体 / 枚举</h3></summary>
+
+[状态机,枚举(enum)](状态机,枚举(enum).MD)
 
 </details>
 
