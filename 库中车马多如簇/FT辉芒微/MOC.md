@@ -6,7 +6,7 @@
 
 1.[官网](https://www.fremontmicro.com/#/home)-->技术资源-->开发资源-->示例代码(下载)
 
-2.下载![1774832326532](image/MOC/1774832326532.png),资源就在这个文件夹里
+2.下载![1774832326532](image/MOC/1774832326532.png),[FMD-MCU 工具安装包-20250125.rar](https://pan.baidu.com/s/1kiJe42cjbhilVMoErC6BYA?pwd=4444)
 
 3.注意要FMDlink![1774832813853](image/MOC/1774832813853.png)
 

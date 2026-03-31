@@ -3,6 +3,8 @@
 [← 学科总览](../MOC.md) | [← 主页](../../README.md)
 
 > 状态：✅ 已学完
+>
+> ![1774937266545](image/MOC/1774937266545.png)
 
 ---
 
@@ -22,6 +24,7 @@
 
 <details>
 <summary><h3 style="display:inline">🔴第三部分：存储器</h3></summary>
+
 
 </details>
 
