@@ -4,7 +4,7 @@
 
 > 状态：正在啃,后面刷题精学LeetCode
 
-[GITHUB嵌入式C++教程](https://github.com/Awesome-Embedded-Learning-Studio/Tutorial_AwesomeModernCPP)⭐⭐⭐⭐⭐
+[GITHUB嵌入式C++教程](https://github.com/Awesome-Embedded-Learning-Studio/Tutorial_AwesomeModernCPP)⭐⭐⭐⭐⭐(含编译工具链急需)
 
 ---
 
