@@ -5,3 +5,6 @@
 *.out
 *.bin
 *.hex
+
+#PDF有点多,也不传了
+*.pdf
