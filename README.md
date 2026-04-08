@@ -6,5 +6,3 @@
 ---
 
 [📖 打开博客](https://evil0knight.github.io/quartz/)
-
-这是我的博客,在这里看效果更佳

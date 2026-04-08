@@ -213,6 +213,31 @@ git push
 
 ---
 
+## 踩坑记录
+
+### 触发了但博客没更新
+
+**现象**：推送笔记后，Quartz 的 GitHub Actions 显示 Success，但博客内容没有变化。
+
+**原因**：`deploy.yml` 中只 checkout 了 `quartz` 仓库自身，没有去拉 `Basic_learning_record` 的内容。构建用的是 Quartz 仓库里原有的旧内容，所以触发了也没变化。
+
+**解决**：在 `deploy.yml` 的 build job 中，`actions/checkout@v4` 之后立即再加一步，把笔记仓库 checkout 到 `content/` 目录：
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+- uses: actions/checkout@v4          # ← 新增这一步
+  with:
+    repository: evil0knight/Basic_learning_record
+    path: content
+- uses: actions/setup-node@v4
+```
+
+这样每次构建都会从 `Basic_learning_record` 拉最新笔记内容。
+
+---
+
 ## 注意事项
 
 - Quartz 对文件名中的中文支持良好，但 URL 会被编码
