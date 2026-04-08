@@ -1,6 +1,7 @@
 ---
 title: 首页
 ---
+
 <div class="home-hero">
   <img class="home-avatar" src="https://avatars.githubusercontent.com/evil0knight" alt="avatar" />
   <div class="home-hero-text">
@@ -55,30 +56,20 @@ title: 首页
       <div class="card-desc">查看我的所有开源项目 →</div>
     </div>
   </a>
-  <a class="card" href="https://github.com/evil0knight/RM_SUPERCAP_JSU" target="_blank">
-    <div class="card-icon">⚡</div>
-    <div class="card-body">
-      <div class="card-title">RM_SUPERCAP_JSU</div>
-      <div class="card-desc">超级电容</div>
-    </div>
-  </a>
-  <a class="card" href="https://github.com/evil0knight/JSU_Infin0" target="_blank">
-    <div class="card-icon">🤖</div>
-    <div class="card-body">
-      <div class="card-title">JSU_Infin0</div>
-      <div class="card-desc">平衡轮腿</div>
-    </div>
-  </a>
+  <!-- 在这里追加项目卡片，参考 MOC.md -->
 </div>
 
 ---
 
-## 欢迎友链
+## 友链
 
-<a class="friend-card" href="https://neomelt.cloud" target="_blank">
-  <img class="friend-avatar" src="https://www.neomelt.cloud/head.jpg" alt="Neomelt" />
-  <div class="friend-info">
-    <div class="friend-name">Neomelt's Blog</div>
-    <div class="friend-desc">Keep looking, don't settle</div>
-  </div>
-</a>
+<div class="friend-links">
+  <a class="friend-card" href="https://quartz.jzhao.xyz" target="_blank">
+    <img class="friend-avatar" src="https://avatars.githubusercontent.com/jackyzha0" alt="Jacky Zhao" />
+    <div class="friend-info">
+      <div class="friend-name">Jacky Zhao</div>
+      <div class="friend-desc">Quartz 作者</div>
+    </div>
+  </a>
+  <!-- 在这里追加友链，参考 MOC.md -->
+</div>
