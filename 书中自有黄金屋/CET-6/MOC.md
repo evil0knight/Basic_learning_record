@@ -7,11 +7,11 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">🔴词汇模块</h3></summary>
+<summary><h3>🔴词汇模块</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴真题记录模块</h3></summary>
+<summary><h3>🔴真题记录模块</h3></summary>
 
 </details>

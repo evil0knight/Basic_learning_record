@@ -93,9 +93,15 @@ D:/Basic_learning_record/
 
 ```html
 <details>
-<summary><h3 style="display:inline">🔴章节名</h3></summary>
+<summary><h3>🔴章节名</h3></summary>
 </details>
 ```
+
+> ⚠️ 禁止在任何标签上使用 `style="display:inline"` 属性，Quartz 构建时会报错。
+
+> ⚠️ 所有 Markdown 链接中的文件扩展名必须小写（用 `.md`，不能用 `.md`），否则 Quartz 部署到 Linux 环境时大小写敏感会导致 404。
+
+> ⚠️ 文件夹名和文件名中不能含有括号（`()`、`（）`），否则 Quartz 渲染后页面中的链接路径会因括号被转义而无法打开。
 
 ### Markdown 数学公式
 
@@ -116,3 +122,9 @@ git push
 ```
 
 > 说明：commit message 中的"本次更新了什么"应替换为实际更新内容的简短描述。
+
+
+
+---
+
+"D:\quartz"本地quartz路径

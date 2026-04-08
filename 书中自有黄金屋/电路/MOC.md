@@ -7,17 +7,17 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">🔴直流电路</h3></summary>
+<summary><h3>🔴直流电路</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴交流电路</h3></summary>
+<summary><h3>🔴交流电路</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴动态电路</h3></summary>
+<summary><h3>🔴动态电路</h3></summary>
 
 </details>
 

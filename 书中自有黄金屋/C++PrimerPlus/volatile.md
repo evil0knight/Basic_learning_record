@@ -1,6 +1,6 @@
 # volatile 关键字
 
-[← 关键字与语法](./关键字与语法.md) | [← C++ 知识地图](./MOC.md)|[←UART中断](../../库中车马多如簇/UART(内含串口助手安装包)/UART接收程序.md)
+[← 关键字与语法](./关键字与语法.md) | [← C++ 知识地图](./MOC.md)|[←UART中断](../../库中车马多如簇/UART内含串口助手安装包/UART接收程序.md)
 
 ---
 
@@ -39,7 +39,7 @@ void main_loop() {
 ```
 
 <details>
-<summary><h3 style="display:inline">函数int square(volatile int *ptr)能实现预期目标吗？为什么？</h3></summary>
+<summary><h3>函数int square(volatile int *ptr)能实现预期目标吗？为什么？</h3></summary>
 
 函数 `int square(volatile int *ptr) { return *ptr * *ptr; }` **不能**实现预期目标。
 

@@ -21,7 +21,7 @@ TX对RX,RX对TX
 
 UART引脚--->![1774922523844](image/MOC/1774922523844.png)USB转TTL,要[下载驱动](https://pan.baidu.com/s/1OfEdpC5rkB4MYNhvWFjdkQ?pwd=4444)--->通过串口助手(电脑上就有基础版本的,底下搜串口助手就好,常见好用的[XCOM](https://pan.baidu.com/s/1ZDK04_Jja_ZhFBHBu4F5Cw?pwd=4444),[VOFA](https://pan.baidu.com/s/18cFV1iPln29mzxJqMRTMOw?pwd=4444))
 
-也可以用[逻辑分析仪](../../术中自有万钟粟/逻辑分析仪.MD)之间看波形并且翻译,更可以[示波器](../../术中自有万钟粟/示波器.md)
+也可以用[逻辑分析仪](../../术中自有万钟粟/逻辑分析仪.md)之间看波形并且翻译,更可以[示波器](../../术中自有万钟粟/示波器.md)
 
 通过[RS232,RS485,TTL](../../库中车马多如簇/RS485-RS232.md)三种电平发送
 

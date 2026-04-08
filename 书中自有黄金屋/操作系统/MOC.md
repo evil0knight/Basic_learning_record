@@ -13,37 +13,37 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">🔴一、进程与线程</h3></summary>
+<summary><h3>🔴一、进程与线程</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴二、进程同步与互斥</h3></summary>
+<summary><h3>🔴二、进程同步与互斥</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴三、死锁</h3></summary>
+<summary><h3>🔴三、死锁</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴四、内存管理</h3></summary>
+<summary><h3>🔴四、内存管理</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴五、文件系统</h3></summary>
+<summary><h3>🔴五、文件系统</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴六、I/O 管理</h3></summary>
+<summary><h3>🔴六、I/O 管理</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴七、调度算法</h3></summary>
+<summary><h3>🔴七、调度算法</h3></summary>
 
 </details>
 

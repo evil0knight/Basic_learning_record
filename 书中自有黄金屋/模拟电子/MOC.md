@@ -7,27 +7,27 @@
 ---
 
 <details>
-<summary><h3 style="display:inline">🔴半导体器件</h3></summary>
+<summary><h3>🔴半导体器件</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴放大电路</h3></summary>
+<summary><h3>🔴放大电路</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴反馈</h3></summary>
+<summary><h3>🔴反馈</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴运算放大器</h3></summary>
+<summary><h3>🔴运算放大器</h3></summary>
 
 </details>
 
 <details>
-<summary><h3 style="display:inline">🔴功率放大</h3></summary>
+<summary><h3>🔴功率放大</h3></summary>
 
 </details>
 
