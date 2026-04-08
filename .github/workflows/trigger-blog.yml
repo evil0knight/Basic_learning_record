@@ -1,0 +1,16 @@
+name: Trigger Blog Update
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Quartz rebuild
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.BLOG_TRIGGER_TOKEN }}
+          repository: evil0knight/quartz
+          event-type: notes-updated
