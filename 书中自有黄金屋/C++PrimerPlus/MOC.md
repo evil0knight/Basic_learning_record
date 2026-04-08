@@ -1,6 +1,6 @@
 # C++ Primer Plus — 知识地图
 
-[← 学科总览](../MOC.md) | [← 主页](../../README.md)
+[← 学科总览](../MOC.md) | [← 主页](../../index.md)
 
 > 状态：正在啃,后面刷题精学LeetCode
 

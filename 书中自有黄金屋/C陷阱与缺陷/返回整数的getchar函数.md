@@ -1,6 +1,6 @@
 # 返回整数的getchar函数
 
-[← 返回 MOC](MOC.md) | [← 主页](../../../README.md)
+[← 返回 MOC](MOC.md) | [← 主页](../../../index.md)
 
 ---
 

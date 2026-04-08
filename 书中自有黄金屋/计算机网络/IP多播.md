@@ -1,6 +1,6 @@
 # IP多播
 
-[← 返回 MOC](MOC.md) | [← 主页](../../../README.md)
+[← 返回 MOC](MOC.md) | [← 主页](../../../index.md)
 
 ---
 
