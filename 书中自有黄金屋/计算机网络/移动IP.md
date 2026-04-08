@@ -1,6 +1,6 @@
 # 移动IP
 
-[← 返回 MOC](MOC.md) | [← 主页](../../../index.md)
+[← 返回 MOC](MOC.md) | [← 主页](../../index.md)
 
 ---
 
