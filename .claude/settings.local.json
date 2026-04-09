@@ -9,7 +9,8 @@
       "Bash(grep -o \"\"model[^\"\"]*\"\":\"\"[^\"\"]*\"\" ~/.claude/sessions/1648.json)",
       "Bash(TMPFILE=\"$TEMP/apitest.json\" grep \"tengu_api_success\" ~/.claude/telemetry/1p_failed_events.5175892e*.json)",
       "Bash(find C:/Users/17443/AppData/Local/ima.copilot -name *.pdf)",
-      "WebFetch(domain:evil0knight.github.io)"
+      "WebFetch(domain:evil0knight.github.io)",
+      "Bash(git pull:*)"
     ]
   }
 }

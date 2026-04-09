@@ -73,7 +73,7 @@ title: 首页
     <div class="card-icon">👔</div>
     <div class="card-body">
       <div class="card-title">南京实习</div>
-      <div class="card-desc">433,WiFi,冷门芯片使用记录</div>
+      <div class="card-desc">433,WiFi多端通信</div>
     </div>
   </a>
 </div>
