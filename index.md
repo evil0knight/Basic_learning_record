@@ -69,6 +69,13 @@ title: 首页
       <div class="card-desc">平衡轮腿</div>
     </div>
   </a>
+  <a class="card" href="https://github.com/evil0knight/Internship_nanjing_1" target="_blank">
+    <div class="card-icon">👔</div>
+    <div class="card-body">
+      <div class="card-title">南京实习</div>
+      <div class="card-desc">433,WiFi,冷门芯片使用记录</div>
+    </div>
+  </a>
 </div>
 
 ---

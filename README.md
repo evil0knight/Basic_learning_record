@@ -5,4 +5,4 @@
 
 ---
 
-[📖 打开博客](https://evil0knight.github.io/quartz/)
+点击这里，获取更好的阅读体验👉[ 个人博客](https://evil0knight.github.io/quartz/),
