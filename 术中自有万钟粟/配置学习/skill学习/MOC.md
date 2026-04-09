@@ -8,9 +8,7 @@
 
 ---
 
-
-
-### SKILL收集:放到D:\skill收集里还有百度网盘
+## SKILL收集:放到D:\skill收集里还有百度网盘
 
 | 立芯家的             | SKILL                                                                               |
 | -------------------- | ----------------------------------------------------------------------------------- |
@@ -19,3 +17,7 @@
 | 瑞芯微专用设备树     | [devicetree_common](https://pan.baidu.com/s/1RnvwDYdyiDhIJRwqNGAIdg?pwd=4444)          |
 | 通用 Linux 性能排查  | [perf_rk](https://pan.baidu.com/s/1Tz4533vlZNGezQmXCDG59Q) (提取码4444)               |
 | 瑞芯微专用性能排查   | [devicetree_rk](https://pan.baidu.com/s/1g3EFRTW3jcCs4rYC3GoioQ?pwd=4444)              |
+
+## 提示词
+
+来源网站:https://daheiai.com/,

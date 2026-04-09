@@ -6,6 +6,8 @@
 
 **API** 的全称是 Application Programming Interface（应用程序编程接口）。
 
+[api价格换算与API中转站挑选](api价格换算.md)
+
 ## 如何接入API:
 
 本人只用过VScode
@@ -14,7 +16,7 @@
 
 ### 1删环境变量:
 
-设置进入"高级系统设置",因为删除要管理员权限--->环境变量---->在系统变量里删除`ANTHROPIC_AUTH_TOKEN`和`ANTHROPIC_BASE_URL`
+设置进入"高级系统设置",因为删除要管理员权限--->环境变量---->在系统变量里删除 `ANTHROPIC_AUTH_TOKEN`和 `ANTHROPIC_BASE_URL`
 
 ### 2删掉Claude Code 的 settings.json
 
@@ -38,7 +40,6 @@
 
 打开C:\Users\17443\AppData\Roaming\Code\User\settings.json,也就是ctrl+shift+p--->选择:打开用户设置(josn)--->
 
-
 ![1775711525596](image/AI配置与学习/1775711525596.png)
 
 没有就在末尾添加上
@@ -59,8 +60,7 @@
 
 https://llmtest.cn/leaderboard
 这个网站是CC的中转站榜单,还有测试CCapi的功能,跟着里面选就好了
-codex感觉不太好用,不过是真的便宜(2026/4/8:一些中转站可以做到0.05倍率),可以当做CLI版的豆包来用
 
-推荐一家https://spatialai.vip/
+最推荐https://spatialai.vip/
 
-[API聚合导航](https://api.daheiai.com/)//最全API中转站导航---人工大黑搜集整理
+[API聚合导航](https://api.daheiai.com/)//某个收集癖的宝库哈哈,虽然我也有点
