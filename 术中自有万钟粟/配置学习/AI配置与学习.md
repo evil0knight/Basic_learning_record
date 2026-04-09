@@ -62,3 +62,5 @@ https://llmtest.cn/leaderboard
 codex感觉不太好用,不过是真的便宜(2026/4/8:一些中转站可以做到0.05倍率),可以当做CLI版的豆包来用
 
 推荐一家https://spatialai.vip/
+
+[API聚合导航](https://api.daheiai.com/)//最全API中转站导航---人工大黑搜集整理
