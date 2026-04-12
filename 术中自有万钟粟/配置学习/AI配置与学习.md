@@ -8,6 +8,8 @@
 
 [api价格换算与API中转站挑选](api价格换算.md)
 
+[Claude Code封号机制深度调查报告](https://bytedance.sg.larkoffice.com/docx/QNsIdi8VFoKm00xY8SRlkXxygve)
+
 ## 如何接入API:
 
 本人只用过VScode
@@ -64,3 +66,9 @@ https://llmtest.cn/leaderboard
 最推荐https://spatialai.vip/
 
 [API聚合导航](https://api.daheiai.com/)//某个收集癖的宝库哈哈,虽然我也有点
+
+## codex设置:
+
+[Codex设置](./Codex设置.md)
+
+VS设置
