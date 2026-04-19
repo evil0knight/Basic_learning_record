@@ -7,4 +7,5 @@
 *.hex
 
 #PDF有点多,也不传了
-*.pdf.claude/worktrees/
+*.pdf
+.claude/worktrees/

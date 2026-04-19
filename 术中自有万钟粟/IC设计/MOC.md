@@ -13,5 +13,7 @@
 | GPIO   | (ARM)GPIO内部电路与寄存器设计 | [GPIO.md](GPIO.md) |
 | 时钟   | (ARM)内部时钟树               | [时钟.md](时钟.md) |
 | DMA    | DMA搬运的底层                 | [DMA.md](DMA.md)   |
+| ADC    |                               |                 |
+| 中断   | 中断原理                      | [中断.md](中断.md) |
 
 ---
