@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1220" viewBox="0 0 1500 1220">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #16324f; }
+      .subtitle { font: 600 20px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #2a567c; }
+      .panel-title { font: 700 26px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #16324f; }
+      .label { font: 600 20px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #16324f; }
+      .text { font: 500 18px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #28435b; }
+      .small { font: 500 16px 'Microsoft YaHei', 'Noto Sans SC', sans-serif; fill: #3f5e79; }
+      .mono { font: 500 16px 'Consolas', 'Cascadia Mono', monospace; fill: #16324f; }
+      .panel { fill: #ffffff; stroke: #7faed8; stroke-width: 3; rx: 24; ry: 24; }
+      .soft { fill: #eef7ff; stroke: #7faed8; stroke-width: 2; rx: 16; ry: 16; }
+      .box { fill: #dff0ff; stroke: #5e96c9; stroke-width: 2; rx: 12; ry: 12; }
+      .box2 { fill: #cfe7fb; stroke: #5e96c9; stroke-width: 2; rx: 12; ry: 12; }
+      .gap { fill: #f7fbff; stroke: #8aa9c8; stroke-width: 2; stroke-dasharray: 8 6; rx: 10; ry: 10; }
+      .note { fill: #f5fbff; stroke: #b8d3ea; stroke-width: 2; rx: 14; ry: 14; }
+      .arrow { stroke: #4a83b5; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .dash { stroke: #7faed8; stroke-width: 3; fill: none; stroke-dasharray: 10 8; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#4a83b5"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="1220" fill="#f8fbfe"/>
+
+  <text x="750" y="60" text-anchor="middle" class="title">HTTP 报文：从整体到局部</text>
+  <text x="750" y="95" text-anchor="middle" class="subtitle">请求报文和响应报文共用同一个外壳，只是在首行和字段含义上不同</text>
+
+  <rect x="410" y="130" width="680" height="250" class="panel"/>
+  <text x="750" y="175" text-anchor="middle" class="panel-title">共同骨架</text>
+
+  <rect x="470" y="205" width="560" height="62" class="box2"/>
+  <text x="750" y="244" text-anchor="middle" class="label">报文首部（起始行 + 各种首部字段）</text>
+
+  <rect x="470" y="277" width="560" height="48" class="gap"/>
+  <text x="750" y="308" text-anchor="middle" class="label">空行（CRLF）</text>
+
+  <rect x="470" y="335" width="560" height="62" class="box"/>
+  <text x="750" y="374" text-anchor="middle" class="label">报文主体（可选，真正传输的数据）</text>
+
+  <path d="M 620 380 C 560 430, 450 430, 360 470" class="arrow"/>
+  <path d="M 880 380 C 940 430, 1050 430, 1140 470" class="arrow"/>
+
+  <rect x="60" y="470" width="640" height="660" class="panel"/>
+  <text x="380" y="520" text-anchor="middle" class="panel-title">请求报文（客户端 → 服务器）</text>
+
+  <rect x="100" y="555" width="270" height="54" class="box2"/>
+  <text x="235" y="589" text-anchor="middle" class="label">请求行</text>
+
+  <rect x="100" y="617" width="270" height="48" class="box"/>
+  <text x="235" y="648" text-anchor="middle" class="text">请求首部字段</text>
+
+  <rect x="100" y="673" width="270" height="48" class="box"/>
+  <text x="235" y="704" text-anchor="middle" class="text">通用首部字段</text>
+
+  <rect x="100" y="729" width="270" height="48" class="box"/>
+  <text x="235" y="760" text-anchor="middle" class="text">实体首部字段</text>
+
+  <rect x="100" y="785" width="270" height="48" class="box"/>
+  <text x="235" y="816" text-anchor="middle" class="text">其他</text>
+
+  <rect x="100" y="841" width="270" height="42" class="gap"/>
+  <text x="235" y="868" text-anchor="middle" class="text">空行（CRLF）</text>
+
+  <rect x="100" y="891" width="270" height="120" class="box2"/>
+  <text x="235" y="956" text-anchor="middle" class="label">报文主体（可选）</text>
+
+  <rect x="410" y="555" width="250" height="112" class="note"/>
+  <text x="535" y="590" text-anchor="middle" class="label">请求行展开</text>
+  <text x="535" y="625" text-anchor="middle" class="mono">方法  URI  HTTP版本</text>
+  <text x="535" y="651" text-anchor="middle" class="small">例如：GET /index.html HTTP/1.1</text>
+
+  <rect x="410" y="688" width="250" height="220" class="soft"/>
+  <text x="535" y="723" text-anchor="middle" class="label">常见字段示例</text>
+  <text x="430" y="760" class="mono">Host: example.com</text>
+  <text x="430" y="792" class="mono">User-Agent: Browser</text>
+  <text x="430" y="824" class="mono">Accept: text/html</text>
+  <text x="430" y="856" class="mono">Content-Type: application/json</text>
+  <text x="430" y="888" class="mono">Content-Length: 128</text>
+
+  <rect x="410" y="928" width="250" height="140" class="note"/>
+  <text x="535" y="963" text-anchor="middle" class="label">理解重点</text>
+  <text x="430" y="998" class="small">1. 先告诉服务器“我要什么”</text>
+  <text x="430" y="1028" class="small">2. 再补充请求条件和属性</text>
+  <text x="430" y="1058" class="small">3. 需要提交数据时再带主体</text>
+
+  <path d="M 370 582 C 390 582, 395 582, 405 582" class="dash"/>
+
+  <rect x="800" y="470" width="640" height="660" class="panel"/>
+  <text x="1120" y="520" text-anchor="middle" class="panel-title">响应报文（服务器 → 客户端）</text>
+
+  <rect x="840" y="555" width="270" height="54" class="box2"/>
+  <text x="975" y="589" text-anchor="middle" class="label">状态行</text>
+
+  <rect x="840" y="617" width="270" height="48" class="box"/>
+  <text x="975" y="648" text-anchor="middle" class="text">响应首部字段</text>
+
+  <rect x="840" y="673" width="270" height="48" class="box"/>
+  <text x="975" y="704" text-anchor="middle" class="text">通用首部字段</text>
+
+  <rect x="840" y="729" width="270" height="48" class="box"/>
+  <text x="975" y="760" text-anchor="middle" class="text">实体首部字段</text>
+
+  <rect x="840" y="785" width="270" height="48" class="box"/>
+  <text x="975" y="816" text-anchor="middle" class="text">其他</text>
+
+  <rect x="840" y="841" width="270" height="42" class="gap"/>
+  <text x="975" y="868" text-anchor="middle" class="text">空行（CRLF）</text>
+
+  <rect x="840" y="891" width="270" height="120" class="box2"/>
+  <text x="975" y="956" text-anchor="middle" class="label">报文主体（可选）</text>
+
+  <rect x="1150" y="555" width="250" height="112" class="note"/>
+  <text x="1275" y="590" text-anchor="middle" class="label">状态行展开</text>
+  <text x="1275" y="625" text-anchor="middle" class="mono">HTTP版本  状态码  原因短语</text>
+  <text x="1275" y="651" text-anchor="middle" class="small">例如：HTTP/1.1 200 OK</text>
+
+  <rect x="1150" y="688" width="250" height="220" class="soft"/>
+  <text x="1275" y="723" text-anchor="middle" class="label">常见字段示例</text>
+  <text x="1170" y="760" class="mono">Date: Sat, 02 May 2026</text>
+  <text x="1170" y="792" class="mono">Server: Apache</text>
+  <text x="1170" y="824" class="mono">Content-Type: text/html</text>
+  <text x="1170" y="856" class="mono">Content-Length: 362</text>
+  <text x="1170" y="888" class="mono">Connection: close</text>
+
+  <rect x="1150" y="928" width="250" height="140" class="note"/>
+  <text x="1275" y="963" text-anchor="middle" class="label">理解重点</text>
+  <text x="1170" y="998" class="small">1. 先回答处理结果</text>
+  <text x="1170" y="1028" class="small">2. 再说明返回内容的属性</text>
+  <text x="1170" y="1058" class="small">3. 主体里才是真正返回的数据</text>
+
+  <path d="M 1110 582 C 1130 582, 1135 582, 1145 582" class="dash"/>
+
+  <rect x="280" y="1148" width="940" height="48" class="soft"/>
+  <text x="750" y="1180" text-anchor="middle" class="label">记忆口诀：共同骨架看“首部 + 空行 + 主体”，请求看“请求行”，响应看“状态行”</text>
+</svg>
