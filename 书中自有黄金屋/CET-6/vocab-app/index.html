@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CET-6 每日高频词汇</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f6fa;
+      color: #2d3436;
+      min-height: 100vh;
+    }
+
+    /* 顶部栏 */
+    header {
+      background: #2d3436;
+      color: #fff;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .header-left h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .header-left .sub {
+      font-size: 0.8rem;
+      color: #b2bec3;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* 全局切换按钮 */
+    #toggleAllBtn {
+      background: #0984e3;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    #toggleAllBtn:hover { background: #0773c5; }
+    #toggleAllBtn.all-shown { background: #636e72; }
+    #toggleAllBtn.all-shown:hover { background: #535c60; }
+
+    /* 主体 */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* 进度信息 */
+    .progress-bar-wrap {
+      background: #dfe6e9;
+      border-radius: 4px;
+      height: 6px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #00b894;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* 状态消息（计划未开始 / 已完成） */
+    .status-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: #636e72;
+      font-size: 1.1rem;
+    }
+
+    /* 单词网格 */
+    .word-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
+
+    /* 单词卡片 */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      gap: 10px;
+    }
+
+    .card-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-en {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #2d3436;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-phonetic {
+      font-size: 0.78rem;
+      color: #b2bec3;
+      margin-top: 2px;
+      min-height: 14px;
+    }
+
+    .card-zh {
+      font-size: 0.88rem;
+      color: #0984e3;
+      margin-top: 6px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .card-zh.visible { display: block; }
+
+    /* 单词显示按钮 */
+    .card-btn {
+      flex-shrink: 0;
+      background: none;
+      border: 1.5px solid #dfe6e9;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      color: #636e72;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .card-btn:hover {
+      border-color: #0984e3;
+      color: #0984e3;
+    }
+
+    .card-btn.active {
+      background: #e8f4fd;
+      border-color: #0984e3;
+      color: #0984e3;
+    }
+
+    /* 序号 */
+    .card-num {
+      font-size: 0.72rem;
+      color: #b2bec3;
+      margin-bottom: 2px;
+    }
+
+    /* 词根词缀行 */
+    .card-roots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 5px;
+    }
+
+    .root-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.72rem;
+      border-radius: 4px;
+      padding: 1px 5px;
+      line-height: 1.5;
+    }
+
+    /* 前缀：蓝紫色 */
+    .root-chip.prefix {
+      background: #eef0ff;
+      color: #5352ed;
+    }
+
+    /* 词根：绿色 */
+    .root-chip.root {
+      background: #e8f8f0;
+      color: #00b894;
+    }
+
+    /* 未知词干：灰色 */
+    .root-chip.stem {
+      background: #f0f3f5;
+      color: #636e72;
+    }
+
+    /* 后缀：橙色 */
+    .root-chip.suffix {
+      background: #fff4e6;
+      color: #e17055;
+    }
+
+    .root-chip .chip-text {
+      font-weight: 600;
+      font-family: "Consolas", "Monaco", monospace;
+    }
+
+    .root-chip .chip-meaning {
+      color: inherit;
+      opacity: 0.75;
+      font-size: 0.68rem;
+    }
+
+    /* 分隔符 + */
+    .root-plus {
+      font-size: 0.7rem;
+      color: #b2bec3;
+      align-self: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1 id="dayTitle">CET-6 每日词汇</h1>
+    <div class="sub" id="dateInfo"></div>
+  </div>
+  <div class="header-right">
+    <button id="toggleAllBtn" onclick="toggleAll()">显示全部中文</button>
+  </div>
+</header>
+
+<main>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar" style="width:0%"></div>
+  </div>
+  <div id="wordContainer"></div>
+</main>
+
+<script src="words.js"></script>
+<script src="roots.js"></script>
+<script>
+  const START_DATE = new Date("2026-03-27T00:00:00");
+  const WORDS_PER_DAY = 30;
+  const PHASE1_DAYS = 29;
+
+  let allShown = false;
+
+  function getToday() {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function getDayIndex() {
+    const today = getToday();
+    const start = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+    return Math.floor((today - start) / 86400000);
+  }
+
+  function formatDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function renderWords() {
+    const container = document.getElementById("wordContainer");
+    const dayIdx = getDayIndex();
+    const today = getToday();
+
+    document.getElementById("dateInfo").textContent = formatDate(today);
+
+    // 边界情况
+    if (typeof WORDS === "undefined" || WORDS.length === 0) {
+      container.innerHTML = '<div class="status-msg">词汇数据未加载，请先运行 convert_vocab.py 生成 words.js。</div>';
+      return;
+    }
+
+    if (dayIdx < 0) {
+      document.getElementById("dayTitle").textContent = "计划还未开始";
+      container.innerHTML = '<div class="status-msg">📅 计划将于 2026-03-27 开始，到时再来！</div>';
+      return;
+    }
+
+    if (dayIdx >= PHASE1_DAYS) {
+      document.getElementById("dayTitle").textContent = "Phase 1 已完成！";
+      container.innerHTML = `<div class="status-msg">🎉 Phase 1（${PHASE1_DAYS}天）已完成！共复习了 ${PHASE1_DAYS * WORDS_PER_DAY} 个高频词汇。</div>`;
+      return;
+    }
+
+    const dayNum = dayIdx + 1;
+    document.getElementById("dayTitle").textContent = `Day ${dayNum} · 今日单词（30个）`;
+
+    // 进度条
+    const progressPct = (dayNum / PHASE1_DAYS * 100).toFixed(1);
+    document.getElementById("progressBar").style.width = progressPct + "%";
+
+    const start = dayIdx * WORDS_PER_DAY;
+    const end = Math.min(start + WORDS_PER_DAY, WORDS.length);
+    const todayWords = WORDS.slice(start, end);
+
+    if (todayWords.length === 0) {
+      container.innerHTML = '<div class="status-msg">今日词汇为空，请检查 words.js 数据。</div>';
+      return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "word-grid";
+
+    todayWords.forEach((w, i) => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const left = document.createElement("div");
+      left.className = "card-left";
+
+      const num = document.createElement("div");
+      num.className = "card-num";
+      num.textContent = `${i + 1}`;
+
+      const en = document.createElement("div");
+      en.className = "card-en";
+      en.textContent = w.en;
+
+      const phonetic = document.createElement("div");
+      phonetic.className = "card-phonetic";
+      phonetic.textContent = w.phonetic || "";
+
+      // 词根分析
+      const rootsEl = document.createElement("div");
+      rootsEl.className = "card-roots";
+      if (typeof analyzeWord === "function") {
+        const parts = analyzeWord(w.en);
+        if (parts && parts.length >= 2) {
+          parts.forEach((part, idx) => {
+            if (idx > 0) {
+              const plus = document.createElement("span");
+              plus.className = "root-plus";
+              plus.textContent = "+";
+              rootsEl.appendChild(plus);
+            }
+            const chip = document.createElement("span");
+            chip.className = `root-chip ${part.type}`;
+            const textSpan = document.createElement("span");
+            textSpan.className = "chip-text";
+            textSpan.textContent = part.text;
+            chip.appendChild(textSpan);
+            if (part.meaning) {
+              const meanSpan = document.createElement("span");
+              meanSpan.className = "chip-meaning";
+              meanSpan.textContent = part.meaning;
+              chip.appendChild(meanSpan);
+            }
+            rootsEl.appendChild(chip);
+          });
+        }
+      }
+
+      const zh = document.createElement("div");
+      zh.className = "card-zh";
+      zh.textContent = w.zh;
+
+      left.appendChild(num);
+      left.appendChild(en);
+      left.appendChild(phonetic);
+      left.appendChild(rootsEl);
+      left.appendChild(zh);
+
+      const btn = document.createElement("button");
+      btn.className = "card-btn";
+      btn.textContent = "释义";
+      btn.onclick = () => toggleCard(zh, btn);
+
+      card.appendChild(left);
+      card.appendChild(btn);
+      grid.appendChild(card);
+    });
+
+    container.innerHTML = "";
+    container.appendChild(grid);
+  }
+
+  function toggleCard(zhEl, btn) {
+    const showing = zhEl.classList.toggle("visible");
+    btn.classList.toggle("active", showing);
+    btn.textContent = showing ? "隐藏" : "释义";
+    // 切换单个后，更新全局按钮状态
+    updateToggleAllBtn();
+  }
+
+  function toggleAll() {
+    allShown = !allShown;
+    document.querySelectorAll(".card-zh").forEach(el => {
+      el.classList.toggle("visible", allShown);
+    });
+    document.querySelectorAll(".card-btn").forEach(btn => {
+      btn.classList.toggle("active", allShown);
+      btn.textContent = allShown ? "隐藏" : "释义";
+    });
+    updateToggleAllBtn();
+  }
+
+  function updateToggleAllBtn() {
+    const all = document.querySelectorAll(".card-zh");
+    const shown = document.querySelectorAll(".card-zh.visible");
+    const toggleBtn = document.getElementById("toggleAllBtn");
+    if (shown.length === all.length && all.length > 0) {
+      toggleBtn.textContent = "隐藏全部中文";
+      toggleBtn.classList.add("all-shown");
+      allShown = true;
+    } else {
+      toggleBtn.textContent = "显示全部中文";
+      toggleBtn.classList.remove("all-shown");
+      allShown = false;
+    }
+  }
+
+  renderWords();
+</script>
+</body>
+</html>
