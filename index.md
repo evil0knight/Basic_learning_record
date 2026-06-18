@@ -160,4 +160,11 @@ rss: https://evil0knight.github.io/quartz/index.xml
       <div class="friend-desc">现实的引力太过沉重，任何飞扬的思想都会砰然坠地。</div>
     </div>
   </a>
+  <a class="friend-card" href="https://blog.tyh123.top" target="_blank">
+    <img class="friend-avatar" src="https://blog.tyh123.top/img/avatar.jpg" alt="硬件日记" />
+    <div class="friend-info">
+      <div class="friend-name">硬件日记</div>
+      <div class="friend-desc">分享单片机、FPGA 开发，和 PCB 设计经验，记录嵌入式开发路上的成长点滴。</div>
+    </div>
+  </a>
 </div>

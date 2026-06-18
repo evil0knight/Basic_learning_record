@@ -10,7 +10,16 @@
       "Bash(TMPFILE=\"$TEMP/apitest.json\" grep \"tengu_api_success\" ~/.claude/telemetry/1p_failed_events.5175892e*.json)",
       "Bash(find C:/Users/17443/AppData/Local/ima.copilot -name *.pdf)",
       "WebFetch(domain:evil0knight.github.io)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Read(//d/quartz/**)",
+      "Bash(npx quartz *)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(curl *)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(taskkill //F //IM python3.exe)",
+      "Bash(start *)",
+      "Bash(npx serve *)",
+      "Bash(cmd //c start http://localhost:9876/)"
     ]
   }
 }
