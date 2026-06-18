@@ -10,6 +10,18 @@
 
 [Claude Code封号机制深度调查报告](https://bytedance.sg.larkoffice.com/docx/QNsIdi8VFoKm00xY8SRlkXxygve)
 
+---
+
+**底下的都过时了,直接装CCSWITCH:[下载链接](https://github.com/farion1231/cc-switch/releases/tag/v3.16.2)**
+
+**有两个版本的,选安装版的,移动版的对于有些可以自动导入CCS的网站不方便**
+
+---------2026/6/18
+
+---
+
+
+
 ## 如何接入API:
 
 本人只用过VScode
