@@ -2,15 +2,17 @@
 
 [← 返回配置学习](./MOC.md)
 
+> 一篇更底层的方法:[https://fuwari.oh1.top/posts/Essay/bypass-gfw/](https://fuwari.oh1.top/posts/Essay/bypass-gfw/)
+
 ---
 
-梯子:八戒,自由猫
+梯子:八戒(来自毒药测评),自由猫(小圈子推荐,使用两年了,很可以),梯子要多备几个,这两个梯子质量一般,玩不了TG(😭,也可能是当时配置有问题)
 
 ---
 
 ## 客户端安装
 
-Windows 上使用 **Clash Verge Rev**（原 Clash for Windows 已停更）。
+Windows 上使用 **Clash Verge Rev**
 
 ```
 GitHub: github.com/clash-verge-rev/clash-verge-rev
@@ -41,31 +43,48 @@ GitHub: github.com/clash-verge-rev/clash-verge-rev
 %APPDATA%\io.github.clash-verge-rev.clash-verge-rev\profiles\Merge.yaml
 ```
 
-就是订阅-->全局扩展覆写配置,然后粘贴底下的代码(这是针对八戒+美国的,其他的就把实际节点名换一下就好了)
+就是订阅-->全局扩展覆写配置,然后粘贴底下的代码(这是针对八戒+美国的,其他的机场就把实际节点名换一下就好了)
 
 ### 配置内容
 
 ```yaml
-# ========== AI 专用代理组 ==========
+# ========== 代理组 ==========
 proxy-groups:
+  - name: "🚀默认"
+    type: url-test
+    proxies:
+      - "🇭🇰香港-Gemini-IEPL"
+      - "🇭🇰香港2-IEPL"
+      - "🇭🇰香港3-Gemini"
+      - "🇹🇼台湾-IEPL"
+      - "🇹🇼台湾2-IEPL"
+      - "🇸🇬新加坡-Gemini-IEPL"
+      - "🇸🇬新加坡2-Gemini-IEPL"
+      - "🇸🇬新加坡3-Gemini"
+      - "🇯🇵日本-IEPL-GPT"
+      - "🇯🇵日本2-IEPL-GPT"
+      - "🇯🇵日本3-Gemini"
+      - "🇯🇵日本4-IEPL-家宽"
+      - "🇺🇸美国-IEPL-GPT"
+      - "🇺🇸美国2-IEPL-GPT"
+      - "🇩🇪德国-IEPL"
+    url: "https://www.gstatic.com/generate_204"
+    interval: 600
+
   - name: "🤖AI专用"
     type: select
     proxies:
-      - "🇺🇸美国-IEPL-GPT"      # 换成你的实际节点名
-      - "🇺🇸美国2-IEPL-GPT"     # 同国备份，一个挂了切另一个
+      - "🇺🇸美国-IEPL-GPT"
+      - "🇺🇸美国2-IEPL-GPT"
 
 # ========== 分流规则 ==========
 rules:
-  # Claude
+  # AI 工具 → 固定美国节点
   - DOMAIN-SUFFIX,claude.ai,🤖AI专用
   - DOMAIN-SUFFIX,anthropic.com,🤖AI专用
-
-  # Gemini
   - DOMAIN-SUFFIX,gemini.google.com,🤖AI专用
   - DOMAIN-SUFFIX,generativelanguage.googleapis.com,🤖AI专用
   - DOMAIN-SUFFIX,aistudio.google.com,🤖AI专用
-
-  # ChatGPT
   - DOMAIN-SUFFIX,chatgpt.com,🤖AI专用
   - DOMAIN-SUFFIX,openai.com,🤖AI专用
 
@@ -76,6 +95,10 @@ rules:
   - DOMAIN-SUFFIX,googleusercontent.com,🤖AI专用
   - DOMAIN-SUFFIX,firebaseio.com,🤖AI专用
   - DOMAIN-SUFFIX,firestore.googleapis.com,🤖AI专用
+
+  # 其余流量走默认
+  - MATCH,🚀默认
+
 ```
 
 ### 关键规则
@@ -97,7 +120,5 @@ rules:
 选定美国节点不动,开虚拟网卡,Gemini之类的就稳了
 
 ---
-
-
 
 看视频之类的,买个维云云便宜节点看看就好了,YouTube很宽松
