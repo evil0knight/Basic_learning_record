@@ -1,6 +1,6 @@
 # FreeRTOS — 知识地图
 
-[← 返回软件架构 MOC](../MOC.md) | [← 操作系统知识地图](../../../书中自有黄金屋/操作系统/MOC.md) | [← 主页](../../../index.md)
+[← 返回嵌入式工程架构 MOC](../MOC.md) | [← 操作系统知识地图](../../../书中自有黄金屋/操作系统/MOC.md) | [← 主页](../../../index.md)
 
 > [FreeRTOS野火教程](https://doc.embedfire.com/rtos/freertos/zh/latest/README.html)
 >
