@@ -167,4 +167,18 @@ rss: https://evil0knight.github.io/quartz/index.xml
       <div class="friend-desc">分享单片机、FPGA 开发，和 PCB 设计经验，记录嵌入式开发路上的成长点滴。</div>
     </div>
   </a>
+  <a class="friend-card" href="https://hjk.life/" target="_blank">
+    <img class="friend-avatar" src="https://gcore.jsdelivr.net/gh/ProphetHJK/prophethjk.github.io@master/assets/img/favicons/rabbit.png" alt="普通人的博客" />
+    <div class="friend-info">
+      <div class="friend-name">普通人</div>
+      <div class="friend-desc">见龙在田,利见大人</div>
+    </div>
+  </a>
+  <a class="friend-card" href="https://shatang.github.io/" target="_blank">
+    <img class="friend-avatar" src="https://shatang.github.io/images/header.jpg" alt="Shatang的博客" />
+    <div class="friend-info">
+      <div class="friend-name">Shatang</div>
+      <div class="friend-desc">身体和灵魂总要有一个在路上</div>
+    </div>
+  </a>
 </div>
