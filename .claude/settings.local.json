@@ -26,7 +26,8 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "WebFetch(domain:www.cnblogs.com)"
+      "WebFetch(domain:www.cnblogs.com)",
+      "PowerShell(\\(Get-Item \"D:\\\\quartz\\\\content\"\\).Target)"
     ]
   }
 }
