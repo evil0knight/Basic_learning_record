@@ -22,5 +22,6 @@
 | doxygen                | 从源代码注释自动生成文档，解析类、函数和变量的信息，以生成HTML和PDF等格式的输出 | [下载链接](https://www.doxygen.nl/index.html),[使用笔记](doxygen.md)                                                                                                                                      |
 | registry_finder        | 删除注册表神器,要用管理员打开,然后CTROL+F搜你想删掉的就好了,在E盘里             | [下载链接](https://registry-finder.com/)                                                                                                                                                               |
 | CC_Switch              | 换中转站用                                                                      | [下载链接](https://github.com/farion1231/cc-switch/releases/tag/v3.16.2)                                                                                                                               |
+| VSCode配置             | 编辑器设置、代码补全、主题字体配置                                              | [VSCode配置 笔记](./VSCode配置.md)                                                                                                                                                                     |
 
 ---

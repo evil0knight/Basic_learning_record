@@ -9,8 +9,23 @@
 
 ---
 
-## 🔩 模块库
+## 欢迎友链
 
-| 模块名 | 状态 | 链接 |
-|--------|------|------|
-| 嵌入式项目骨架 | ✅ 已整理 | [→](./库中车马多如簇/嵌入式工程架构/嵌入式项目骨架.md) |
+<div class="friend-links">
+  <a class="friend-card" href="https://hjk.life/" target="_blank">
+    <img class="friend-avatar" src="https://gcore.jsdelivr.net/gh/ProphetHJK/prophethjk.github.io@master/assets/img/favicons/rabbit.png" alt="普通人的博客" />
+    <div class="friend-info">
+      <div class="friend-name">普通人</div>
+      <div class="friend-desc">见龙在田,利见大人</div>
+    </div>
+  </a>
+  <a class="friend-card" href="https://shatang.github.io/" target="_blank">
+    <img class="friend-avatar" src="https://shatang.github.io/images/header.jpg" alt="Shatang的博客" />
+    <div class="friend-info">
+      <div class="friend-name">Shatang</div>
+      <div class="friend-desc">身体和灵魂总要有一个在路上</div>
+    </div>
+  </a>
+</div>
+
+---

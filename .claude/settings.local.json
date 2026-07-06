@@ -19,7 +19,13 @@
       "Bash(taskkill //F //IM python3.exe)",
       "Bash(start *)",
       "Bash(npx serve *)",
-      "Bash(cmd //c start http://localhost:9876/)"
+      "Bash(cmd //c start http://localhost:9876/)",
+      "Read(//c/Users/17443/.claude/**)",
+      "Bash(tasklist)",
+      "PowerShell(Copy-Item *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
