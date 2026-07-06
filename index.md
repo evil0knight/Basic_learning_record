@@ -181,4 +181,11 @@ rss: https://evil0knight.github.io/quartz/index.xml
       <div class="friend-desc">身体和灵魂总要有一个在路上</div>
     </div>
   </a>
+  <a class="friend-card" href="https://www.cnblogs.com/const-zpc" target="_blank">
+    <img class="friend-avatar" src="https://pic.cnblogs.com/avatar/2138433/20220610142655.png" alt="大橙子疯的博客" />
+    <div class="friend-info">
+      <div class="friend-name">大橙子疯</div>
+      <div class="friend-desc">代码是写给人看的，不是写给机器看的，只是顺便计算机可以执行而已</div>
+    </div>
+  </a>
 </div>
