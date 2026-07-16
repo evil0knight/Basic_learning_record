@@ -1,6 +1,6 @@
 # MicroLIB 打开原因
 
-[← 嵌软高手知识地图](./MOC.md)
+[← 嵌软高手知识地图](./MOC.md)|←[uart--printf配置](../../库中车马多如簇\UART内含串口助手安装包\printf配置.md)
 
 ---
 

@@ -13,7 +13,8 @@
           "files.autoGuessEncoding": false
       }
       ```
-   2. VScode-->右下角编码点一下-->通过编码重新打开-->GB2312
+   2. VScode-->右下角编码点一下-->通过编码重新打开-->GB2312,
+      vscode修改默认编码:![1783934488018](image/MOC/1783934488018.png)
    3. keil5-->Edit-->configuration-->Encoding-->GB2312
 4. [代码规范](./代码规范.md)注意
 5. 裸机使用[表驱法 笔记](./表驱法.md),操作系统使用[freeRTOS 笔记](./freeRTOS/MOC.md)
