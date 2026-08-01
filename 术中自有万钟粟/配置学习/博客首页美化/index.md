@@ -32,7 +32,7 @@ title: 首页
     <div class="card-icon">⚙️</div>
     <div class="card-body">
       <div class="card-title">术中自有万钟粟</div>
-      <div class="card-desc">实用技术笔记 · Git · Modbus · IC设计</div>
+      <div class="card-desc">实用技术笔记 · Git · Modbus · Cortex-M4内核原理</div>
     </div>
   </a>
   <a class="card" href="库中车马多如簇/MOC.md">

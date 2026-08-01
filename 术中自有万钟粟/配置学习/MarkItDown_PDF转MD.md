@@ -12,7 +12,7 @@
 注意是**PowerShell**
 
 ```powershell
-$env:PYTHONPATH='E:\PythonTools\markitdown'
+$env:PYTHONPATH='E:\Toolchains\Python\markitdown'
 ```
 
 然后执行转换：
@@ -40,7 +40,7 @@ markitdown ".\xxx.pdf"
 先执行：
 
 ```powershell
-$env:PYTHONPATH='E:\PythonTools\markitdown'
+$env:PYTHONPATH='E:\Toolchains\Python\markitdown'
 ```
 
 再检查版本：
@@ -70,13 +70,13 @@ pip install markitdown[all]
 按我现在电脑里的实际安装结果看，当时更像是装到了单独目录里，位置是：
 
 ```text
-E:\PythonTools\markitdown
+E:\Toolchains\Python\markitdown
 ```
 
 如果以后想按现在这台机器的方式重新装，大概率可以直接用：
 
 ```powershell
-pip install markitdown[all] --target E:\PythonTools\markitdown
+pip install markitdown[all] --target E:\Toolchains\Python\markitdown
 ```
 
 如果 `markitdown` 命令还没进 PATH，可以临时补一下：
@@ -89,10 +89,10 @@ $env:Path += ';E:\PythonTools\markitdown\bin'
 
 ## 4. 当前机器的实际情况
 
-- `markitdown.exe` 在 `E:\PythonTools\markitdown\bin\markitdown.exe`
-- 包主体在 `E:\PythonTools\markitdown`
+- `markitdown.exe` 在 `E:\Toolchains\Python\markitdown\bin\markitdown.exe`
+- 包主体在 `E:\Toolchains\Python\markitdown`
 - 当前直接运行 `markitdown` 会因为少了 `PYTHONPATH` 报错
-- 先执行 `$env:PYTHONPATH='E:\PythonTools\markitdown'` 后即可正常使用
+- 先执行 `$env:PYTHONPATH='E:\Toolchains\Python\markitdown'` 后即可正常使用
 
 ---
 
