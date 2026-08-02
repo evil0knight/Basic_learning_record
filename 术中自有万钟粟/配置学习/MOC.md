@@ -25,5 +25,7 @@
 | VSCode配置             | 编辑器设置、代码补全、主题字体配置                                              | [VSCode配置 笔记](./VSCode配置.md)                                                                                                                                                                     |
 | 串口助手               | XCOM,VOFA下载                                                                   |                                                                                                                                                                                                        |
 | Ozone调试器            | SEGGER Ozone 调试器下载                                                         | [Ozone调试器 笔记](./Ozone调试器.md)                                                                                                                                                                     |
+| RTT                    | SEGGER RTT 实时传输                                                             | [RTT 笔记](./RTT/MOC.md)                                                                                                                                                                                |
+| EasyLogger             | 嵌入式日志库，支持彩色分级输出                                                   | [EasyLogger 笔记](./EasyLogger.md)                                                                                                                                                                 |
 
 ---

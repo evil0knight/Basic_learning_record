@@ -56,4 +56,4 @@ UART接收时，硬件依靠波特率时钟将引脚上的跳变一位一位送�
 
 ## [UART发送程序_8位](UART发送程序.md)
 
-## [uart---&gt;printf(输出和debug配置)_stm32](printf配置)
+## [UART的printf重定向](printf配置.md)
