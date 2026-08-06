@@ -1,6 +1,6 @@
 # HardFault 调试：
 
-[← 嵌软高手知识地图](./MOC.md)
+[← 返回 debug方法](./MOC.md) | [← 主页](../../index.md)
 
 ---
 

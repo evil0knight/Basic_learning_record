@@ -37,7 +37,7 @@ FreeRTOS 每个任务有独立的固定大小栈：
 
 **MicroLIB 怎么解决**：代码尺寸和内存高度优化，`printf` 栈消耗大幅降低，RTOS 任务中栈溢出风险显著减小。
 
-> 📎 HardFault 的定位方法（看栈帧、找 PC、反推出问题的指令）见 [HardFault 调试](./HardFault调试.md)
+> 📎 HardFault 的定位方法（看栈帧、找 PC、反推出问题的指令）见 [HardFault 调试](../debug方法/HardFault调试.md)
 
 ---
 

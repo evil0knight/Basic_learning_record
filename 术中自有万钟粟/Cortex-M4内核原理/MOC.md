@@ -18,6 +18,5 @@
 | CPU 寄存器 | PC/LR/SP 作用、硬件压栈与软件压栈流程 | [cpu寄存器.md](cpu寄存器.md) |
 | 函数调用与压栈过程 | 函数调用时的栈帧变化与压栈流程 | [函数调用与压栈过程.md](函数调用与压栈过程.md) |
 | ARM MCU 内存划分 | Flash/RAM 各段（.text/.data/.bss/Heap/Stack）与变量存储位置 | [arm_mcu内存划分.md](arm_mcu内存划分.md) |
-| 编译文件 | AXF/ELF/HEX/BIN 四种文件的区别、内容与互转 | [编译文件.md](编译文件.md) |
 
 ---

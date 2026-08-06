@@ -1,6 +1,6 @@
 # C 语言 — 知识地图
 
-[← 学科总览](../MOC.md) | [← 主页](../../index.md) 
+[← 学科总览](../MOC.md) | [← 主页](../../index.md)
 
 > [ ←C陷阱与缺陷](../C陷阱与缺陷/MOC.md)
 
@@ -10,7 +10,9 @@
 
 [typedef](typedef.md)
 
-[函数指针](函数与指针.md) 
+[bool — 占8位的原因](bool.md)
+
+[函数指针](函数与指针.md)
 
 [const与指针(窍门)](const.md)
 
@@ -32,9 +34,11 @@
 
 [restrict — 指针别名优化限定符](restrict.md)
 
-### 预处理 / 编译
+[__attribute__ GCC编译器扩展属性](__attribute__.md)
 
-[编译与链接](../C++PrimerPlus/C++编译与链接/编译与链接moc.md)
+### 预处理 / 编译-
+
+[编译与链接](../../术中自有万钟粟/编译链接下载/MOC.md)
 
 ### 面向对象
 

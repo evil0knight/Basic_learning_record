@@ -1,6 +1,6 @@
 # EasyLogger
 
-[← 返回配置学习](./MOC.md) | [← 主页](../../index.md)
+[← 返回 配置学习](../配置学习/MOC.md) | [← 返回 debug方法](./MOC.md) | [← 主页](../../index.md)
 
 > [GitHub网址](https://github.com/armink/EasyLogger?tab=readme-ov-file)
 

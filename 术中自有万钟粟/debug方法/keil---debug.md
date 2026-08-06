@@ -1,6 +1,6 @@
 # keil的debug方法
 
-[← 返回 MOC](MOC.md) | [← 主页](../index.md)
+[← 返回 debug方法](./MOC.md) | [← 主页](../../index.md)
 
 ---
 
