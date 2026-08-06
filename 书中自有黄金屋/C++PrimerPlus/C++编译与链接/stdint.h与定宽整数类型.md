@@ -19,4 +19,4 @@
 
 `FreeRTOS` 的 `portmacro.h` 里那些 `StackType_t`、`TickType_t` 等类型，本质上也是在做同一件事：把“当前端口该用什么宽度和什么自然类型”明确下来。
 
-对照看：[FreeRTOS 移植与配置](../../../库中车马多如簇/嵌入式工程架构/freeRTOS/移植与配置.md)
+对照看：[FreeRTOS 移植与配置](../../../术中自有万钟粟/嵌入式工程架构/freeRTOS/移植与配置.md)

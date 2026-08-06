@@ -1,6 +1,6 @@
 # FreeRTOS 快捷配置
 
-[← 返回 FreeRTOS MOC](MOC.md) | [← 主页](../../../index.md)
+[← 返回 FreeRTOS](./MOC.md) | [← 主页](../../../index.md)
 
 ---
 

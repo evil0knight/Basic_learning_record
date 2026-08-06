@@ -1,0 +1,15 @@
+# 嵌入式工程架构 MOC
+
+[← 返回技术栈](../MOC.md)
+
+1. [嵌入式项目骨架](嵌入式项目骨架.md),把需求,功能,前期准备,等等做好
+2. 设计好层次架构![1782394614361](image/MOC/1782394614361.png)这里,Driver层是MCU厂家提供的库,然后在Core写好最基础的片内外设驱动函数接口供BSP和操作系统调用,	BSP层写调用外设的函数,如果是裸机就跳过OS层,否则OS统一管理中断
+3. 统一编码UTF-8
+
+   1. VScode-->右下角编码点一下-->通过编码重新打开-->UTF-8,
+      vscode修改默认编码:设置-->搜encoding-->选 UTF8
+   2. keil5-->Edit-->configuration-->Encoding-->UTF-8
+4. [代码规范](./代码规范.md)注意
+5. 裸机使用[表驱法 笔记](./表驱法.md),操作系统使用[freeRTOS 笔记](./freeRTOS/MOC.md)
+6. [BSP层和platform](BSP,Platform写法.md)层怎么写,供app等上层调用
+7. 外设到[库的MOC](../../库中车马多如簇/MOC.md)里去选
