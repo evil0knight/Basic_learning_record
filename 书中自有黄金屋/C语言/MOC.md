@@ -22,6 +22,8 @@
 
 [协议解析：联合体 union](./联合体.md)
 
+[void* 通用指针 与 void(*)(void) 函数指针](void_指针与函数指针.md)
+
 ## C语言非常用特性
 
 [柔性数组](柔性数组.md)(结构体中)
@@ -34,7 +36,9 @@
 
 [restrict — 指针别名优化限定符](restrict.md)
 
-[__attribute__ GCC编译器扩展属性](__attribute__.md)
+[assert — 断言，终止程序](assert.md)
+
+[attribute GCC编译器扩展属性](__attribute__.md)
 
 ### 预处理 / 编译-
 

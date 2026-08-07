@@ -2,6 +2,10 @@
 
 [← 返回 编译链接下载](./MOC.md) | [← 主页](../../index.md)
 
+> [修改jlink算法下载到外部flash](https://twd6onxsxva.feishu.cn/docx/VmjDdzhspo6NrXxds1ucIsu2nId)(未实验)
+>
+> [下载LVGL到外部的flash](https://twd6onxsxva.feishu.cn/docx/CWOXdid60o6R9Excg96cNGnnnOb)(未试验过)
+
 ---
 
 **核心：仿真器并不直接把代码写入 Flash，而是先下载到 RAM，再让 MCU 自己分批搬运到 ROM。**

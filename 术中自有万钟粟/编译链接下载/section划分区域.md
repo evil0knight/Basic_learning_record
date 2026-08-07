@@ -1,6 +1,6 @@
 # section划分区域
 
-[← 返回 编译链接下载](./MOC.md) | [← 主页](../../index.md)
+[← attribute](../../书中自有黄金屋/C语言/__attribute__.md) | [← 返回 编译链接下载](./MOC.md) | [← 主页](../../index.md)
 
 ---
 
