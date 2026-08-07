@@ -20,6 +20,6 @@
 | Linux系统         | 目前只有WSL 环境配置           | [Linux系统 笔记](./Linux系统/MOC.md)                      |
 | debug方法         | RTT,Ozone,keil里的debug        | [debug方法 笔记](./debug方法/MOC.md)                      |
 | 嵌入式工程架构    | 项目骨架、代码规范、各个层写法 | [嵌入式工程架构 笔记](./嵌入式工程架构/MOC.md)            |
-| OTA               | 固件空中升级                   | [OTA 笔记](./OTA/MOC.md)                              |
+| OTA+bootloader    | 固件空中升级+bootloader        | [OTA 笔记](./OTA/MOC.md)                                  |
 
 ---
