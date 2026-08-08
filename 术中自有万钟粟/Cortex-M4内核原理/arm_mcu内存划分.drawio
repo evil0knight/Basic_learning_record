@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="ARM MCU 内存划分" id="arm_mcu_memory">
-    <mxGraphModel dx="917" dy="441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="2053" dy="1141" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -82,7 +82,7 @@
         <mxCell id="step1-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;① 硬件复位&lt;/b&gt;" vertex="1">
           <mxGeometry height="20" width="120" x="515" y="78" as="geometry" />
         </mxCell>
-        <mxCell id="step1-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="从 &lt;b&gt;0x0000 0000&lt;/b&gt; 读取 MSP 初始值（BOOT 引脚控制映射到 Flash / 系统存储器 / SRAM）→ 加载到 MSP 寄存器&lt;br&gt;从 &lt;b&gt;0x0000 0004&lt;/b&gt; 读取 Reset_Handler 地址 → 加载到 PC 寄存器" vertex="1">
+        <mxCell id="step1-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="从 &lt;b&gt;0x0000 0000&lt;/b&gt; 读取 MSP 初始值（BOOT 引脚控制映射到 Flash / 系统存储器 / SRAM）→ 加载到 MSP 寄存器&lt;br&gt;从 &lt;b&gt;0x0000 0004&lt;/b&gt; 读取 Reset_Handler 地址(这里运行原装地址或者配置bootloader去选择性下载) → 加载到 PC 寄存器" vertex="1">
           <mxGeometry height="40" width="520" x="515" y="95" as="geometry" />
         </mxCell>
         <mxCell id="arrow-s1-s2" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;" value="">
