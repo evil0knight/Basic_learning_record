@@ -8,4 +8,5 @@
 
 1. 整体的[流程步骤](流程步骤.md), [环境配置](环境配置.md)
 2. bootloader阶段:
-   1. [板子上的boot0和boot1](板子上的boot0和boot1.md)
+   1. [板子上的boot0和boot1](bootloader/板子上的boot0和boot1.md)
+   2.

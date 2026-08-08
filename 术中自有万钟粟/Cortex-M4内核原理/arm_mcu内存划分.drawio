@@ -1,0 +1,137 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="ARM MCU 内存划分" id="arm_mcu_memory">
+    <mxGraphModel dx="917" dy="441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="flash-container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#dae8fc;labelBorderColor=#6c8ebf;labelBorderStyle=solid;strokeWidth=2;" value="Flash / ROM（程序代码区）" vertex="1">
+          <mxGeometry height="190" width="420" x="30" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="flash-text" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=left;spacingLeft=8;" value="&lt;b&gt;.text（代码段）&lt;/b&gt;&lt;br&gt;机器码，上电后程序在此运行&lt;br&gt;未初始化全局变量以&lt;b&gt;指令方式&lt;/b&gt;存在&lt;br&gt;上电后执行指令开辟 BSS 段" vertex="1">
+          <mxGeometry height="65" width="380" x="50" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="flash-data-init" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;align=left;spacingLeft=8;" value="&lt;b&gt;.data 初始值&lt;/b&gt;&lt;br&gt;已初始化全局变量 / static 变量的初始数值（ROM 中的常量副本）" vertex="1">
+          <mxGeometry height="65" width="380" x="50" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-flash-ram" edge="1" parent="1" source="flash-container" style="endArrow=block;html=1;strokeWidth=3;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;dashed=1;dashPattern=8 4;" target="ram-container" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="240" y="300" as="sourcePoint" />
+            <mxPoint x="240" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-flash-ram-label" connectable="0" parent="arrow-flash-ram" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#f8cecc;strokeColor=#b85450;rounded=1;fontColor=#990000;" value="&lt;b&gt;启动时 __main() 复制 .data 初始值到 RAM 的 .data 区&lt;br&gt;并清零 RAM 的 .bss 区&lt;/b&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ram-container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#d5e8d4;labelBorderColor=#82b366;labelBorderStyle=solid;strokeWidth=2;" value="RAM / SRAM（0x2000 0000 ~ 0x200x xxxx，视芯片而定）" vertex="1">
+          <mxGeometry height="340" width="420" x="30" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-data" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;fontStyle=0;" value="&lt;b&gt;.data（数据段）&lt;/b&gt;&lt;br&gt;已初始化的全局变量 / static 变量" vertex="1">
+          <mxGeometry height="50" width="380" x="50" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-bss" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;fontStyle=0;" value="&lt;b&gt;.bss（BSS 段）&lt;/b&gt;&lt;br&gt;未初始化全局变量（上电自动清零）&lt;br&gt;变量地址&lt;b&gt;编译期已确定&lt;/b&gt;，赋值不改变其地址&lt;br&gt;FreeRTOS 线程栈和 TCB 存放于此" vertex="1">
+          <mxGeometry height="70" width="380" x="50" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-heap-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#a5d6a7;fontSize=11;dashed=1;dashPattern=3 3;" value="" vertex="1">
+          <mxGeometry height="60" width="380" x="50" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-heap" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#66bb6a;fontSize=11;align=left;spacingLeft=8;" value="&lt;b&gt;Heap（堆）&lt;/b&gt;&lt;br&gt;malloc / free 动态分配的内存（向上增长 ↑）" vertex="1">
+          <mxGeometry height="55" width="380" x="50" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-stack-bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#a5d6a7;fontSize=11;dashed=1;dashPattern=3 3;" value="" vertex="1">
+          <mxGeometry height="80" width="380" x="50" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="ram-stack" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#43a047;fontSize=11;align=left;spacingLeft=8;" value="&lt;b&gt;Stack（栈）&lt;/b&gt;&lt;br&gt;函数局部变量 · 返回地址 · 压栈保护现场&lt;br&gt;（向下增长 ↓）" vertex="1">
+          <mxGeometry height="75" width="380" x="50" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="heap-up-arrow" edge="1" parent="1" source="ram-heap-bg" style="endArrow=open;html=1;strokeWidth=2;strokeColor=#66bb6a;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="ram-stack-bg" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="240" y="500" as="sourcePoint" />
+            <mxPoint x="240" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="heap-up-label" connectable="0" parent="heap-up-arrow" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=9;fillColor=#e8f5e9;strokeColor=none;" value="Heap ↑ / Stack ↓&lt;br&gt;两者相向增长" vertex="1">
+          <mxGeometry relative="1" x="-0.1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-ram-cpu" edge="1" parent="1" source="ram-container" style="endArrow=block;html=1;strokeWidth=3;strokeColor=#82b366;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="cpu-container" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="240" y="630" as="sourcePoint" />
+            <mxPoint x="240" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-ram-cpu-label" connectable="0" parent="arrow-ram-cpu" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=11;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;" value="&lt;b&gt;load / store&lt;/b&gt;&lt;br&gt;CPU 从 RAM 取数据到寄存器计算&lt;br&gt;结果写回 RAM" vertex="1">
+          <mxGeometry relative="1" x="-0.2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cpu-container" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#fff2cc;labelBorderColor=#d6b656;labelBorderStyle=solid;strokeWidth=2;" value="CPU 芯片内部" vertex="1">
+          <mxGeometry height="110" width="420" x="30" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="cpu-registers" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=left;spacingLeft=8;" value="&lt;b&gt;Registers（CPU 寄存器：R0~R15、PC、SP 等）&lt;/b&gt;&lt;br&gt;速度最快、数量极少的「工作台」，真正执行加减乘除运算" vertex="1">
+          <mxGeometry height="60" width="380" x="60" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="startup-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;align=center;" value="&lt;b&gt;上电启动流程&lt;/b&gt;" vertex="1">
+          <mxGeometry height="35" width="550" x="500" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="step1-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
+          <mxGeometry height="70" width="550" x="500" y="75" as="geometry" />
+        </mxCell>
+        <mxCell id="step1-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;① 硬件复位&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="120" x="515" y="78" as="geometry" />
+        </mxCell>
+        <mxCell id="step1-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="从 Flash &lt;b&gt;0x0800 0000&lt;/b&gt; 读取 MSP 初始值 → 加载到 MSP 寄存器&lt;br&gt;从 Flash &lt;b&gt;0x0800 0004&lt;/b&gt; 读取 Reset_Handler 地址 → 加载到 PC 寄存器" vertex="1">
+          <mxGeometry height="40" width="520" x="515" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-s1-s2" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="775" y="145" as="sourcePoint" />
+            <mxPoint x="775" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="step2-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
+          <mxGeometry height="50" width="550" x="500" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="step2-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;② 执行 Reset_Handler&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="220" x="515" y="168" as="geometry" />
+        </mxCell>
+        <mxCell id="step2-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="调用 &lt;b&gt;SystemInit()&lt;/b&gt;（在 system_stm32xxxxx.c 中，ARM 制定规范，ST 实现）" vertex="1">
+          <mxGeometry height="20" width="520" x="515" y="188" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-s2-s3" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="775" y="215" as="sourcePoint" />
+            <mxPoint x="775" y="235" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="step3-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
+          <mxGeometry height="90" width="550" x="500" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="step3-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;③ 执行 __main()&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="220" x="515" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="step3-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="1. 将 Flash 中 &lt;b&gt;.data 段初始值&lt;/b&gt; 复制到 SRAM 的 &lt;b&gt;.data 区&lt;/b&gt;&lt;br&gt;2. 将 SRAM 的 &lt;b&gt;.bss 区清零&lt;/b&gt;&lt;br&gt;3. 完成其他初始化后，&lt;b&gt;调用用户的 main()&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="520" x="515" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="addr-info" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1e88e5;fontSize=13;fontStyle=1;align=center;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#e3f2fd;" value="&lt;b&gt;关键地址&lt;/b&gt;" vertex="1">
+          <mxGeometry height="120" width="250" x="500" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="addr-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=8;" value="&lt;b&gt;Flash 起始：&lt;/b&gt;0x0800 0000&lt;br&gt;&lt;b&gt;RAM 起始：&lt;/b&gt;0x2000 0000&lt;br&gt;&lt;b&gt;MSP 初值位置：&lt;/b&gt;0x0800 0000&lt;br&gt;&lt;b&gt;Reset_Handler：&lt;/b&gt;0x0800 0004&lt;br&gt;&lt;b&gt;外设寄存器：&lt;/b&gt;0x4000 0000 起&lt;br&gt;&lt;b&gt;系统控制块：&lt;/b&gt;0xE000 E000 起" vertex="1">
+          <mxGeometry height="90" width="230" x="510" y="378" as="geometry" />
+        </mxCell>
+        <mxCell id="connector-step3-flash" edge="1" parent="1" source="step3-text" style="endArrow=open;html=1;strokeWidth=1.5;strokeColor=#e57373;dashed=1;dashPattern=4 3;exitX=0;exitY=0.5;entryX=1;entryY=0.5;fontSize=10;fontColor=#c62828;" target="flash-data-init" value="复制 .data 初始值">
+          <mxGeometry relative="1" width="50" x="-0.2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="connector-step3-ram" edge="1" parent="1" source="step3-text" style="endArrow=open;html=1;strokeWidth=1.5;strokeColor=#e57373;dashed=1;dashPattern=4 3;exitX=0;exitY=0.7;entryX=1;entryY=0.5;fontSize=10;fontColor=#c62828;" target="ram-bss" value="清零 .bss 区">
+          <mxGeometry relative="1" width="50" x="-0.2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
