@@ -1,6 +1,15 @@
 # ARM MCU 内存划分
 
-[← 返回 Cortex-M4内核原理](./MOC.md) | [← 主页](../../index.md)
+[← 返回 Cortex-M4内核原理](./MOC.md) | [← 主页](../../index.md)|
+
+
+
+
+## [更好的阅读体验](https://app.diagrams.net/#Hevil0knight/Basic_learning_record/main/术中自有万钟粟/Cortex-M4内核原理/arm_mcu内存划分.drawio)
+
+
+
+
 
 ```
  Plaintext
