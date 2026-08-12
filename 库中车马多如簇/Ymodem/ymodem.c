@@ -33,7 +33,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t file_name[FILE_NAME_LENGTH];
-uint32_t FlashDestination = ApplicationAddress; 
+uint32_t FlashDestination = APP_RUN_START_ADDRESS;
 uint16_t PageSize = PAGE_SIZE;
 uint32_t EraseCounter = 0x0;
 uint32_t NbrOfPage = 0;
@@ -147,7 +147,7 @@ int32_t Ymodem_Receive (uint8_t *buf)
   int32_t i, j, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
 
   /* Initialize FlashDestination variable */
-  FlashDestination = ApplicationAddress;
+  FlashDestination = APP_RUN_START_ADDRESS;
 
   for (session_done = 0, errors = 0, session_begin = 0; ;)//初始化变量，进入循环
   {
@@ -196,8 +196,7 @@ int32_t Ymodem_Receive (uint8_t *buf)
 
                     /* Test the size of the image to be sent */
                     /* Image size is greater than Flash size */
-                    //if (size > (FLASH_SIZE - 1))
-                    if ((size <= 0) || ((uint32_t)size > APP_FLASH_SIZE))
+                    if ((size <= 0) || ((uint32_t)size > APP_RUN_SIZE))
                     {
                       /* End session */
                       Send_Byte(CA);
@@ -215,7 +214,7 @@ int32_t Ymodem_Receive (uint8_t *buf)
                     // {
                     //   FLASHStatus = FLASH_ErasePage(FlashDestination + (PageSize * EraseCounter));
                     // }
-                    if(1 == Flash_erase(ApplicationAddress,size))
+                    if (Flash_erase(APP_RUN_START_ADDRESS, (uint32_t)size) != 0U)
                     {
                       /* End session */
                       Send_Byte(CA);
@@ -239,7 +238,10 @@ int32_t Ymodem_Receive (uint8_t *buf)
                 {
                  memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
                  RamSource = (uint32_t)buf;
-                 for (j = 0;(j < packet_length) && (FlashDestination <  ApplicationAddress + size);j += 4)
+                 for (j = 0;
+                      (j < packet_length) &&
+                      (FlashDestination < APP_RUN_START_ADDRESS + (uint32_t)size);
+                      j += 4)
                  {
                    /* Program the data received into STM32F10x Flash */
                    //FLASH_ProgramWord(FlashDestination, *(uint32_t*)RamSource);
@@ -561,7 +563,7 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
         {
            buf_ptr += pktSize;  
            size -= pktSize;
-           if (blkNumber == (FLASH_IMAGE_SIZE/1024))
+           if (blkNumber == (APP_RUN_SIZE / 1024U))
            {
              return 0xFF; /*  error */
            }

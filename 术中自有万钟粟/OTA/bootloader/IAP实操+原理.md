@@ -2,233 +2,143 @@
 
 [← bootloader](./MOC.md) | [← 主页](../../../index.md)
 
-> 这里是直接从bootloader跳转到APP,是bootloader基础
+> 这里是 Bootloader 直接跳转到 APP 的基础实现。
 
 ---
 
-## 原理:
+## 原理
 
-在keil里配置程序flash0地址和4地址里的MSP和跳转函数,先跳转到用户bootloader里,然后用户bootloader再跳转到app里,了解一下[上电的流程](https://app.diagrams.net/#Hevil0knight%2FBasic_learning_record%2Fmain%2F%E6%9C%AF%E4%B8%AD%E8%87%AA%E6%9C%89%E4%B8%87%E9%92%9F%E7%B2%9F%2FCortex-M4%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86%2Farm_mcu%E5%86%85%E5%AD%98%E5%88%92%E5%88%86.drawio#%7B%22pageId%22%3A%22arm_mcu_memory%22%7D)(右边)
+MCU 上电后先运行 Bootloader。需要启动 APP 时，Bootloader 读取 APP 向量表：第一个字是初始主栈指针 MSP，第二个字是复位入口地址。设置 MSP 后调用复位入口，即可进入 APP。了解一下[上电的流程](https://app.diagrams.net/#Hevil0knight%2FBasic_learning_record%2Fmain%2F%E6%9C%AF%E4%B8%AD%E8%87%AA%E6%9C%89%E4%B8%87%E9%92%9F%E7%B2%9F%2FCortex-M4%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86%2Farm_mcu%E5%86%85%E5%AD%98%E5%88%92%E5%88%86.drawio#%7B%22pageId%22%3A%22arm_mcu_memory%22%7D)（右边）。
 
 ## 实操
 
-[环境配置](环境配置.md)后,
+[环境配置](环境配置.md)完成后，在 Bootloader 工程中单独建立跳转管理模块。
 
-编译优化等级高一点
+### 1. 新建 `Boot_Manager.h`
 
-### bootloader程序配置:
+新建 `Tasks/Boot_Manager/Boot_Manager.h`：
 
-改一下 `main.c`,已经写好注释了,
+```c
+#ifndef __BOOT_MANAGER_H
+#define __BOOT_MANAGER_H
 
+/* Bootloader：0x08000000~0x08007FFF，共 32 KiB。 */
+#define BOOTLOADER_START_ADDRESS  0x08000000U
+#define BOOTLOADER_END_ADDRESS    0x08008000U
+#define BOOTLOADER_SIZE           (BOOTLOADER_END_ADDRESS - BOOTLOADER_START_ADDRESS)
+
+/* APP_RUN：0x08008000~0x0801FFFF，共 96 KiB。 */
+#define APP_RUN_START_ADDRESS     BOOTLOADER_END_ADDRESS
+#define APP_RUN_END_ADDRESS       0x08020000U
+#define APP_RUN_SIZE              (APP_RUN_END_ADDRESS - APP_RUN_START_ADDRESS)
+
+void DisablePeripherals(void);
+void JumpToApp(void);
+
+#endif
 ```
-/**
-  ******************************************************************************
-	WeAct 微行创新 
-	>> 标准库实例例程
-  ******************************************************************************
-  */
 
-/* Includes ------------------------------------------------------------------*/
+`APP_RUN_START_ADDRESS` 是 APP 的链接地址、向量表地址、Flash 擦写地址和 Bootloader 跳转地址，必须保持一致。
+
+### 2. 新建 `Boot_Manager.c`
+
+新建 `Tasks/Boot_Manager/Boot_Manager.c`：
+
+```c
+#include "Boot_Manager.h"
 #include "main.h"
 #include "tim.h"
-#include "gpio.h"
-#include "Debug.h"
-#include <SEGGER_RTT.h>
-#include "elog.h"
 
-// 全局定义 STM32F411xE 或者 STM32F401xx
-// 当前定义 STM32F411xE
-
-// STM32F411 外部晶振25Mhz，考虑到USB使用，内部频率设置为96Mhz
-// 需要100mhz,自行修改system_stm32f4xx.c
-
-/** @addtogroup Template_Project
-  * @{
-  */ 
-
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-static __IO uint32_t uwTimingDelay;
-RCC_ClocksTypeDef RCC_Clocks;
-
-#define APP_FLASH_ADDR 0X8019000U
 typedef void (*pFunction)(void);
 
-static pFunction JumpToApplication;
-static uint32_t JumpAddress;
+void DisablePeripherals(void)
+{
+    /* 关闭 TIM3 及其中断源。 */
+    TIM_Cmd(TIM3, DISABLE);
+    TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
-/* Private function prototypes -----------------------------------------------*/
-  void DisablePeripherals(void)
-  {
-      /* 关闭 TIM3 */
-      TIM_Cmd(TIM3, DISABLE);
-      TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
-      TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    NVIC_DisableIRQ(TIM3_IRQn);
+    NVIC_ClearPendingIRQ(TIM3_IRQn);
 
-      /* 关闭 TIM3 在 NVIC 中的中断 */
-      NVIC_DisableIRQ(TIM3_IRQn);
-      NVIC_ClearPendingIRQ(TIM3_IRQn);
+    /* 关闭 SysTick。 */
+    SysTick->CTRL = 0U;
+    SysTick->LOAD = 0U;
+    SysTick->VAL  = 0U;
 
-      /* 关闭 SysTick */
-      SysTick->CTRL = 0U;
-      SysTick->LOAD = 0U;
-      SysTick->VAL  = 0U;
+    TIM_DeInit(TIM3);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, DISABLE);
 
-      /* 恢复 TIM3 外设寄存器 */
-      TIM_DeInit(TIM3);
+    /* 恢复默认 HSI 时钟，供 APP 重新配置 PLL。 */
+    RCC_DeInit();
+}
 
-      /* 关闭 TIM3 外设时钟 */
-      RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, DISABLE);
-
-      /* 恢复默认 HSI 时钟，供 APP 重新配置 PLL */
-      RCC_DeInit();
-  }
 void JumpToApp(void)
 {
-        uint16_t i;
-        uint32_t jumpAddr,armAddr;
-        //读取APP前4个字节数据
-        armAddr=*(uint32_t *)APP_FLASH_ADDR;
-        for(i=0;i<5000;++i)
-        {
-                log_i("bootloader running...\r\n");
-        }
-        /*
-         * RAM地址范围是0x200000000~0x2001FFFF
-         * 表示应用程序的入口地址在 RAM 的有效范围内（即在 0x20000000 到 0x2001FFFF 之间）
-         * APP_FLASH_ADDR前四个字节的内容：表示应用程序的初始栈顶指针（SP）地址
-         * __IO的作用是告诉编译器和开发者某个变量或指针是与硬件寄存器或内存映射外设相关的，
-         * 确保编译器在处理这些变量时不会进行优化，从而保证每次访问都能读取或写入最新的值。
-        */
-        if (((*(__IO uint32_t*)APP_FLASH_ADDR) & 0x2FFE0000 ) == 0x20000000)
-        {
-                // 获取应用程序的入口地址（复位向量）
-                jumpAddr = *(__IO uint32_t*) (APP_FLASH_ADDR + 4); //PC指针地址
-                // 将函数指针.-应用程序的入口地址
-                JumpToApplication=(pFunction)jumpAddr;
-                // 设置栈顶指针为应用程序的初始值
-                __set_MSP(*(__IO uint32_t*) APP_FLASH_ADDR);
-                // 跳转到应用程序，开始执行
-                JumpToApplication();
-        }
-        return;
+    uint32_t jump_address;
+    pFunction jump_to_application;
+
+    /* 向量表第一个字是初始 MSP，STM32F411 SRAM 范围为
+       0x20000000~0x2001FFFF。 */
+    if (((*(__IO uint32_t *)APP_RUN_START_ADDRESS) & 0x2FFE0000U) == 0x20000000U)
+    {
+        /* 向量表第二个字是 APP 的复位入口地址。 */
+        jump_address = *(__IO uint32_t *)(APP_RUN_START_ADDRESS + sizeof(uint32_t));
+        jump_to_application = (pFunction)jump_address;
+
+        __set_MSP(*(__IO uint32_t *)APP_RUN_START_ADDRESS);
+        jump_to_application();
+    }
 }
-/* Private functions ---------------------------------------------------------*/
- /*
-  *power by WeAct Studio
-  *The board with `WeAct` Logo && `version number` is our board, quality guarantee. 
-  *For more information please visit: https://github.com/WeActTC/MiniF4-STM32F4x1
-  *更多信息请访问：https://gitee.com/WeActTC/MiniF4-STM32F4x1
-  */
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
+```
+
+如果 Bootloader 还使用了其他定时器、串口或 DMA，也要在 `DisablePeripherals()` 中关闭对应外设和中断。
+
+### 3. 加入 Keil 工程
+
+1. 将 `Boot_Manager.c` 加入 Keil 的 Boot Manager 分组。
+2. 在魔法棒的 **C/C++ → Include Paths** 中加入 `Tasks/Boot_Manager`。
+3. 在 Bootloader 的 `main.c` 中包含 `Boot_Manager.h`，不再在 `main.c` 中定义 APP 地址和跳转函数。
+
+```c
+#include "Boot_Manager.h"
+
 int main(void)
 {
-	/* Enable Clock Security System(CSS): this will generate an NMI exception
-     when HSE clock fails *****************************************************/
-  RCC_ClockSecuritySystemCmd(ENABLE);
-	SCB->VTOR=0X08000000 | 0X0;
- /*!< At this stage the microcontroller clock setting is already configured, 
-       this is done through SystemInit() function which is called from startup
-       files before to branch to application main.
-       To reconfigure the default setting of SystemInit() function, 
-       refer to system_stm32f4xx.c file */
+    /* Bootloader 原有初始化代码。 */
 
-  /* SysTick end of count event each 1ms */
-  SystemCoreClockUpdate();
-  RCC_GetClocksFreq(&RCC_Clocks);
-  SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
-  
+    DisablePeripherals();
+    JumpToApp();
 
-  /* Add your application code here */
-  /* Insert 50 ms delay */
-  Delay(50);
-
-  GPIO_Config();
-  TIM_Config();   
-	app_elog_init();
-
-  DisablePeripherals();
-  JumpToApp();
-  /* Infinite loop */
-  while (1)
-  {
-	log_i("hi");
-	Delay(1000);
-	}
+    while (1)
+    {
+        /* APP 无效时停留在 Bootloader。 */
+    }
 }
-
-/**
-  * @brief  Inserts a delay time.
-  * @param  nTime: specifies the delay time length, in milliseconds.
-  * @retval None
-  */
-void Delay(__IO uint32_t nTime)
-{ 
-  uwTimingDelay = nTime;
-
-  while(uwTimingDelay != 0);
-}
-
-/**
-  * @brief  Decrements the TimingDelay variable.
-  * @param  None
-  * @retval None
-  */
-void TimingDelay_Decrement(void)
-{
-  if (uwTimingDelay != 0x00)
-  { 
-    uwTimingDelay--;
-  }
-}
-
-#ifdef  USE_FULL_ASSERT
-
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t* file, uint32_t line)
-{ 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
-  /* Infinite loop */
-  while (1)
-  {
-  }
-}
-#endif
-
-/**
-  * @}
-  */
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-
 ```
 
-### 然后APP程序配置:
+### 4. APP 程序配置
 
-```
+Keil 地址配置：
+
+| 工程       | IROM1 Start  | IROM1 Size | 地址范围                    |
+| ---------- | ------------ | ---------- | --------------------------- |
+| Bootloader | `0x08000000` | `0x8000`   | `0x08000000~0x08007FFF`     |
+| APP        | `0x08008000` | `0x18000`  | `0x08008000~0x0801FFFF`     |
+
+![Keil APP IROM1 配置](image/IAP实操+原理/1786245097041.png)
+
+APP 包含 `Boot_Manager.h`，并在初始化外设前设置向量表：
+
+```c
+#include "Boot_Manager.h"
+
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-	SCB->VTOR=FLASH_BASE | 0X19000;
-	__enable_irq();
-  /* USER CODE END 1 */
+    SCB->VTOR = APP_RUN_START_ADDRESS;
+    __enable_irq();
+
+    /* APP 原有初始化代码。 */
 ```
 
-![1786245097041](image/IAP实操+原理/1786245097041.png)
-
-到这里就可以通过用户bootloader跳转到用户APP了
+到这里就可以通过用户 Bootloader 跳转到用户 APP。

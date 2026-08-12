@@ -62,10 +62,14 @@ uint8_t Flash_erase(u32 addr, u32 size)
 //    FLASH_Status ret = 1;
     uint32_t flash_start_sector = 0;
     uint32_t flash_end_sector = 0;
+    if (size == 0U)
+    {
+       return 1U;
+    }
     flash_start_sector = STMFLASH_GetFlashSector(addr);
-    flash_end_sector = STMFLASH_GetFlashSector(addr + size);
+    flash_end_sector = STMFLASH_GetFlashSector(addr + size - 1u);
 
-    for (uint8_t i = 0; i <= 12; i++)
+    for (uint8_t i = 0; i < 12; i++)
     {
         if ((Flash_Sectorsize[i]) >= flash_start_sector && (Flash_Sectorsize[i]) <= flash_end_sector)
         {

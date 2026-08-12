@@ -45,11 +45,7 @@ typedef  void (*pFunction)(void);
 // #error "Please select first the STM32 device to be used (in stm32f10x.h)"    
 //#endif
 
- #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
- #define FLASH_SIZE                        (0x100000) /* 1 MByte */
-
-//计算上传文件大小 
-#define FLASH_IMAGE_SIZE                   (uint32_t) (FLASH_SIZE - (ApplicationAddress - 0x08000000))
+#define PAGE_SIZE                         (0x800U) /* 2 Kbytes */
 
 #define IS_AF(c)  ((c >= 'A') && (c <= 'F'))
 #define IS_af(c)  ((c >= 'a') && (c <= 'f'))
@@ -72,7 +68,7 @@ uint32_t SerialKeyPressed(uint8_t *key);
 uint8_t GetKey(void);
 void SerialPutChar(uint8_t c);
 void Serial_PutString(uint8_t *s);
-//void GetInputString(uint8_t * buffP);
+void GetInputString(uint8_t * buffP);
 //uint32_t FLASH_PagesMask(__IO uint32_t Size);
 //void FLASH_DisableWriteProtectionPages(void);
 //void Main_Menu(void);

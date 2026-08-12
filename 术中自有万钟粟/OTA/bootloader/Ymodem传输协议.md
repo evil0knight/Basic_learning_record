@@ -12,41 +12,18 @@ Ymodem 只负责可靠地把文件从上位机传到单片机。串口初始化�
 
 [Ymodem 源码与适配文件](../../../库中车马多如簇/Ymodem/MOC.md)
 
-### `Core/Inc/Boot_Manager.h`：新建
+### 复用 Boot Manager
 
-```c
-#ifndef __BOOT_MANAGER_H
-#define __BOOT_MANAGER_H
+Keil 的 Bootloader/APP 地址、向量表和 Boot Manager 配置见 [IAP 实操 + 原理](./IAP实操+原理.md)。
 
-#define ApplicationAddress  0x08020000U
-#define FLASH_END_ADDRESS   0x08080000U
-#define APP_FLASH_SIZE      (FLASH_END_ADDRESS - ApplicationAddress)
-
-#endif
-```
-
-### Keil配置:
-
-1. ![1786438410415](image/Ymodem传输协议/1786438410415.png)
-2. APP工程,main的第一句就写:
-
-   ```
-     /* USER CODE BEGIN 1 */
-   	SCB->VTOR=FLASH_BASE | 0X20000;//由于使用用户bootloader,设置中断向量表起始地址
-   	__enable_irq();
-     /* USER CODE END 1 */
-   ```
-3. bootloader工程,main第一句就写:`SCB->VTOR=0X08000000;`
-4. *keil group*,加入 `common.c`,`ymodem.c`,`flash.c`,`Usart.c`,这些应该已经放到工程分层好的位置了,文件夹位置略
-5. 魔法棒*Include Paths*,添加包含好所有的 `.h`
+Ymodem 还需将 `common.c`、`ymodem.c`、`flash.c`、`Usart.c` 加入 Keil 工程，并将对应头文件目录加入 **C/C++ → Include Paths**。
 
 ## 文件代码编写:
 
-1. `common.h`：第 48~52 行,改bootloader工程大小
+1. `common.h`：只保留协议使用的 `PAGE_SIZE`；固件大小统一使用 `APP_RUN_SIZE`，不再重复定义大小宏。
 
-   ```
-   #define FLASH_SIZE        0x80000U
-   #define FLASH_IMAGE_SIZE  ((uint32_t)APP_FLASH_SIZE)
+   ```c
+   #define PAGE_SIZE  (0x800U)
    ```
 2. 调用 `Ymodem_Receive()` 前初始化需要的通信接口。当前 `Usart.c` 默认初始化 USART1；使用其他串口时初始化对应 USART。
 3. 接收接口：`ymodem.c` 第 58 行调用 `SerialKeyPressed()`，在 `common.c` 第 201 行实现。
@@ -74,7 +51,7 @@ Ymodem 只负责可靠地把文件从上位机传到单片机。串口初始化�
    ```
 
    使用 USART2 时，将 `USART1` 改为 `USART2`。使用 USB CDC 等其他字节流接口时，只替换 `SerialKeyPressed()` 和 `SerialPutChar()` 的函数体，不修改 `ymodem.c`。
-5. 擦除接口：`ymodem.c` 第 219 行调用 `Flash_erase(ApplicationAddress, size)`，对应 `flash.c` 第 57 行。接口返回 `0` 表示成功，返回 `1` 表示失败。
+5. 擦除接口：`ymodem.c` 第 219 行调用 `Flash_erase(APP_RUN_START_ADDRESS, size)`，对应 `flash.c` 第 57 行。接口返回 `0` 表示成功，返回 `1` 表示失败。
 6. 写入接口：`ymodem.c` 第 247 行调用 `Flash_Write(FlashDestination, data)`，对应 `flash.c` 第 116 行。当前协议代码每次写入 4 字节，并在写入后回读比较。
 7. 芯片配置：
 
@@ -83,7 +60,7 @@ Ymodem 只负责可靠地把文件从上位机传到单片机。串口初始化�
    - `VoltageRange_3` 表示芯片供电电压为 $2.7\text{ V}\sim3.6\text{ V}$，适用于常见的 3.3 V 供电。它不会设置芯片电压，而是让 `FLASH_EraseSector()` 按该电压范围设置 Flash 控制寄存器的编程并行度 `PSIZE`；电压越高，可安全并行操作的数据宽度越大。范围选择错误可能导致擦除失败或操作不可靠。
 
    更换芯片时，按目标芯片数据手册修改扇区地址和供电电压范围；若仍使用 STM32F4 SPL，不修改 `ymodem.c`。
-8. APP 区配置：`ApplicationAddress` 是擦除和写入起点，`APP_FLASH_SIZE` 是允许接收的最大文件大小，继续使用顶部 `Boot_Manager.h` 中的配置。
+8. APP_RUN 配置：`APP_RUN_START_ADDRESS` 是擦除、写入和跳转起点，`APP_RUN_SIZE` 是允许接收的最大文件大小（96 KiB），使用 [IAP 实操 + 原理](./IAP实操+原理.md)中 `Boot_Manager.h` 的配置。
 
 Ymodem 只调用 `Flash_erase()` 和 `Flash_Write()` 两个 Flash 接口。
 
@@ -115,6 +92,10 @@ if (received_crc != calculated_crc)
 `uint32_t ymodem_buffer[256]` 是 1024 字节、4 字节对齐的接收缓冲区
 
 ```c
+#include "main.h"
+#include "tim.h"
+#include "gpio.h"
+#include "elog.h"
 #include "stm32f4xx.h"
 #include "ymodem.h"
 #include "Boot_Manager.h"
@@ -122,28 +103,42 @@ if (received_crc != calculated_crc)
 
 static uint32_t ymodem_buffer[256];
 
-/* 由项目实现：按键、升级标志或短时串口命令均可。 */
-extern int UpgradeRequested(void);
+/* 示例：上电按键触发升级，也可替换为升级标志或串口命令。 */
+int UpgradeRequested(void)
+{
+    return Key_Scan() ? 1 : 0;
+}
 ```
 
-`AppVectorIsValid()` 和 `JumpToApp()` 的实现见 [IAP实操+原理](./IAP实操+原理.md)（这里的程序是直接跳转）
+`DisablePeripherals()` 和 `JumpToApp()` 已在 [IAP 实操 + 原理](./IAP实操+原理.md)的 `Boot_Manager.c` 中实现，这里只需包含 `Boot_Manager.h` 后调用。
 
 ```c
 int main(void)
 {
     int32_t received_size;
 
-    /* SystemInit() 已由启动文件在进入 main() 前调用。 */
-    SCB->VTOR = 0x08000000U;
+    RCC_ClockSecuritySystemCmd(ENABLE);
+    SCB->VTOR = BOOTLOADER_START_ADDRESS;
+
+    SystemCoreClockUpdate();
+    RCC_GetClocksFreq(&RCC_Clocks);
+    SysTick_Config(RCC_Clocks.HCLK_Frequency / 1000);
+
+    Delay(50);
+
+    GPIO_Config();
+    TIM_Config();
     USART1_Init();
+    app_elog_init();
 
     /* 由按键、升级标志或上位机命令决定是否进入升级。 */
     if (UpgradeRequested())
     {
         received_size = Ymodem_Receive((uint8_t *)ymodem_buffer);
 
-        if ((received_size > 0) && AppVectorIsValid())
+        if (received_size > 0)
         {
+            DisablePeripherals();
             NVIC_SystemReset();
         }
 
@@ -153,10 +148,8 @@ int main(void)
         }
     }
 
-    if (AppVectorIsValid())
-    {
-        JumpToApp();
-    }
+    DisablePeripherals();
+    JumpToApp();
 
     while (1)
     {
@@ -181,7 +174,7 @@ APP 的 `main()` 在初始化外设前恢复向量表和全局中断：
 ```c
 int main(void)
 {
-    SCB->VTOR = 0x08020000U;
+    SCB->VTOR = APP_RUN_START_ADDRESS;
     __enable_irq();
 
     /* APP 自己的时钟和外设初始化。 */
@@ -211,10 +204,12 @@ int main(void)
 
 ### 发送 APP
 
-1. 编译 APP 工程并生成 `.bin`，不要发送带地址记录的 `.hex`，也不要误选 Bootloader 的 `.bin`。
+1. Keil → 魔法棒 → Output → 勾选 Create HEX File；再切到 User → After Build 勾选 Run #1，填入：
+   $K\ARM\ARMCC\bin\fromelf.exe --bin --output=@L.bin !L
+   编译后 `.bin` 在 `.axf` 同目录（通常是 `Objects/`）,**注意,是APP的bin,别找错了💦**
 2. 复位板卡并触发升级模式，等待 SecureCRT 终端连续出现 `C`。这表示程序已进入 `Ymodem_Receive()` 并请求 CRC16 传输。
 3. 点击 `Transfer → Send Ymodem...`，选择 APP 的 `.bin`，确认后开始传输。
 4. SecureCRT 弹出传输进度窗口后，Bootloader 依次接收文件信息包和数据包；不要在终端中继续输入字符。
-5. 进度达到 100% 且窗口正常结束后，Bootloader 校验 APP 向量表并复位，APP 从 `0x08020000` 启动。
+5. 进度达到 100% 且窗口正常结束后，Bootloader 校验 APP 向量表并复位，APP 从 `0x08008000` 启动。
 
 必须先让板卡进入接收模式并出现 `C`，再点击 `Send Ymodem`。如果 SecureCRT 一直停在等待状态，先取消发送，确认终端能看到 `C` 后重试。
