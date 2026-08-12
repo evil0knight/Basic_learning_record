@@ -33,6 +33,7 @@
 |     编码器     | 正交编码器测速，TIM 编码器模式 | [编码器笔记](./编码器/MOC.md)                           |
 |     缓冲区     | 单缓冲,双缓冲,环形缓冲,乒乓缓冲 | [缓冲区笔记](缓冲区/MOC.md)                             |
 |   EasyLogger   | 嵌入式日志库，源码 + keil 移植  | [使用方法](../术中自有万钟粟/debug方法/EasyLogger.md)   |
-|     Ymodem     | 文件传输协议，源码 + 协议笔记  | [源码](./Ymodem/) · [协议笔记](../术中自有万钟粟/OTA/bootloader/Ymodem传输协议.md) |
+|     Flash      | STM32F411 片内 Flash 擦写       | [Flash](./flash/MOC.md)                                |
+|     Ymodem     | 文件传输协议，源码 + 协议笔记  | [Ymodem](./Ymodem/MOC.md)                               |
 
 <!-- 整理已经熟悉的模块 -->

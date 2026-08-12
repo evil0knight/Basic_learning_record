@@ -6,7 +6,9 @@
 
 ---
 
-1. 整体的[流程步骤](流程步骤.md), [环境配置](环境配置.md)
+1. 整体的[流程步骤](流程步骤.md)(或者说OTA的思路), [环境配置](环境配置.md)
 2. bootloader阶段:
+
    1. [芯片烧录模式（ICP / ISP / IAP）与 BOOT 引脚](bootloader/板子上的boot0和boot1.md)
-   2. [IAP实操+原理](bootloader/IAP实操+原理.md)
+   2. [IAP实操步骤+原理](bootloader/IAP实操+原理.md),这里是直接从bootloader跳转到APP,是bootloader基础
+   3. [Ymodem传输协议](bootloader/Ymodem传输协议.md),如何使用串口+Ymodem协议发送文件,并擦写APP到flash里

@@ -2,15 +2,23 @@
 
 [← bootloader](./MOC.md) | [← 主页](../../../index.md)
 
+> 这里是直接从bootloader跳转到APP,是bootloader基础
+
 ---
 
 ## 原理:
 
-在keil里配置程序flash0地址和4地址里的MSP和跳转函数,先跳转到用户bootloader里,然后用户bootloader再跳转到app里,了解一下[上电的流程](https://app.diagrams.net/#Hevil0knight%2FBasic_learning_record%2Fmain%2F%E6%9C%AF%E4%B8%AD%E8%87%AA%E6%9C%89%E4%B8%87%E9%92%9F%E7%B2%9F%2FCortex-M4%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86%2Farm_mcu%E5%86%85%E5%AD%98%E5%88%92%E5%88%86.drawio#%7B%22pageId%22%3A%22arm_mcu_memory%22%7D)(左边)
+在keil里配置程序flash0地址和4地址里的MSP和跳转函数,先跳转到用户bootloader里,然后用户bootloader再跳转到app里,了解一下[上电的流程](https://app.diagrams.net/#Hevil0knight%2FBasic_learning_record%2Fmain%2F%E6%9C%AF%E4%B8%AD%E8%87%AA%E6%9C%89%E4%B8%87%E9%92%9F%E7%B2%9F%2FCortex-M4%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86%2Farm_mcu%E5%86%85%E5%AD%98%E5%88%92%E5%88%86.drawio#%7B%22pageId%22%3A%22arm_mcu_memory%22%7D)(右边)
 
 ## 实操
 
-[环境配置](环境配置.md)后,改一下 `main.c`,已经写好注释了,就是关外设,然后告诉了这个程序下一步跳到app去运行去
+[环境配置](环境配置.md)后,
+
+编译优化等级高一点
+
+### bootloader程序配置:
+
+改一下 `main.c`,已经写好注释了,
 
 ```
 /**
@@ -73,6 +81,9 @@ static uint32_t JumpAddress;
 
       /* 关闭 TIM3 外设时钟 */
       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, DISABLE);
+
+      /* 恢复默认 HSI 时钟，供 APP 重新配置 PLL */
+      RCC_DeInit();
   }
 void JumpToApp(void)
 {
@@ -206,3 +217,18 @@ void assert_failed(uint8_t* file, uint32_t line)
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
 ```
+
+### 然后APP程序配置:
+
+```
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+	SCB->VTOR=FLASH_BASE | 0X19000;
+	__enable_irq();
+  /* USER CODE END 1 */
+```
+
+![1786245097041](image/IAP实操+原理/1786245097041.png)
+
+到这里就可以通过用户bootloader跳转到用户APP了

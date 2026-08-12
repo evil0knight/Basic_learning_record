@@ -27,5 +27,6 @@
 | Ozone调试器            | SEGGER Ozone 调试器下载                                                         | [Ozone调试器 笔记](../debug方法/Ozone调试器.md)                             |
 | RTT                    | SEGGER RTT 实时传输                                                             | [RTT 笔记](../debug方法/RTT/MOC.md)                                         |
 | EasyLogger             | 嵌入式日志库，支持彩色分级输出                                                   | [EasyLogger 笔记](../debug方法/EasyLogger.md)                               |
+| SecureCRT              | SecureCRT上位机发送bin文件                                                       | [下载链接](https://pan.baidu.com/share/init?surl=sZ-eVfsNHwpMGhgzUuDpFQ)(qaz8), [使用教程](https://mp.weixin.qq.com/s?__biz=Mzk0NjI3ODE4OQ==&mid=2247669151&idx=2&sn=0ad14fbe288f8eaca2075706a3798007&chksm=c3048fddf47306cbb6c6b93d44f55027a3cb6cc555ce753f9b04e5feb22005400fa3fa91824e#rd) |
 
 ---

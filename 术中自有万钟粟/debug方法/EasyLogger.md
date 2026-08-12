@@ -1,6 +1,6 @@
 # EasyLogger
 
-[← 返回 配置学习](../配置学习/MOC.md) | [← 返回 debug方法](./MOC.md) | [← 主页](../../index.md)
+[← 返回 模块总览](../../库中车马多如簇/MOC.md) | [← 返回 配置学习](../配置学习/MOC.md) | [← 返回 debug方法](./MOC.md) | [← 主页](../../index.md)
 
 [←OTA配置](../OTA\环境配置.md)
 
@@ -10,9 +10,11 @@
 
 ## keil配置
 
-1. 我下载到toolchains里了![1785589992431](image/EasyLogger/1785589992431.png)
+1. 我放到 `库中车马多如簇\EasyLogger-master\easylogger`里了
 
-   ![1785590106832](image/EasyLogger/1785590106832.png)
+   ![1786279540405](image/EasyLogger/1786279540405.png)
+
+   直接复制到你要添加的工程里就行
 2. keil编译包含:![1785590253080](image/EasyLogger/1785590253080.png)并且包含头文件![1785590340457](image/EasyLogger/1785590340457.png)
 
 ## 代码部分:
@@ -44,7 +46,7 @@
                (unsigned long) sec, (unsigned long) ms);
        return time_buf;
    ```
-5. 创建Debug.c把下面的复制进去(Toolchains里我已经创建了可以直接复制)
+5. 创建Debug.c把下面的复制进去(库中我已经创建了可以直接复制)
 
    ```c
    #include "Debug.h"
@@ -70,7 +72,7 @@
        elog_start();
    }
    ```
-6. 创建 `Debug.h`(Toolchains里我已经创建了可以直接复制)
+6. 创建 `Debug.h`(库中我已经创建了可以直接复制)
 
    ```
    /* Define to prevent recursive inclusion---------*/

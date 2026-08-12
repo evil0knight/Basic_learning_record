@@ -8,6 +8,10 @@
 
 ## 语言基础
 
+[类型转换：整型提升与算术转换（unsigned "赢"）](./类型转换.md)
+
+[头文件重复包含与守卫 (#ifndef / #pragma once)](头文件重复包含.md)
+
 [typedef](typedef.md)
 
 [bool — 占8位的原因](bool.md)
@@ -39,6 +43,8 @@
 [assert — 断言，终止程序](assert.md)
 
 [attribute GCC编译器扩展属性](__attribute__.md)
+
+[位域（Bit-field）](位域.md)
 
 ### 预处理 / 编译-
 

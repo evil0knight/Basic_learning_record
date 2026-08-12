@@ -27,7 +27,7 @@
 #include "common.h"
 #include "stm32f4xx_flash.h"
 #include "Boot_Manager.h"
-#include "Flash.h"
+#include "flash.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -39,7 +39,6 @@ uint32_t EraseCounter = 0x0;
 uint32_t NbrOfPage = 0;
 FLASH_Status FLASHStatus = FLASH_COMPLETE;
 uint32_t RamSource;
-extern uint8_t tab_1024[1024];
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -197,7 +196,8 @@ int32_t Ymodem_Receive (uint8_t *buf)
 
                     /* Test the size of the image to be sent */
                     /* Image size is greater than Flash size */
-                    if (size > (FLASH_SIZE - 1))
+                    //if (size > (FLASH_SIZE - 1))
+                    if ((size <= 0) || ((uint32_t)size > APP_FLASH_SIZE))
                     {
                       /* End session */
                       Send_Byte(CA);
