@@ -7,4 +7,4 @@
 | --- | --- |
 | [flash.h](./flash.h) | 扇区地址和接口声明 |
 | [flash.c](./flash.c) | Flash 擦写代码 |
-| [Ymodem 移植](../../术中自有万钟粟/OTA/bootloader/Ymodem传输协议.md) | Ymodem 笔记 |
+| [Ymodem 移植](../../术中自有万钟粟/OTA/Ymodem传输协议.md) | Ymodem 笔记 |

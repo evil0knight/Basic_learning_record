@@ -1,7 +1,7 @@
 
 # 芯片烧录模式与 BOOT 引脚（ICP / ISP / IAP）
 
-[← bootloader](./MOC.md) | [← 主页](../../../index.md)
+[← OTA](./MOC.md) | [← 主页](../../index.md)
 
 ---
 

@@ -1,16 +1,16 @@
 # Ymodem 传输协议
 
-[← bootloader](./MOC.md) | [← 主页](../../../index.md)
+[← OTA](./MOC.md) | [← 主页](../../index.md)
 
 > [CSDN 详解](https://blog.csdn.net/huangdenan/article/details/103611081) | [立芯协议讲解](https://twd6onxsxva.feishu.cn/docx/QFGNdILHSoTBW2xdgWRcKrmnnAe?from=from_parent_docx) | [立芯移植视频](https://twd6onxsxva.feishu.cn/docx/U8EUdres3oy4LuxLbxqckmaVnOd)|
 >
-> [Ymodem 源码与适配文件](../../../库中车马多如簇/Ymodem/MOC.md)
+> [Ymodem 源码与适配文件](../../库中车马多如簇/Ymodem/MOC.md)
 
 Ymodem 只负责可靠地把文件从上位机传到单片机。串口初始化、Flash 擦写、升级入口、固件合法性检查和跳转 APP 都由 Bootloader 完成。
 
 ---
 
-[Ymodem 源码与适配文件](../../../库中车马多如簇/Ymodem/MOC.md)
+[Ymodem 源码与适配文件](../../库中车马多如簇/Ymodem/MOC.md)
 
 ### 复用 Boot Manager
 
@@ -200,7 +200,7 @@ int main(void)
 
 ## SecureCRT 上位机发送
 
-安装教程已经放到[配置学习](../../配置学习/MOC.md)里了,软件位置在 `E:\ProgramFile\UART_Serial_Assistant\SecureCRT\open_exe`
+安装教程已经放到[配置学习](../配置学习/MOC.md)里了,软件位置在 `E:\ProgramFile\UART_Serial_Assistant\SecureCRT\open_exe`
 
 ### 发送 APP
 

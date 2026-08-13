@@ -1,6 +1,6 @@
 # IAP 实操 + 原理
 
-[← bootloader](./MOC.md) | [← 主页](../../../index.md)
+[← OTA](./MOC.md) | [← 主页](../../index.md)
 
 > 这里是 Bootloader 直接跳转到 APP 的基础实现。
 
