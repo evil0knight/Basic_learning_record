@@ -204,9 +204,31 @@ int main(void)
 
 ### 发送 APP
 
-1. Keil → 魔法棒 → Output → 勾选 Create HEX File；再切到 User → After Build 勾选 Run #1，填入：
+1. Keil → 魔法棒 → Output → 勾选 Create HEX File。`Name of
+   Executable` 必须保留为 `xxxxxxx.axf`，不能改成 `.bin`。AXF 是链接器的
+   主输出，BIN 是在 After Build 阶段由 AXF 转换出的第二个文件；这样 AXF、
+   HEX 和 BIN 才能同时存在。
+
+   再切到 User → After Build 勾选 Run #1，填入：
+
+   ```text
    $K\ARM\ARMCC\bin\fromelf.exe --bin --output=@L.bin !L
-   编译后 `.bin` 在 `.axf` 同目录（通常是 `Objects/`）,**注意,是APP的bin,别找错了💦**
+   ```
+
+   其中 `!L` 必须展开为 `.axf` 输入文件，`@L.bin` 是输出文件。如果工程宏
+   展开异常，使用明确路径，输入和输出不能写成同一个文件。AUV 工程使用：
+
+   ```text
+   $K\ARM\ARMCC\bin\fromelf.exe --bin --output=FangZhou_AUV_V1.0.0\FangZhou_AUV_V1_0_0.bin FangZhou_AUV_V1.0.0\FangZhou_AUV_V1_0_0.axf
+   ```
+
+   构建日志中应显示 `FromELF` 的输入为 `.axf`、输出为 `.bin`。生成后检查
+   `.axf` 和 `.bin` 同时存在；BIN 大小应接近程序 ROM 大小，若 BIN 反而和
+   带调试信息的 AXF 一样达到数 MB，说明 `Name of Executable` 或转换命令仍
+   配置错误。
+
+   **注意：命令中的 `--bin` 和 `--output` 是两个普通短横线，不是排版产生
+   的长横线。发送的是 APP 的 BIN，不是 Bootloader 的 BIN。**
 2. 复位板卡并触发升级模式，等待 SecureCRT 终端连续出现 `C`。这表示程序已进入 `Ymodem_Receive()` 并请求 CRC16 传输。
 3. 点击 `Transfer → Send Ymodem...`，选择 APP 的 `.bin`，确认后开始传输。
 4. SecureCRT 弹出传输进度窗口后，Bootloader 依次接收文件信息包和数据包；不要在终端中继续输入字符。

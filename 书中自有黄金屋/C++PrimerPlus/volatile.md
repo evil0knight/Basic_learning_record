@@ -19,27 +19,42 @@ RTOS中典型应用：ISR和任务共享变量（中断中修改flag，任务中
 | 硬件寄存器                  | 外设寄存器的值随时可能被硬件改变                                                |
 | 中断服务程序（ISR）共享变量 | 主循环读取、ISR 写入的标志位                                                    |
 | 多线程共享变量（有限）      | 防止编译器优化，但**不保证[原子性](./原子性与atomic.md)**，不能替代锁/atomic |
-| DMA缓冲区                   | DMA控制器直接修改内存                                                           |
+| DMA缓冲区                   | DMA控制器直接修改内存,需要将指针本身声明为 volatile                             |
 | MMIO 操作                   | Memory-mapped I/O 必须加 volatile                                               |
 
+---
+
+## 对于指针:
+
+`volatile int *p`：p 指向的**内容**是 volatile 的，每次通过 p 读取值都从内存重读。p 本身不是 volatile。
+
+`int * volatile p`：**p 本身**是 volatile 的，意味着指针的值（即地址）可能被外部改变，每次使用 p 都重新读取指针值。
+
+`volatile int * volatile p`：指针和指向的内容**都是** volatile 的。
+
+---
+
+## 寄存器映射（外设寄存器）
+
+外设寄存器挂在总线地址上，值会被**硬件随时改变**（如状态寄存器的「发送完成」位由外设硬件置位），所以用指针访问必须加 `volatile`。
+
 ```c
-// 硬件寄存器映射
-volatile uint32_t* const UART_SR = (uint32_t*)0x40011000;
+// 等发送完成：不加 volatile 会死循环
+volatile uint32_t *status_reg = (volatile uint32_t *)0x40013800;
 
-// ISR 共享标志
-volatile bool data_ready = false;
-
-void ISR_Handler() {
-    data_ready = true;  // 中断中写
-}
-
-void main_loop() {
-    while (!data_ready);  // 主循环轮询，不会被优化掉
-}
+while ((*status_reg & 0x01) == 0);   // 等待就绪位
 ```
 
-<details>
-<summary><h3>函数int square(volatile int *ptr)能实现预期目标吗？为什么？</h3></summary>
+**不加 volatile 为什么翻车**：编译器发现循环体里没改 `*status_reg`，就认为它每次读都一样，把读取**提到循环外只读一次**，于是 `while` 永远卡在第一次读到的值（死循环 / 永不等待）。
+
+加了 `volatile`，编译器强制**每次循环真正去读硬件寄存器**，才能看到硬件改的新值。
+
+> **铁律：硬件寄存器地址必须用 `volatile` 修饰。**
+> 内核侧的特殊寄存器（MRS/MSR 访问、无地址）不需要 volatile，见 [特殊寄存器](../../术中自有万钟粟/Cortex-M4内核原理/特殊寄存器.md)。
+
+---
+
+## 函数int square(volatile int *ptr)能实现预期目标吗？为什么？
 
 函数 `int square(volatile int *ptr) { return *ptr * *ptr; }` **不能**实现预期目标。
 
@@ -56,4 +71,4 @@ int square(volatile int *ptr)
 
 这道题考的就是对 volatile **每次访问都重新读取内存**语义的理解。
 
-`</details>`
+---

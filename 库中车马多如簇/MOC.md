@@ -35,5 +35,6 @@
 |   EasyLogger   | 嵌入式日志库，源码 + keil 移植  | [使用方法](../术中自有万钟粟/debug方法/EasyLogger.md)   |
 |     Flash      | STM32F411 片内 Flash 擦写       | [Flash](./flash/MOC.md)                                |
 |     Ymodem     | 文件传输协议，源码 + 协议笔记  | [Ymodem](./Ymodem/MOC.md)                               |
+|       AES      | 对称加密，128/192/256 bit CBC，源码 + OTA 使用 | [AES](./AES/MOC.md)                                    |
 
 <!-- 整理已经熟悉的模块 -->

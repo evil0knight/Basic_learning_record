@@ -28,5 +28,6 @@
 | RTT                    | SEGGER RTT 实时传输                                                             | [RTT 笔记](../debug方法/RTT/MOC.md)                                         |
 | EasyLogger             | 嵌入式日志库，支持彩色分级输出                                                   | [EasyLogger 笔记](../debug方法/EasyLogger.md)                               |
 | SecureCRT              | SecureCRT上位机发送bin文件                                                       | [下载链接](https://pan.baidu.com/share/init?surl=sZ-eVfsNHwpMGhgzUuDpFQ)(qaz8), [使用教程](https://mp.weixin.qq.com/s?__biz=Mzk0NjI3ODE4OQ==&mid=2247669151&idx=2&sn=0ad14fbe288f8eaca2075706a3798007&chksm=c3048fddf47306cbb6c6b93d44f55027a3cb6cc555ce753f9b04e5feb22005400fa3fa91824e#rd) |
+| 串口加密传输工具       | STM32串口ISP及文件加密工具，加密固件后经串口发送，`E:\ProgramFile\UART_Serial_Assistant\串口加密传输工具\STM32串口ISP及文件加密工具.exe` | [下载链接](https://pan.baidu.com/s/1McQ1cT1JvEs1lzYHR_EppQ?pwd=4444) |
 
 ---

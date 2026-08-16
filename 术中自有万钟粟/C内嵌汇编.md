@@ -100,6 +100,8 @@ static inline void set_control(uint32_t val) {
 
 破坏列表中写 `"memory"` 告诉编译器：此处可能读写任意内存，不要缓存寄存器中的内存值。
 
+> 乱序根源与 volatile/编译屏障/CPU 屏障的完整对比见 [内存屏障与指令重排序](./Cortex-M4内核原理/内存屏障与指令重排序.md)。
+
 ---
 
 ## 开关全局中断（ARM Cortex-M）
