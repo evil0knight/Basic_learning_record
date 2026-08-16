@@ -2,7 +2,7 @@
 
 [← 返回 MOC](MOC.md) | [← 主页](../../index.md)
 
-### [volatile笔记](../../书中自有黄金屋/C++PrimerPlus/volatile.md)
+### [volatile笔记](../../书中自有黄金屋/C语言/volatile.md)
 
 ---
 

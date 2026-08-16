@@ -1,6 +1,6 @@
 # 原子性与 std::atomic
 
-[← 并发编程](./并发编程.md) | [← C++ 知识地图](./MOC.md) | [← volatile](./volatile.md)
+[← 并发编程](./并发编程.md) | [← C++ 知识地图](./MOC.md) | [← volatile](../C语言/volatile.md)
 
 ---
 

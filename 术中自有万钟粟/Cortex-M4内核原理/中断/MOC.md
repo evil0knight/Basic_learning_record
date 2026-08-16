@@ -24,5 +24,6 @@
 | 向量表与优先级 | 中断向量表结构、NVIC 优先级分组、抢占 vs 响应优先级 | [向量表与优先级](./向量表与优先级.md) |
 | 中断悬起与标志位 | Pending 机制、外设标志位 vs NVIC Pending 位、解悬、丢中断 | [中断悬起与标志位](./中断悬起与标志位.md) |
 | PWM 与比较匹配中断 | CMP 比较匹配机制、中心对齐双 CMP 中断（Buck-Boost 场景） | [PWM与比较匹配中断](./PWM与比较匹配中断.md) |
+| 看门狗与 PendSV | IWDG/WWDG 复位机制、PendSV 上下文切换 | [看门狗与PendSV](./看门狗与PendSV.md) |
 
 > 📎 异常进入/退出时 SP、LR、PC 寄存器的硬件行为（自动压栈、EXC_RETURN 等）详见 [PC/LR/SP 寄存器笔记](../PC_LR_SP寄存器.md)
