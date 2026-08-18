@@ -111,22 +111,22 @@
         <mxCell id="address-space-title" parent="1" style="text;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;" value="Cortex-M 地址空间" vertex="1">
           <mxGeometry height="30" width="200" x="40" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-system" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#9673a6;fontSize=10;align=left;spacingLeft=8;" value="&lt;b&gt;0xFFFF FFFF⬇️&lt;/b&gt;&lt;br&gt;片上系统外设 / 供应商保留区" vertex="1">
+        <mxCell id="address-space-system" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#9673a6;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0xFFFF FFFF&lt;/span&gt;&lt;br&gt;片上系统外设 / 供应商保留区&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0xE000 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="65" width="200" x="40" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-ppb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;fontSize=9;align=left;spacingLeft=8;" value="&lt;b&gt;0xE000 0000&lt;/b&gt;：PPB 内核私有总线&lt;br&gt;E000 E010：SysTick&lt;br&gt;E000 E100：NVIC&lt;br&gt;E000 ED08：SCB-&amp;gt;VTOR&lt;div&gt;&lt;b&gt;0xE000 0000⬆️&lt;/b&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="address-space-ppb" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82b366;fontSize=9;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0xE000 0000&lt;/span&gt;&lt;br&gt;PPB 内核私有总线&lt;br&gt;E000 E010：SysTick&lt;br&gt;E000 E100：NVIC&lt;br&gt;E000 ED08：SCB-&amp;gt;VTOR&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x6000 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="105" width="200" x="40" y="155" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-external" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" value="&lt;br&gt;外部 RAM / 外部存储区&lt;div&gt;&lt;b&gt;0x6000 0000⬆️&lt;/b&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="address-space-external" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x6000 0000&lt;/span&gt;&lt;br&gt;外部 RAM / 外部存储区&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x4000 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="60" width="200" x="40" y="270" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-peripheral" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" value="片上外设：GPIO、USART、TIM、RCC&lt;div&gt;&lt;b&gt;0x4000 0000⬆️&lt;/b&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="address-space-peripheral" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x4000 0000&lt;/span&gt;&lt;br&gt;片上外设：GPIO、USART、TIM、RCC&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x2000 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="60" width="200" x="40" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-sram" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#66bb6a;fontSize=10;align=left;spacingLeft=8;" value="&lt;br&gt;片内 SRAM：变量、堆、栈&lt;div&gt;&lt;b&gt;0x2000 0000⬆️&lt;/b&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="address-space-sram" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#66bb6a;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x2000 0000&lt;/span&gt;&lt;br&gt;片内 SRAM：变量、堆、栈&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0800 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="75" width="200" x="40" y="410" as="geometry" />
         </mxCell>
-        <mxCell id="address-space-flash" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" value="&lt;br&gt;向量表：MSP、Reset、NMI、中断入口&lt;br&gt;代码区：main() 与用户业务代码&lt;div&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0800 0000&lt;/span&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="address-space-flash" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0800 0000&lt;/span&gt;&lt;br&gt;向量表：MSP、Reset、NMI、中断入口&lt;br&gt;代码区：main() 与用户业务代码&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0800 0000&lt;/span&gt;" vertex="1">
           <mxGeometry height="95" width="200" x="40" y="495" as="geometry" />
         </mxCell>
         <mxCell id="address-space-alias" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#1e88e5;fontSize=10;align=left;spacingLeft=8;" value="&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0800 0000&lt;/span&gt;&lt;div&gt;空白区域&lt;br&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x001F FFFF&lt;/span&gt;&lt;div&gt;根据boot0和boot1映射:栈顶指针和reset handler中断&lt;br&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(255, 51, 51);&quot;&gt;0x0000 0000&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
