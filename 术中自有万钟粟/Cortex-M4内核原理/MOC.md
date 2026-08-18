@@ -19,6 +19,7 @@
 | 中断                 | 中断原理                              | [中断](./中断/MOC.md)                          |
 | CPU 通用寄存器组     | PC/LR/SP 作用、硬件压栈与软件压栈流程 | [cpu通用寄存器组.md](cpu通用寄存器组.md)       |
 | 特殊寄存器           | XPSR/PRIMASK/FAULTMASK/BASEPRI/CONTROL，MRS/MSR 访问 | [特殊寄存器.md](特殊寄存器.md)             |
+| 剩余寄存器           | FPU 寄存器、双栈指针与状态寄存器索引    | [剩余寄存器.md](剩余寄存器.md)                 |
 | 函数栈帧与压栈出栈   | SP/BP双指针、编译期变量偏移、压栈出栈  | [函数栈帧与压栈出栈.md](函数栈帧与压栈出栈.md) |
 | ARM MCU 内存划分     | Flash/RAM/register+**上电流程**      | [arm_mcu内存划分.md](arm_mcu内存划分.md)       |
 | 存储介质             | Nor/NandFlash、EEPROM、EPROM、ROM/RAM/Register 对比+磨损均衡 | [存储介质.md](存储介质.md)               |

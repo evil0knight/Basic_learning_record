@@ -36,5 +36,6 @@
 |     Flash      | STM32F411 片内 Flash 擦写       | [Flash](./flash/MOC.md)                                |
 |     Ymodem     | 文件传输协议，源码 + 协议笔记  | [Ymodem](./Ymodem/MOC.md)                               |
 |       AES      | 对称加密，128/192/256 bit CBC，源码 + OTA 使用 | [AES](./AES/MOC.md)                                    |
+|       SPI      | SPI 通信接口 | [SPI](./SPI/MOC.md)                                    |
 
 <!-- 整理已经熟悉的模块 -->
