@@ -66,52 +66,82 @@
           <mxGeometry height="60" width="180" x="640" y="173" as="geometry" />
         </mxCell>
         <mxCell id="startup-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;align=center;" value="&lt;b&gt;上电启动流程&lt;/b&gt;" vertex="1">
-          <mxGeometry height="35" width="550" x="910" y="105" as="geometry" />
+          <mxGeometry height="30" width="300" x="1330" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="step1-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
-          <mxGeometry height="70" width="550" x="910" y="150" as="geometry" />
+        <mxCell id="reset-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=12;fontStyle=1;align=center;" value="&lt;b&gt;上电 / 硬件复位&lt;/b&gt;" vertex="1">
+          <mxGeometry height="36" width="180" x="1390" y="128" as="geometry" />
         </mxCell>
-        <mxCell id="step1-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;① 硬件复位&lt;/b&gt;" vertex="1">
-          <mxGeometry height="20" width="120" x="925" y="153" as="geometry" />
+        <mxCell id="latch-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=12;align=center;" value="硬件在复位上升沿锁存 BOOT0 / BOOT1 引脚" vertex="1">
+          <mxGeometry height="38" width="560" x="1200" y="196" as="geometry" />
         </mxCell>
-        <mxCell id="step1-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="从 &lt;b&gt;0x0000 0000&lt;/b&gt; 读取 MSP 初始值（BOOT 引脚控制映射到 Flash / 系统存储器 / SRAM）→ 加载到 MSP 寄存器&lt;br&gt;从 &lt;b&gt;0x0000 0004&lt;/b&gt; 读取 Reset_Handler 地址(这里运行原装地址或者配置bootloader去选择性下载) → 加载到 PC 寄存器" vertex="1">
-          <mxGeometry height="40" width="520" x="925" y="170" as="geometry" />
+        <mxCell id="boot0-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=12;align=center;" value="&lt;b&gt;BOOT0 = 0&lt;/b&gt;（默认主 Flash）" vertex="1">
+          <mxGeometry height="42" width="420" x="900" y="270" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-s1-s2" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;" value="">
-          <mxGeometry height="50" relative="1" width="50" as="geometry">
-            <mxPoint x="1185" y="220" as="sourcePoint" />
-            <mxPoint x="1185" y="240" as="targetPoint" />
-          </mxGeometry>
+        <mxCell id="boot1-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=12;align=center;" value="&lt;b&gt;BOOT0 = 1, BOOT1 = 0&lt;/b&gt;（系统 ROM）" vertex="1">
+          <mxGeometry height="42" width="300" x="1360" y="270" as="geometry" />
         </mxCell>
-        <mxCell id="step2-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
-          <mxGeometry height="50" width="550" x="910" y="240" as="geometry" />
+        <mxCell id="boot2-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=12;align=center;" value="&lt;b&gt;BOOT0 = 1, BOOT1 = 1&lt;/b&gt;（SRAM 运行）" vertex="1">
+          <mxGeometry height="42" width="300" x="1700" y="270" as="geometry" />
         </mxCell>
-        <mxCell id="step2-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;② 执行 Reset_Handler&lt;/b&gt;" vertex="1">
-          <mxGeometry height="20" width="220" x="925" y="243" as="geometry" />
+        <mxCell id="map0-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=middle;" value="&lt;b&gt;内存映射:&lt;/b&gt; 0x0800 0000 映射到 0&lt;br&gt;硬件从 Flash 起始地址加载 MSP/PC" vertex="1">
+          <mxGeometry height="66" width="420" x="900" y="348" as="geometry" />
         </mxCell>
-        <mxCell id="step2-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="调用 &lt;b&gt;SystemInit()&lt;/b&gt;（在 system_stm32xxxxx.c 中，ARM 制定规范，ST 实现）" vertex="1">
-          <mxGeometry height="20" width="520" x="925" y="263" as="geometry" />
+        <mxCell id="map1-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=middle;" value="&lt;b&gt;内存映射:&lt;/b&gt; 0x1FFF 0000 映射到 0&lt;br&gt;硬件从系统 ROM 加载 MSP/PC" vertex="1">
+          <mxGeometry height="66" width="300" x="1360" y="348" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-s2-s3" edge="1" parent="1" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;" value="">
-          <mxGeometry height="50" relative="1" width="50" as="geometry">
-            <mxPoint x="1185" y="290" as="sourcePoint" />
-            <mxPoint x="1185" y="310" as="targetPoint" />
-          </mxGeometry>
+        <mxCell id="map2-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=middle;" value="&lt;b&gt;内存映射:&lt;/b&gt; 0x2000 0000 映射到 0&lt;br&gt;硬件从 SRAM 起始地址加载 MSP/PC" vertex="1">
+          <mxGeometry height="66" width="300" x="1700" y="348" as="geometry" />
         </mxCell>
-        <mxCell id="step3-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=10;verticalAlign=top;" value="" vertex="1">
-          <mxGeometry height="90" width="550" x="910" y="310" as="geometry" />
+        <mxCell id="app1a-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;【分支 1A：无用户 Bootloader】&lt;/b&gt;&lt;br&gt;&lt;b&gt;0x0800 0000 用户 APP&lt;/b&gt;&lt;br&gt;1. VTOR 默认 0x08000000&lt;br&gt;2. SystemInit()&lt;br&gt;3. __main() 搬移变量&lt;br&gt;4. 执行 APP main() 循环" vertex="1">
+          <mxGeometry height="140" width="200" x="900" y="452" as="geometry" />
         </mxCell>
-        <mxCell id="step3-label" parent="1" style="text;html=1;fontSize=12;fontStyle=1;fillColor=none;strokeColor=none;" value="&lt;b&gt;③ 执行 __main()&lt;/b&gt;" vertex="1">
-          <mxGeometry height="20" width="220" x="925" y="313" as="geometry" />
+        <mxCell id="bootloader-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;0x0800 0000 为用户自定义 Bootloader&lt;/b&gt;&lt;br&gt;1. 检测升级信号 (Ymodem 串口接收 bin 文件)&lt;br&gt;2. 擦除并重写 0x0800 8000 APP 分区&lt;br&gt;3. 关中断、重置 MSP、跳转至 0x0800 8004" vertex="1">
+          <mxGeometry height="170" width="210" x="1110" y="452" as="geometry" />
         </mxCell>
-        <mxCell id="step3-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=10;" value="1. 将 Flash 中 &lt;b&gt;.data 段初始值&lt;/b&gt; 复制到 SRAM 的 &lt;b&gt;.data 区&lt;/b&gt;&lt;br&gt;2. 将 SRAM 的 &lt;b&gt;.bss 区清零&lt;/b&gt;&lt;br&gt;3. 完成其他初始化后，&lt;b&gt;调用用户的 main()&lt;/b&gt;" vertex="1">
-          <mxGeometry height="60" width="520" x="925" y="330" as="geometry" />
+        <mxCell id="app8000-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;0x0800 8000 用户 APP 应用程序&lt;/b&gt;&lt;br&gt;1. SCB-&gt;VTOR = 0x0800 8000 (重定位向量表)&lt;br&gt;2. SystemInit() &amp; __main()&lt;br&gt;3. 执行 APP main() 业务循环" vertex="1">
+          <mxGeometry height="130" width="210" x="1110" y="660" as="geometry" />
         </mxCell>
-        <mxCell id="addr-info" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1e88e5;fontSize=13;fontStyle=1;align=center;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#e3f2fd;" value="&lt;b&gt;关键地址&lt;/b&gt;" vertex="1">
-          <mxGeometry height="160" width="280" x="910" y="430" as="geometry" />
+        <mxCell id="rom-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;【芯片出厂只读 Bootloader】&lt;/b&gt;&lt;br&gt;物理位置: 0x1FFF 0000 (ROM)&lt;br&gt;作用: 空片出厂烧录 (ISP 模式)&lt;br&gt;方式: 串口/USB/CAN 接收固件" vertex="1">
+          <mxGeometry height="120" width="300" x="1360" y="452" as="geometry" />
         </mxCell>
-        <mxCell id="addr-text" parent="1" style="text;html=1;fontSize=11;fillColor=none;strokeColor=none;align=left;spacingLeft=8;" value="&lt;b&gt;向量表基址：&lt;/b&gt;0x0000 0000（BOOT 引脚决定映射到哪）&lt;br&gt;&lt;b&gt;  BOOT0=0 → Flash 0x0800 0000&lt;/b&gt;&lt;br&gt;&lt;b&gt;  BOOT0=1 → 系统存储器 0x1FFF 0000&lt;/b&gt;&lt;br&gt;&lt;b&gt;MSP 初值：&lt;/b&gt;0x0000 0000（向量表第 1 项）&lt;br&gt;&lt;b&gt;Reset_Handler：&lt;/b&gt;0x0000 0004（向量表第 2 项）&lt;br&gt;&lt;b&gt;外设寄存器：&lt;/b&gt;0x4000 0000 起&lt;br&gt;&lt;b&gt;系统控制块：&lt;/b&gt;0xE000 E000 起" vertex="1">
-          <mxGeometry height="130" width="260" x="920" y="453" as="geometry" />
+        <mxCell id="sram-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;【SRAM 内存直接运行模式】&lt;/b&gt;&lt;br&gt;物理位置: 0x2000 0000 (SRAM)&lt;br&gt;1. 代码直接下载到 SRAM&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;(不擦写 Flash，零磨损)&lt;br&gt;2. 向量表设为 0x2000 0000&lt;br&gt;3. 掉电程序立刻丢失&lt;br&gt;4. 专供高速开发断点调试/算法测试" vertex="1">
+          <mxGeometry height="160" width="300" x="1700" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="e-reset-latch" edge="1" parent="1" source="reset-node" target="latch-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-latch-boot0" edge="1" parent="1" source="latch-node" target="boot0-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.05;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-latch-boot1" edge="1" parent="1" source="latch-node" target="boot1-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.55;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-latch-boot2" edge="1" parent="1" source="latch-node" target="boot2-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.95;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-boot0-map0" edge="1" parent="1" source="boot0-node" target="map0-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-boot1-map1" edge="1" parent="1" source="boot1-node" target="map1-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-boot2-map2" edge="1" parent="1" source="boot2-node" target="map2-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map1-rom" edge="1" parent="1" source="map1-node" target="rom-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map2-sram" edge="1" parent="1" source="map2-node" target="sram-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map0-app1a" edge="1" parent="1" source="map0-node" target="app1a-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.24;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-map0-bootloader" edge="1" parent="1" source="map0-node" target="bootloader-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.76;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-bootloader-app8000" edge="1" parent="1" source="bootloader-node" target="app8000-node" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#bdbdbd;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="address-space-title" parent="1" style="text;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;" value="Cortex-M 地址空间" vertex="1">
           <mxGeometry height="30" width="200" x="40" y="40" as="geometry" />
