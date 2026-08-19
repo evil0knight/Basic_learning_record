@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="ARM MCU 内存划分" id="arm_mcu_memory">
-    <mxGraphModel dx="1716" dy="1097" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="2" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="1201" dy="768" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="2" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -80,9 +80,6 @@
         <mxCell id="boot0-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=12;align=center;" value="&lt;b&gt;BOOT0 = 0&lt;/b&gt;（默认主 Flash）" vertex="1">
           <mxGeometry height="42" width="170" x="1085" y="631" as="geometry" />
         </mxCell>
-        <mxCell id="D35LznEcIH3lO-CnSRmF-3" edge="1" parent="1" source="boot1-node" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Helvetica;fontSize=14;fontColor=default;fontStyle=1;labelBorderColor=#82b366;labelBackgroundColor=#d5e8d4;" target="latch-node" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="boot1-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=12;align=center;" value="&lt;b&gt;BOOT0 = 1, BOOT1 = 0&lt;/b&gt;（系统 ROM）" vertex="1">
           <mxGeometry height="42" width="200" x="1325" y="628" as="geometry" />
         </mxCell>
@@ -101,7 +98,7 @@
         <mxCell id="app1a-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;【分支 1A：无用户 Bootloader】&lt;/b&gt;&lt;br&gt;&lt;b&gt;0x0800 0000 用户 APP&lt;/b&gt;&lt;br&gt;1. VTOR 默认 0x08000000&lt;br&gt;2. SystemInit()&lt;br&gt;3. __main() 搬移变量&lt;br&gt;4. 执行 APP main() 循环" vertex="1">
           <mxGeometry height="110" width="170" x="940" y="820" as="geometry" />
         </mxCell>
-        <mxCell id="bootloader-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;0x0800 0000 为用户自定义 Bootloader&lt;/b&gt;&lt;br&gt;1. 检测升级信号 (Ymodem 串口接收 bin 文件)&lt;br&gt;2. 擦除并重写 0x0800 8000 APP 分区&lt;br&gt;3. 关中断、重置 MSP、跳转至 0x0800 8004" vertex="1">
+        <mxCell id="bootloader-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;0x0800 0000 为用户自定义 Bootloader&lt;/b&gt;&lt;br&gt;1. 检测升级信号 (Ymodem 串口接收 bin 文件)&lt;br&gt;2. 擦除并重写 0x0800 8000 APP 分区(这个是自己设置APP从哪里开始)&lt;br&gt;3. 关中断、重置 MSP、跳转至 0x0800 8004" vertex="1">
           <mxGeometry height="120" width="200" x="1125" y="815" as="geometry" />
         </mxCell>
         <mxCell id="app8000-node" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC4EF;strokeColor=#bdbdbd;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;" value="&lt;b&gt;0x0800 8000 用户 APP 应用程序&lt;/b&gt;&lt;br&gt;1. SCB-&gt;VTOR = 0x0800 8000 (重定位向量表)&lt;br&gt;2. SystemInit() &amp; __main()&lt;br&gt;3. 执行 APP main() 业务循环" vertex="1">
