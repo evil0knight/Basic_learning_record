@@ -536,6 +536,40 @@ void Aes_IV_key256bit_Decode(unsigned char *IV_IN_OUT, unsigned char *State_IN_O
 //	
 // } 
 
+void Aes_key128bit_CBC_Encrypt(unsigned char *data, unsigned int size,
+                               unsigned char *iv, unsigned char *key)
+{
+    unsigned int offset;
+
+    if ((data == NULL) || (iv == NULL) || (key == NULL) ||
+        ((size == 0U) || ((size % 16U) != 0U)))
+    {
+        return;
+    }
+
+    for (offset = 0U; offset < size; offset += 16U)
+    {
+        Aes_IV_key128bit_Encrypt(iv, &data[offset], key);
+    }
+}
+
+void Aes_key128bit_CBC_Decode(unsigned char *data, unsigned int size,
+                              unsigned char *iv, unsigned char *key)
+{
+    unsigned int offset;
+
+    if ((data == NULL) || (iv == NULL) || (key == NULL) ||
+        ((size == 0U) || ((size % 16U) != 0U)))
+    {
+        return;
+    }
+
+    for (offset = 0U; offset < size; offset += 16U)
+    {
+        Aes_IV_key128bit_Decode(iv, &data[offset], key);
+    }
+}
+
 
 
 

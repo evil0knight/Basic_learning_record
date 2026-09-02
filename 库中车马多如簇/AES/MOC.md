@@ -1,28 +1,60 @@
 # AES 加解密
 
-| [← 模块总览](../MOC.md) | [← 主页](../../index.md) |
-| --- | --- |
+[← 模块总览](../MOC.md) | [← 主页](../../index.md)
+[← OTA AES加密](../../术中自有万钟粟/OTA/AES加密.md)
 
-纯 C 实现的 AES 对称加解密，一次处理 16 字节一个数据块，支持 128 / 192 / 256 bit 三种密钥；CBC 链式由调用者通过 `IV` 缓冲区维持。
+---
 
 | 文件 | 内容 |
 | --- | --- |
-| [AES.h](./AES.h) | 加解密接口声明 |
-| [AES.c](./AES.c) | 加解密实现（S 盒 / 密钥扩展 / 列混淆等） |
-| [OTA AES 加密](../../术中自有万钟粟/OTA/AES加密.md) | OTA 场景的使用与解密搬运 |
+| [AES.h](./AES.h) / [AES.c](./AES.c) | AES-128/192/256加解密 |
+| [OTA AES加密](../../术中自有万钟粟/OTA/AES加密.md) | OTA中Flash分块加解密流程 |
 
-## 接口
+## 移植
 
-| 函数 | 作用 |
-| --- | --- |
-| `Aes_IV_key128bit_Encrypt / Decode` | 128bit 加 / 解密 1 块 |
-| `Aes_IV_key192bit_Encrypt / Decode` | 192bit 加 / 解密 1 块 |
-| `Aes_IV_key256bit_Encrypt / Decode` | 256bit 加 / 解密 1 块 |
+1. 复制 `AES.h`、`AES.c` 到工程的 `Middleware/AES/` 目录，并将 `AES.c` 加入工程编译。
+2. 在需要使用AES的业务文件中包含 `AES.h`。
+3. 调用方需要提供：16/24/32字节密钥、16字节初始向量`IV`、以及16字节对齐的数据缓冲区。
+4. 输入数据长度必须是16的整数倍，不足时由调用方补齐。
+5. CBC连续处理时，所有数据块传入同一个`IV_IN_OUT`缓冲区；每次新消息重新复制初始IV。
+6. AES不需要HAL、GPIO、UART、Flash适配函数，不新增Port、Wrapper或注册表。
 
-形参：`IV_IN_OUT`（向量，跨块链式）、`State_IN_OUT`（明文 / 密文块）、`key`（16 / 24 / 32 字节密钥）。
+## 接口调用
 
-## 使用要点
+1. AES-128加密一个数据块：
 
-- CBC 链式靠 `IV_IN_OUT` 自动完成：循环传同一个 `IV` 缓冲区即可连续解密整段数据。
-- 每次调用都重新生成轮密钥（`Aes_Key_Schedule_Create`），高频调用应改为只生成一次。
-- `IV_IN_OUT == NULL` 退化为 ECB（不异或向量）；`key == NULL` 直接返回。
+```c
+#include "AES.h"
+
+uint8_t key[16] = {0};
+uint8_t iv[16] = {0};
+uint8_t block[16] = {0};
+
+Aes_IV_key128bit_Encrypt(iv, block, key);
+```
+
+2. AES-128解密一个数据块：
+
+```c
+Aes_IV_key128bit_Decode(iv, block, key);
+```
+
+3. 多块CBC加密：
+
+```c
+#include "AES.h"
+
+uint8_t key[16] = {0};
+uint8_t iv[16] = {0};
+uint8_t data[32] = {0};
+
+Aes_key128bit_CBC_Encrypt(data, sizeof(data), iv, key);
+```
+
+4. 多块CBC解密：
+
+```c
+Aes_key128bit_CBC_Decode(data, sizeof(data), iv, key);
+```
+
+5. OTA场景中，从Flash读出数据后调用上述CBC接口，再将结果写回目标Flash；具体流程参考[OTA AES加密](../../术中自有万钟粟/OTA/AES加密.md)。

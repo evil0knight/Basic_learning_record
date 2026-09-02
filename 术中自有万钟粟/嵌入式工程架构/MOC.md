@@ -1,15 +1,11 @@
 # 嵌入式工程架构 MOC
 
-[← 返回技术栈](../MOC.md)
+[← 返回技术栈](../MOC.md) | [← 代码架构库](../../库中车马多如簇/代码架构/MOC.md) | [← 主页](../../index.md)
 
-1. [嵌入式项目骨架](嵌入式项目骨架.md),把需求,功能,前期准备,等等做好
-2. 设计好层次架构![1782394614361](image/MOC/1782394614361.png)这里,Driver层是MCU厂家提供的库,然后在Core写好最基础的片内外设驱动函数接口供BSP和操作系统调用,	BSP层写调用外设的函数,如果是裸机就跳过OS层,否则OS统一管理中断
-3. 统一编码UTF-8
-
-   1. VScode-->右下角编码点一下-->通过编码重新打开-->UTF-8,
-      vscode修改默认编码:设置-->搜encoding-->选 UTF8
-   2. keil5-->Edit-->configuration-->Encoding-->UTF-8
-4. [代码规范](./代码规范.md)注意
+1. [PDLC产品开发生命周期](PDLC产品开发生命周期.md),把需求,功能,前期准备,等等做好
+2. [统一编码](统一编码.md)UTF-8
+3. [代码规范](./代码规范.md)注意
+4. 从[代码架构库](../../库中车马多如簇/代码架构/MOC.md)下载代码骨架或者单独选择组织下载
 5. 裸机使用[表驱法 笔记](./表驱法.md),操作系统使用[freeRTOS 笔记](./freeRTOS/MOC.md)
-6. [BSP层和platform](BSP,Platform写法.md)层怎么写,供app等上层调用
+6. BSP与Platform：[Driver](../../库中车马多如簇/代码架构/firmware/05_bsp/bsp_xxx/driver/MOC.md)、[Handler](../../库中车马多如簇/代码架构/firmware/05_bsp/bsp_xxx/handler/MOC.md)、[Adapter](../../库中车马多如簇/代码架构/firmware/04_platform/platform_bsp/bsp_adapter/MOC.md)、[Wrapper](../../库中车马多如簇/代码架构/firmware/04_platform/platform_bsp/bsp_wrapper/MOC.md)
 7. 外设到[库的MOC](../../库中车马多如簇/MOC.md)里去选

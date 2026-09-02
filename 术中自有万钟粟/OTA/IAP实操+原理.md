@@ -1,144 +1,31 @@
-# IAP 实操 + 原理
+# IAP 实操与原理
 
-[← OTA](./MOC.md) | [← 主页](../../index.md)
+[← 返回 OTA](./MOC.md) | [← 主页](../../index.md)
 
-> 这里是 Bootloader 直接跳转到 APP 的基础实现。
+## 向量表与跳转
 
----
+BootLoader 读取 APP 向量表的第一个字作为初始 MSP，第二个字作为复位入口地址；设置 MSP、切换 `SCB->VTOR` 后调用入口即可跳转。APP 的链接起始地址、向量表地址、擦写地址必须一致。
 
-## 原理
-
-MCU 上电后先运行 Bootloader。需要启动 APP 时，Bootloader 读取 APP 向量表：第一个字是初始主栈指针 MSP，第二个字是复位入口地址。设置 MSP 后调用复位入口，即可进入 APP。了解一下[上电的流程](https://app.diagrams.net/#Hevil0knight%2FBasic_learning_record%2Fmain%2F%E6%9C%AF%E4%B8%AD%E8%87%AA%E6%9C%89%E4%B8%87%E9%92%9F%E7%B2%9F%2FCortex-M4%E5%86%85%E6%A0%B8%E5%8E%9F%E7%90%86%2Farm_mcu%E5%86%85%E5%AD%98%E5%88%92%E5%88%86.drawio#%7B%22pageId%22%3A%22arm_mcu_memory%22%7D)（右边）。
-
-## 实操
-
-[环境配置](环境配置.md)完成后，在 Bootloader 工程中单独建立跳转管理模块。
-
-### 1. 新建 `Boot_Manager.h`
-
-新建 `Tasks/Boot_Manager/Boot_Manager.h`：
+最小原理示例（仅用于理解，最终移植代码使用 OTA 库）：
 
 ```c
-#ifndef __BOOT_MANAGER_H
-#define __BOOT_MANAGER_H
+typedef void (*app_entry_t)(void);
 
-/* Bootloader：0x08000000~0x08007FFF，共 32 KiB。 */
-#define BOOTLOADER_START_ADDRESS  0x08000000U
-#define BOOTLOADER_END_ADDRESS    0x08008000U
-#define BOOTLOADER_SIZE           (BOOTLOADER_END_ADDRESS - BOOTLOADER_START_ADDRESS)
-
-/* APP_RUN：0x08008000~0x0801FFFF，共 96 KiB。 */
-#define APP_RUN_START_ADDRESS     BOOTLOADER_END_ADDRESS
-#define APP_RUN_END_ADDRESS       0x08020000U
-#define APP_RUN_SIZE              (APP_RUN_END_ADDRESS - APP_RUN_START_ADDRESS)
-
-void DisablePeripherals(void);
-void JumpToApp(void);
-
-#endif
+uint32_t app_msp = *(uint32_t *)OTA_APP_ADDRESS;
+uint32_t app_reset = *(uint32_t *)(OTA_APP_ADDRESS + 4U);
+__set_MSP(app_msp);
+((app_entry_t)app_reset)();
 ```
 
-`APP_RUN_START_ADDRESS` 是 APP 的链接地址、向量表地址、Flash 擦写地址和 Bootloader 跳转地址，必须保持一致。
+## 可复制实现
 
-### 2. 新建 `Boot_Manager.c`
+- [Boot_Manager.h](../../库中车马多如簇/OTA/bootloader/Boot_Manager.h)
+- [Boot_Manager.c](../../库中车马多如簇/OTA/bootloader/Boot_Manager.c)
+- [OTA 库 MOC](../../库中车马多如簇/OTA/MOC.md)
 
-新建 `Tasks/Boot_Manager/Boot_Manager.c`：
+BootLoader 工程直接集成 `Boot_Manager.c/.h`，由 `OTA_StateManager()` 统一处理有效性检查、升级和跳转；APP 工程使用相同的 `OTA_APP_ADDRESS` 配置向量表。
 
-```c
-#include "Boot_Manager.h"
-#include "main.h"
-#include "tim.h"
+## 地址配置
 
-typedef void (*pFunction)(void);
+以 STM32F411 为例，BootLoader 可放在 `0x08000000`，APP 逻辑起始地址为 `0x08008000`，最大长度由 `OTA_APP_MAX_SIZE` 控制。具体片内/片外映射由 Flash Adapter 决定，不能在业务代码中硬编码某个器件的地址。
 
-void DisablePeripherals(void)
-{
-    /* 关闭 TIM3 及其中断源。 */
-    TIM_Cmd(TIM3, DISABLE);
-    TIM_ITConfig(TIM3, TIM_IT_Update, DISABLE);
-    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-
-    NVIC_DisableIRQ(TIM3_IRQn);
-    NVIC_ClearPendingIRQ(TIM3_IRQn);
-
-    /* 关闭 SysTick。 */
-    SysTick->CTRL = 0U;
-    SysTick->LOAD = 0U;
-    SysTick->VAL  = 0U;
-
-    TIM_DeInit(TIM3);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, DISABLE);
-
-    /* 恢复默认 HSI 时钟，供 APP 重新配置 PLL。 */
-    RCC_DeInit();
-}
-
-void JumpToApp(void)
-{
-    uint32_t jump_address;
-    pFunction jump_to_application;
-
-    /* 向量表第一个字是初始 MSP，STM32F411 SRAM 范围为
-       0x20000000~0x2001FFFF。 */
-    if (((*(__IO uint32_t *)APP_RUN_START_ADDRESS) & 0x2FFE0000U) == 0x20000000U)
-    {
-        /* 向量表第二个字是 APP 的复位入口地址。 */
-        jump_address = *(__IO uint32_t *)(APP_RUN_START_ADDRESS + sizeof(uint32_t));
-        jump_to_application = (pFunction)jump_address;
-
-        __set_MSP(*(__IO uint32_t *)APP_RUN_START_ADDRESS);
-        jump_to_application();
-    }
-}
-```
-
-如果 Bootloader 还使用了其他定时器、串口或 DMA，也要在 `DisablePeripherals()` 中关闭对应外设和中断。
-
-### 3. 加入 Keil 工程
-
-1. 将 `Boot_Manager.c` 加入 Keil 的 Boot Manager 分组。
-2. 在魔法棒的 **C/C++ → Include Paths** 中加入 `Tasks/Boot_Manager`。
-3. 在 Bootloader 的 `main.c` 中包含 `Boot_Manager.h`，不再在 `main.c` 中定义 APP 地址和跳转函数。
-
-```c
-#include "Boot_Manager.h"
-
-int main(void)
-{
-    /* Bootloader 原有初始化代码。 */
-
-    DisablePeripherals();
-    JumpToApp();
-
-    while (1)
-    {
-        /* APP 无效时停留在 Bootloader。 */
-    }
-}
-```
-
-### 4. APP 程序配置
-
-Keil 地址配置：
-
-| 工程       | IROM1 Start  | IROM1 Size | 地址范围                    |
-| ---------- | ------------ | ---------- | --------------------------- |
-| Bootloader | `0x08000000` | `0x8000`   | `0x08000000~0x08007FFF`     |
-| APP        | `0x08008000` | `0x18000`  | `0x08008000~0x0801FFFF`     |
-
-![Keil APP IROM1 配置](image/IAP实操+原理/1786245097041.png)
-
-APP 包含 `Boot_Manager.h`，并在初始化外设前设置向量表：
-
-```c
-#include "Boot_Manager.h"
-
-int main(void)
-{
-    SCB->VTOR = APP_RUN_START_ADDRESS;
-    __enable_irq();
-
-    /* APP 原有初始化代码。 */
-```
-
-到这里就可以通过用户 Bootloader 跳转到用户 APP。

@@ -1,0 +1,11 @@
+#ifndef RTOS_CONFIG_H
+#define RTOS_CONFIG_H
+
+#define CFG_TASK_XXX_STACK_SIZE 256U
+#define CFG_TASK_XXX_PRIORITY   1U
+
+#define CFG_QUEUE_XXX_DEPTH     1U
+#define CFG_SEMA_XXX_MAX_COUNT  1U
+#define CFG_SEMA_XXX_INIT_COUNT 0U
+
+#endif

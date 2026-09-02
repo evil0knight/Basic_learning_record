@@ -44,6 +44,12 @@ void Aes_IV_key256bit_Encrypt(unsigned char *IV_IN_OUT, unsigned char *State_IN_
 //key256bit:        秘钥  256bit  32字节
 void Aes_IV_key256bit_Decode(unsigned char *IV_IN_OUT, unsigned char *State_IN_OUT, unsigned char *key256bit);
 
+/* AES-128 CBC多块接口，size必须为16的整数倍。 */
+void Aes_key128bit_CBC_Encrypt(unsigned char *data, unsigned int size,
+                               unsigned char *iv, unsigned char *key);
+void Aes_key128bit_CBC_Decode(unsigned char *data, unsigned int size,
+                              unsigned char *iv, unsigned char *key);
+
 
 
 #endif

@@ -13,13 +13,13 @@
 /* 包含头文件 *****************************************************************/
 #include "common.h"
 #include "ymodem.h"
-#include "stm32f4xx.h"
-#include "USART.h"
+#include "usart_port.h"
+#include "ymodem_config.h"
 /* 变量 ----------------------------------------------------------------------*/
 pFunction Jump_To_Application;
 //uint32_t JumpAddress;
 uint32_t BlockNbr = 0, UserMemoryMask = 0;
-__IO uint32_t FlashProtection = 0;
+uint32_t FlashProtection = 0;
 
 
 /*******************************************************************************
@@ -200,16 +200,9 @@ uint32_t GetIntegerInput(int32_t * num)
 *******************************************************************************/
 uint32_t SerialKeyPressed(uint8_t *key)
 {
-		if ( USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)//检查UART有没有数据收到
-		{
-			 *key = (uint8_t)USART1->DR;
-			 return 1;
-		}
-		else
-		{
-			 return 0;
-		}
-    //*key = USART_ReceiveChar(USART1);
+    /* timeout=0：非阻塞检查 RXNE，有数据读回 CORE_USART_OK，没数据返回超时 */
+    return (core_usart_receive((en_core_usart_instance_t)YMODEM_UART_INDEX,
+                               key, 1U, 0U) == CORE_USART_OK) ? 1U : 0U;
 }
 
 /*******************************************************************************
@@ -231,7 +224,7 @@ uint8_t GetKey(void)
     //     if (SerialKeyPressed((uint8_t*)&key)) break;
     // }
     // return key;
-
+    return key;
 }
 
 /*******************************************************************************
@@ -245,23 +238,8 @@ uint8_t GetKey(void)
 *******************************************************************************/
 void SerialPutChar(uint8_t c)
 {
-    USART_SendChar(USART1,c);
-// 	  GPIO_SetBits(GPIOB,GPIO_Pin_9);//发送使能
-
-// //    USART_SendData(USART2, c);
-// //    while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
-// //    {
-// //    }
-// 	  USART_ClearFlag(USART1,USART_IT_TC);	
-// 	  USART_ClearFlag(USART1,USART_IT_TXE);
-
-// 	  USART_SendData(USART1, c);
-//     while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
-//     {
-
-//     }	
-		
-// 		GPIO_ResetBits(GPIOB,GPIO_Pin_9);//接收使能
+    (void)core_usart_transmit((en_core_usart_instance_t)YMODEM_UART_INDEX,
+                              &c, 1U, 1000U);
 }
 
 /*******************************************************************************
@@ -275,13 +253,16 @@ void SerialPutChar(uint8_t c)
 *******************************************************************************/
 void Serial_PutString(uint8_t *s)
 {
-	// GPIO_SetBits(GPIOB,GPIO_Pin_9);//发送使能
-    // while (*s != '\0')
-    // {
-    //     SerialPutChar(*s);
-    //     s++;
-    // }
-	// GPIO_ResetBits(GPIOB,GPIO_Pin_9);//接收使能
+    if (s == NULL)
+    {
+        return;
+    }
+
+    while (*s != '\0')
+    {
+        SerialPutChar(*s);
+        s++;
+    }
 }
 
 
@@ -296,7 +277,8 @@ void Serial_PutString(uint8_t *s)
 *******************************************************************************/
 void GetInputString (uint8_t * buffP)
 {
-    // uint32_t bytes_read = 0;
+	(void)buffP;
+	// uint32_t bytes_read = 0;
     // uint8_t c = 0;
     // do
     // {
@@ -338,7 +320,7 @@ void GetInputString (uint8_t * buffP)
   * @历史记录:     
      <作者>    <时间>      <修改记录>
 *******************************************************************************/
-uint32_t FLASH_PagesMask(__IO uint32_t Size)
+uint32_t FLASH_PagesMask(uint32_t Size)
 {
     // uint32_t pagenumber = 0x0;
     // uint32_t size = Size;
@@ -352,7 +334,8 @@ uint32_t FLASH_PagesMask(__IO uint32_t Size)
     //     pagenumber = size / PAGE_SIZE;
     // }
     // return pagenumber;
-
+    (void)Size;
+    return 0U;
 }
 
 /*******************************************************************************

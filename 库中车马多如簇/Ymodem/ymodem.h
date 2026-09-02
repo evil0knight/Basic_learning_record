@@ -41,6 +41,7 @@
 #define PACKET_OVERHEAD         (PACKET_HEADER + PACKET_TRAILER)
 #define PACKET_SIZE             (128)
 #define PACKET_1K_SIZE          (1024)
+#define YMODEM_VERIFY_BUFFER_SIZE PACKET_1K_SIZE
 
 #define FILE_NAME_LENGTH        (256)
 #define FILE_SIZE_LENGTH        (16)
@@ -62,7 +63,12 @@
 /* Exported macro ------------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
-int32_t Ymodem_Receive (uint8_t *);
+/* buf must point to a buffer of at least YMODEM_VERIFY_BUFFER_SIZE bytes. */
+typedef int32_t (*ymodem_data_sink_fn_t)(const uint8_t *data, uint32_t size,
+                                         uint32_t address, void *context);
+/* 接收模式：CRC 校验通过的数据通过 Sink 回调交给上层，Ymodem 不写 Flash。 */
+int32_t Ymodem_ReceiveWithSink(uint8_t *buf, ymodem_data_sink_fn_t sink,
+                              void *context, uint32_t start_address);
 uint8_t Ymodem_Transmit (uint8_t *,const  uint8_t* , uint32_t );
 uint16_t UpdateCRC16(uint16_t crcIn, uint8_t byte);
 uint16_t Cal_CRC16(const uint8_t* data, uint32_t size);

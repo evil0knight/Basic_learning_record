@@ -1,0 +1,9 @@
+#ifndef VERSION_CONFIG_H
+#define VERSION_CONFIG_H
+
+#define CFG_VERSION_MAJOR 0U
+#define CFG_VERSION_MINOR 1U
+#define CFG_VERSION_PATCH 0U
+#define CFG_VERSION_STRING "0.1.0"
+
+#endif

@@ -45,8 +45,6 @@ typedef  void (*pFunction)(void);
 // #error "Please select first the STM32 device to be used (in stm32f10x.h)"    
 //#endif
 
-#define PAGE_SIZE                         (0x800U) /* 2 Kbytes */
-
 #define IS_AF(c)  ((c >= 'A') && (c <= 'F'))
 #define IS_af(c)  ((c >= 'a') && (c <= 'f'))
 #define IS_09(c)  ((c >= '0') && (c <= '9'))

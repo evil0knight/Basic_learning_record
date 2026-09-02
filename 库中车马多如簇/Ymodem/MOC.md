@@ -1,16 +1,32 @@
 # Ymodem
 
-| [← 模块总览](../MOC.md) | [← 主页](../../index.md) |
-| --- | --- |
+[← 模块总览](../MOC.md) | [← 主页](../../index.md) | [← Ymodem传输协议](../../术中自有万钟粟/OTA/Ymodem传输协议.md)
 
-Ymodem 是基于串口的文件传输协议。该目录保存 STM32 Bootloader 接收固件所需的参考源码和 F411 Flash 适配层。
+---
 
-| 文件 | 内容 |
-| --- | --- |
-| [协议、移植与使用](../../术中自有万钟粟/OTA/Ymodem传输协议.md) | F411 初始化、Flash 布局、调用和排错 |
-| [ymodem.h](./ymodem.h) / [ymodem.c](./ymodem.c) | Ymodem 收发状态机 |
-| [common.h](./common.h) / [common.c](./common.c) | 字符串工具和串口收发适配 |
-| [Usart.c](../UART内含串口助手安装包/Usart/Usart.c) / [Usart.h](../UART内含串口助手安装包/Usart/Usart.h) | STM32F4 标准库 USART1 驱动 |
-| [Flash 驱动](../flash/MOC.md) | F411 APP 区擦除与写入，Ymodem 工程需加入该目录 |
+| 文件                                      | 作用                                                   |
+| ----------------------------------------- | ------------------------------------------------------ |
+| [ymodem.h](./ymodem.h) / [ymodem.c](./ymodem.c) | Ymodem 协议（接收/发送/CRC），数据经 Sink 回调交给上层 |
+| [common.h](./common.h) / [common.c](./common.c) | 工具函数 + UART Port 字节收发                          |
+| [ymodem_config.h](./ymodem_config.h)         | UART 实例编号、超时轮询次数                            |
 
-> 参考源码仍需按协议笔记补接收 CRC 校验和 APP 容量判断后再用于升级。
+## 移植
+
+1. 放入目标工程：
+
+```text
+03_Middlewares/communication/ymodem/
+├── ymodem.c/.h
+├── common.c/.h
+└── ymodem_config.h
+```
+
+2. 同时移植 [UART Port](../UART/MOC.md)（`core_usart_*`）。
+3. 在 `ymodem_config.h` 配置 UART 实例编号。
+4. 将 `ymodem.c`、`common.c` 加入编译。
+
+## 接收等待与平台钩子
+
+`Receive_Byte()` 采用轮询 `SerialKeyPressed()` 的方式等待单字节，最多执行 `YMODEM_BYTE_TIMEOUT_COUNT` 次；达到上限返回超时并终止当前会话。该宏位于 [ymodem_config.h](./ymodem_config.h)，应结合主频、波特率和 UART 驱动一次轮询耗时实测配置，不能直接照搬默认值。
+
+每 1024 次轮询调用一次 `YMODEM_POLL_HOOK()`。默认是空宏，产品可将它映射为看门狗喂狗、RTOS 让步、DMA 状态维护或超时计数。钩子必须快速返回，不应执行 Flash 擦写或再次等待 UART。
