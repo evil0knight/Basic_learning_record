@@ -22,7 +22,6 @@
 |    WiFi 模块    |                 涂鸦 WiFi 模组                 | [WiFi 模块笔记](./WiFi模块/WiFi模块.md)                 |
 |    FT辉芒微    |                     skill                     | [FT辉芒微/MOC.md](FT辉芒微/MOC.md)                      |
 |       LED       |                BSP分层驱动架构                | [BSP_LED](LED/BSP_LED/MOC.md)                           |
-| RS232,RS485,TTL |                      电平                      | [笔记](RS485-RS232.md)                                  |
 |      UART      |                    UART大全                    | [UART](../库中车马多如簇/UART/MOC.md) |
 |       CAN       |                    CAN总线                    | [CAN](./CAN总线/MOC.md)                                 |
 |  外设文件模板  |                   SKILL要用                   | [外设文件模板.md](外设文件模板.md)                      |
