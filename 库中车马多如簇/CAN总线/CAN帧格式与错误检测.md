@@ -1,6 +1,6 @@
 # CAN帧格式与错误检测
 
-[← 返回 MOC](MOC.md) | [← CAN基础](CAN总线/can基础.md) | [← 主页](../../index.md)
+[← 返回 MOC](MOC.md) | [← CAN基础](./can基础.md) | [← 主页](../../index.md)
 
 ---
 
