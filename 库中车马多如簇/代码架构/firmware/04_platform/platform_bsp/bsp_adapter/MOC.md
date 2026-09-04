@@ -6,9 +6,9 @@
 
 连接 Wrapper、BSP、MCU 和 OS，负责实例化器件并向 Wrapper 注册函数表。
 
-| 文件 | 作用 |
-| --- | --- |
-| [bsp_adapter_port_xxx.h](./bsp_adapter_port_xxx.h) | 可复用：Adapter注册入口声明 |
+| 文件                                            | 作用                              |
+| ----------------------------------------------- | --------------------------------- |
+| [bsp_adapter_port_xxx.h](./bsp_adapter_port_xxx.h) | 可复用：Adapter注册入口声明       |
 | [bsp_adapter_port_xxx.c](./bsp_adapter_port_xxx.c) | 复用挂载结构，替换MCU/OS Port实现 |
 
 ## Adapter层职责
@@ -32,4 +32,4 @@ void bsp_adapter_xxx_register(void);
 4. 在 `app_init/platform_io_register/user_periph_setup.c` 调用注册入口。
 5. Adapter 负责挂载，业务代码不直接调用 Adapter 内部函数。
 
-SPI器件的Driver保存静态表槽位编号。Adapter不保存物理引脚；实际`hspi`和CS填写在`spi_port_config.h`静态表，参见[SPI Port](../../../../../SPI/SPI_Port/MOC.md)。
+SPI器件的Driver保存静态表槽位编号。Adapter不保存物理引脚；实际 `hspi`和CS填写在 `spi_port_config.h`静态表，参见[SPI Port](../../../../../SPI/SPI_Port/MOC.md)。
