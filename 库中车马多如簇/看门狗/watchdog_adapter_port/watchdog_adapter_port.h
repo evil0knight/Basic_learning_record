@@ -11,7 +11,6 @@
  * 换芯片时只需重写对应的 watchdog_adapter_port.c，service_watchdog_monitor.c
  * 无需任何改动。
  *
- * 各接口与 STM32F411 手表的原始调用的对应关系见 .c 文件头部注释。
  */
 
 /* 初始化硬件看门狗（IWDG）并准备备份寄存器访问 */
