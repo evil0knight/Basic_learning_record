@@ -17,3 +17,6 @@
 
 # 私密求职资料,不外传
 术中自有万钟粟/求职/
+
+# DSH agent temp files (pasted images / vision artifacts)
+.dsh-vision-toolkit/

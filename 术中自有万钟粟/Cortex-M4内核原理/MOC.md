@@ -14,14 +14,15 @@
 | (ARM)内部时钟树                                              | [时钟.md](时钟.md)                                 |
 | 欠压两级防线：PVD 中断存数据、BOR 硬件复位                   | [PVD与BOR.md](PVD与BOR.md)                         |
 | DMA搬运的底层                                                | [DMA.md](DMA.md)                                   |
-|                                                              |                                                 |
+| ADC                                                          | [ADC.md](ADC.md)                                   |
+| 总线矩阵                                                     | [总线矩阵.md](总线矩阵.md)                         |
 | 基本/通用/高级定时器 + SysTick/RTC 分类与应用                | [定时器.md](定时器.md)                             |
 | 中断原理                                                     | [中断](./中断/MOC.md)                              |
 | PC/LR/SP 作用、硬件压栈与软件压栈流程                        | [cpu通用寄存器组.md](cpu通用寄存器组.md)           |
 | XPSR/PRIMASK/FAULTMASK/BASEPRI/CONTROL，MRS/MSR 访问         | [特殊寄存器.md](特殊寄存器.md)                     |
 | FPU 寄存器、双栈指针与状态寄存器索引                         | [剩余寄存器.md](剩余寄存器.md)                     |
 | SP/BP双指针、编译期变量偏移、压栈出栈                        | [函数栈帧与压栈出栈.md](函数栈帧与压栈出栈.md)     |
-| Flash/RAM/register+**上电流程**                        | [arm_mcu内存划分.md](arm_mcu内存划分.md)           |
+| Flash/RAM/register+**上电流程+总线矩阵**               | [arm_mcu内存划分.md](arm_mcu内存划分.md)           |
 | Nor/NandFlash、EEPROM、EPROM、ROM/RAM/Register 对比+磨损均衡 | [存储介质.md](存储介质.md)                         |
 | 大小端序概念 + 指针/联合体两种判断法                         | [大小端.md](大小端.md)                             |
 | 内存保护单元：region 配置/权限，与 MMU 区别                  | [MPU.md](MPU.md)                                   |
