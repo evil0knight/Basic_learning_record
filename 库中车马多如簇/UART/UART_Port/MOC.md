@@ -1,8 +1,6 @@
-# USART Port
+﻿# USART Port
 
 [← UART 模块](../MOC.md) | [← 主页](../../../index.md)
-
-USART 平台抽象层（platform_mcu 层）：`core_usart_*` 统一接口，内部转 HAL，支持阻塞收发、DMA 收发、DMA + 空闲中断、回调注册。裸机 / OS 通用（无 OS 依赖）。
 
 ## 文件
 
@@ -11,60 +9,61 @@ USART 平台抽象层（platform_mcu 层）：`core_usart_*` 统一接口，内�
 | [usart_port.h](./inc/usart_port.h) / [usart_port.c](./src/usart_port.c) | `core_usart_*` 接口 + HAL 分发 + DMA + 回调桥 |
 | [usart_port_config.h](./inc/usart_port_config.h)                     | 槽位表（HAL 句柄 + 波特率 + 超时）              |
 
-## 移植
+## port文件作用
 
-1. 复制 `UART_Port/inc` 和 `UART_Port/src` 内全部文件到目标工程 `02_Platform/platform_mcu/usart/`。
-2. 添加 `UART_Port/inc` 头文件搜索路径。
-3. `usart_port.c` 加入编译。
-4. 确认 CubeMX 生成 `usart.h` / `usart.c`（含 `MX_USART1_UART_Init`），并勾选 USART1 的 DMA 收发（用 DMA 功能时）。
-5. 在 [usart_port_config.h](./inc/usart_port_config.h) 填 HAL 句柄、波特率、默认超时。
+1. 接口封装,HAL库提供的函数向上包了一层
+2. 回调函数注册,
+   通过注册对象结构体,把huart句柄和回调函数放在一个结构体里实现高内聚
+3. 回调函数调用,
+   直接看是哪个句柄,然后调用对象结构体内对应的函数指针去执行回调函数
 
-## 调用接口
+## port文件的使用
 
-### 阻塞收发
+1. 无论使用 DMA 还是阻塞/中断模式，都要先在 Port 配置表中注册 UART 句柄。
+2. 在 `inc/usart_port_config.h` 中配置逻辑实例：
 
 ```c
-#include "usart_port.h"
-
-uint8_t rx[16];
-
-core_usart_init();
-core_usart_transmit(CORE_USART1, (uint8_t *)"hi\r\n", 4U, 1000U);
-core_usart_receive(CORE_USART1, rx, sizeof(rx), 1000U);
+static const st_usart_config_t g_usart_configs[CORE_USART_MAX] = {
+    [CORE_USART1] = {
+        .handle = &huart1,
+        .baudrate = 115200U,
+        .timeout = CORE_USART_DEFAULT_TIMEOUT
+    },
+};
 ```
 
-### DMA + 空闲中断接收（一帧触发回调）
+`huart1` 必须由 CubeMX 生成的 `MX_USART1_UART_Init()` 完成硬件初始化。
+
+3. 在 server 线程开始时注册回调并启动接收：
 
 ```c
-#include "usart_port.h"
+static uint8_t s_server_rx_buf[128];//DMA搬运缓冲区
 
-static uint8_t s_rx[128];
-
-static void on_rx(uint8_t *data, uint16_t size)
+static void server_uart_rx(uint8_t *data, uint16_t size)
 {
-    /* data = s_rx，size = 本次收到字节数；在这里解析帧 */
-    (void)data;
-    (void)size;
+    //处理本次接收数据
+    if ((data != NULL) && (size > 0U)) {
+        server_protocol_parse(data, size);
+    }
+    //启动第二次DMA接收
+    core_usart_receive_to_idle_dma(CORE_USART1,
+                                   s_server_rx_buf, 
+                                   sizeof(s_server_rx_buf));
 }
 
-void uart_setup(void)
+void server_thread(void *argument)
 {
-    core_usart_init();
-    core_usart_register_rx_callback(CORE_USART1, on_rx);
-    core_usart_receive_to_idle_dma(CORE_USART1, s_rx, sizeof(s_rx));
+    (void)argument;
+    //主次回调函数-->自己写的处理函数
+    core_usart_register_rx_callback(CORE_USART1, server_uart_rx);
+    //启动第一次接收DMA
+    core_usart_receive_to_idle_dma(
+        CORE_USART1, s_server_rx_buf, sizeof(s_server_rx_buf));
+
+    for (;;) {
+        server_thread_process();//线程逻辑
+    }
 }
 ```
 
-一帧结束（总线空闲）触发 `on_rx`，`size` 是本帧长度，之后需再次调 `core_usart_receive_to_idle_dma` 重启接收。
-
-### DMA 发送
-
-```c
-core_usart_register_tx_callback(CORE_USART1, on_tx_done);
-core_usart_transmit_dma(CORE_USART1, buf, len);
-```
-
-## 依赖
-
-- HAL UART Driver + DMA（CubeMX 生成）
-- 无 OS 依赖（裸机 / OS 通用）
+线程开始时注册回调并启动首轮接收。UART 空闲线或 DMA 缓冲区接收满时执行回调，`size` 为本次实际接收长度；回调结束后重新启动下一轮接收。

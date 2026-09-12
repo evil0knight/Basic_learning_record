@@ -16,6 +16,7 @@ static usart_error_callback_t g_usart_error_callbacks[CORE_USART_MAX] = {NULL};
 /* 最近一次 receive_to_idle_dma 的缓冲，空闲中断回调时传回给上层 */
 static uint8_t *g_usart_rx_buffer[CORE_USART_MAX] = {NULL};
 
+/* 将 STM32 HAL 返回值转换为上层统一的 USART 状态码。 */
 static en_core_usart_status_t core_usart_from_hal(HAL_StatusTypeDef hal_status)
 {
     switch (hal_status)
@@ -32,6 +33,7 @@ static en_core_usart_status_t core_usart_from_hal(HAL_StatusTypeDef hal_status)
     }
 }
 
+/* 根据 UART 句柄查找对应的逻辑串口实例；未找到时返回无效实例。 */
 static en_core_usart_instance_t core_usart_instance_from_handle(UART_HandleTypeDef *huart)
 {
     uint32_t i;
@@ -51,7 +53,7 @@ static en_core_usart_instance_t core_usart_instance_from_handle(UART_HandleTypeD
 
     return CORE_USART_MAX;
 }
-
+    /* 校验实例、数据缓冲区及串口句柄，避免将非法参数传给 HAL。 */
 static en_core_usart_status_t core_usart_validate(en_core_usart_instance_t instance,
                                                   const void *data,
                                                   uint16_t size)
@@ -142,7 +144,8 @@ en_core_usart_status_t core_usart_transmit_dma(en_core_usart_instance_t instance
                               (uint8_t *)data, size));
 }
 
-/* DMA 接收（循环模式，完成走 HAL_UART_RxCpltCallback） */
+/* DMA 接收（循环模式，完成走 HAL_UART_RxCpltCallback） 
+   只启动一轮接收*/
 en_core_usart_status_t core_usart_receive_dma(en_core_usart_instance_t instance,
                                               uint8_t *data,
                                               uint16_t size)
@@ -158,7 +161,8 @@ en_core_usart_status_t core_usart_receive_dma(en_core_usart_instance_t instance,
         HAL_UART_Receive_DMA(g_usart_configs[instance].handle, data, size));
 }
 
-/* DMA + 空闲中断接收：一帧收完触发 rx_callback(data, size) */
+/* DMA + 空闲中断接收：一帧收完触发 rx_callback(data, size) 
+   只启动一轮接收*/
 en_core_usart_status_t core_usart_receive_to_idle_dma(en_core_usart_instance_t instance,
                                                       uint8_t *data,
                                                       uint16_t size)
@@ -189,11 +193,13 @@ en_core_usart_status_t core_usart_receive_to_idle_dma(en_core_usart_instance_t i
 en_core_usart_status_t core_usart_register_rx_callback(en_core_usart_instance_t instance,
                                                        usart_rx_callback_t callback)
 {
-    if (instance >= CORE_USART_MAX)
+    if (instance >= CORE_USART_MAX)//串口是否注册过
     {
         return CORE_USART_ERROR;
     }
 
+    //将用户提供的回调函数地址保存注册到对应串口的回调数组中。
+    //之后 UART 接收中断或 DMA 接收事件发生时，底层代码可以通过这个数组找到并调用用户函数。
     g_usart_rx_callbacks[instance] = callback;
     return CORE_USART_OK;
 }
@@ -202,11 +208,13 @@ en_core_usart_status_t core_usart_register_rx_callback(en_core_usart_instance_t 
 en_core_usart_status_t core_usart_register_tx_callback(en_core_usart_instance_t instance,
                                                        usart_tx_callback_t callback)
 {
-    if (instance >= CORE_USART_MAX)
+    if (instance >= CORE_USART_MAX)//串口是否注册过
     {
         return CORE_USART_ERROR;
     }
 
+    //将用户提供的回调函数地址保存注册到对应串口的回调数组中。
+    //之后 UART 接收中断或 DMA 接收事件发生时，底层代码可以通过这个数组找到并调用用户函数。
     g_usart_tx_callbacks[instance] = callback;
     return CORE_USART_OK;
 }
@@ -215,43 +223,72 @@ en_core_usart_status_t core_usart_register_tx_callback(en_core_usart_instance_t 
 en_core_usart_status_t core_usart_register_error_callback(en_core_usart_instance_t instance,
                                                           usart_error_callback_t callback)
 {
-    if (instance >= CORE_USART_MAX)
+    if (instance >= CORE_USART_MAX)//串口是否注册过
     {
         return CORE_USART_ERROR;
     }
 
+    //将用户提供的回调函数地址保存注册到对应串口的回调数组中。
+    //之后 UART 接收中断或 DMA 接收事件发生时，底层代码可以通过这个数组找到并调用用户函数。
     g_usart_error_callbacks[instance] = callback;
     return CORE_USART_OK;
 }
 
-/* 取 HAL 句柄 */
+/* 根据逻辑串口编号，取得对应的 STM32 HAL UART 句柄(如 &huart1) */
 UART_HandleTypeDef *core_usart_get_handle(en_core_usart_instance_t instance)
 {
     return (instance < CORE_USART_MAX) ? g_usart_configs[instance].handle : NULL;
 }
 
-/* ===== HAL 回调桥 ===== */
+/* ===== HAL 回调桥 ===== 
+   回调函数调用上层处理函数,前面已经注册*/
 
+/**
+   * @brief UART 接收完成回调
+   *
+   * 使用 HAL_UART_Receive_IT() 或 HAL_UART_Receive_DMA()
+   * 启动接收，并成功接收完指定长度的数据后触发。
+   *
+   * @param huart 触发回调的 UART HAL 句柄
+   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     en_core_usart_instance_t instance = core_usart_instance_from_handle(huart);
 
     if ((instance < CORE_USART_MAX) && (g_usart_rx_callbacks[instance] != NULL))
     {
+        //core_usart_register_xxx_callback注册过了,这里调用用户的上层函数
         g_usart_rx_callbacks[instance](NULL, 0U);
     }
 }
 
+/**
+ * @brief UART 发送完成回调
+ *
+ * 使用 HAL_UART_Transmit_IT() 或 HAL_UART_Transmit_DMA()
+ * 启动发送，并成功发送完指定长度的数据后触发。
+ *
+ * @param huart 触发回调的 UART HAL 句柄
+ */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     en_core_usart_instance_t instance = core_usart_instance_from_handle(huart);
 
     if ((instance < CORE_USART_MAX) && (g_usart_tx_callbacks[instance] != NULL))
     {
+        //core_usart_register_xxx_callback注册过了,这里调用用户的上层函数
         g_usart_tx_callbacks[instance]();
     }
 }
 
+/**
+ * @brief UART 错误回调
+ *
+ * UART 运行过程中发生错误后触发，例如帧错误、噪声错误、
+ * 溢出错误或 DMA 传输错误。
+ *
+ * @param huart 发生错误的 UART HAL 句柄
+ */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
     en_core_usart_instance_t instance = core_usart_instance_from_handle(huart);
@@ -259,16 +296,27 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
     if ((instance < CORE_USART_MAX) &&
         (g_usart_error_callbacks[instance] != NULL) && (huart != NULL))
     {
+        //core_usart_register_xxx_callback注册过了,这里调用用户的上层函数
         g_usart_error_callbacks[instance](huart->ErrorCode);
     }
 }
-
+/**
+* @brief UART 接收事件回调
+*
+* 使用 HAL_UARTEx_ReceiveToIdle_DMA() 或
+* HAL_UARTEx_ReceiveToIdle_IT() 启动接收后，
+* 检测到空闲线或接收缓冲区已满时触发。
+*
+* @param huart 触发回调的 UART HAL 句柄
+* @param Size  本次实际接收到的数据长度
+*/
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
     en_core_usart_instance_t instance = core_usart_instance_from_handle(huart);
 
     if ((instance < CORE_USART_MAX) && (g_usart_rx_callbacks[instance] != NULL))
     {
+        //core_usart_register_xxx_callback注册过了,这里调用用户的上层函数
         g_usart_rx_callbacks[instance](g_usart_rx_buffer[instance], Size);
     }
 }
