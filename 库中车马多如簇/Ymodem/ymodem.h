@@ -66,6 +66,12 @@
 /* buf must point to a buffer of at least YMODEM_VERIFY_BUFFER_SIZE bytes. */
 typedef int32_t (*ymodem_data_sink_fn_t)(const uint8_t *data, uint32_t size,
                                          uint32_t address, void *context);
+typedef int32_t (*ymodem_read_fn_t)(uint8_t *data, uint16_t size,
+                                    uint32_t timeout);
+typedef int32_t (*ymodem_write_fn_t)(const uint8_t *data, uint16_t size,
+                                     uint32_t timeout);
+
+void Ymodem_SetIo(ymodem_read_fn_t read_fn, ymodem_write_fn_t write_fn);
 /* 接收模式：CRC 校验通过的数据通过 Sink 回调交给上层，Ymodem 不写 Flash。 */
 int32_t Ymodem_ReceiveWithSink(uint8_t *buf, ymodem_data_sink_fn_t sink,
                               void *context, uint32_t start_address);

@@ -35,6 +35,16 @@ uint8_t file_name[FILE_NAME_LENGTH];
 static ymodem_data_sink_fn_t s_data_sink;
 static void *s_data_sink_context;
 static uint32_t s_sink_start_address;
+static ymodem_read_fn_t s_read_fn;
+static ymodem_write_fn_t s_write_fn;
+
+void Ymodem_SetIo(ymodem_read_fn_t read_fn, ymodem_write_fn_t write_fn)
+{
+    s_read_fn = read_fn;
+    s_write_fn = write_fn;
+}
+
+/* UART Port 注入的逻辑串口；阻塞或 DMA 实现由 Port 配置决定。 */
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -48,15 +58,12 @@ static uint32_t s_sink_start_address;
   */
 static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
 {
-  while (timeout-- > 0)
+  if (s_read_fn == NULL)
   {
-    if ((timeout & 0x3FFU) == 0U) YMODEM_POLL_HOOK();
-    if (SerialKeyPressed(c) == 1)
-    {
-      return 0;
-    }
+    return -1;
   }
-  return -1;
+  YMODEM_POLL_HOOK();
+  return (s_read_fn(c, 1U, timeout) == 0) ? 0 : -1;
 }
 
 /**
@@ -66,8 +73,8 @@ static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
   */
 static uint32_t Send_Byte (uint8_t c)
 {
-  SerialPutChar(c);
-  return 0;
+  return ((s_write_fn != NULL) &&
+          (s_write_fn(&c, 1U, YMODEM_BYTE_TIMEOUT_COUNT) == 0)) ? 0U : 1U;
 }
 
 /**

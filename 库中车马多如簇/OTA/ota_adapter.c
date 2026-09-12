@@ -3,6 +3,30 @@
 #include "ota_config.h"
 #include "stm32f4xx_hal.h"
 #include "watchdog_adapter_port.h"
+#include "usart_port.h"
+#include "ymodem_config.h"
+
+int32_t ota_adapter_uart_read(uint8_t *data, uint16_t size, uint32_t timeout)
+{
+#if (YMODEM_UART_MODE == YMODEM_UART_MODE_DMA)
+    uint16_t received_size = 0U;
+    if (core_usart_receive_to_idle_dma_sync((en_core_usart_instance_t)YMODEM_UART_INDEX,
+                                             data, size, &received_size, timeout) != CORE_USART_OK)
+    {
+        return -1;
+    }
+    return (received_size == size) ? 0 : -1;
+#else
+    return (core_usart_receive((en_core_usart_instance_t)YMODEM_UART_INDEX,
+                               data, size, timeout) == CORE_USART_OK) ? 0 : -1;
+#endif
+}
+
+int32_t ota_adapter_uart_write(const uint8_t *data, uint16_t size, uint32_t timeout)
+{
+    return (core_usart_transmit((en_core_usart_instance_t)YMODEM_UART_INDEX,
+                                data, size, timeout) == CORE_USART_OK) ? 0 : -1;
+}
 
 /*
  * STM32F411 默认实现

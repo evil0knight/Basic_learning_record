@@ -229,6 +229,7 @@ void ota_task_runnable(void *argument)
             {
                 ota_adapter_ui_progress_write(0U);
                 W25Q64_Init();
+                Ymodem_SetIo(ota_adapter_uart_read, ota_adapter_uart_write);
                 appDataLength = Ymodem_ReceiveWithSink(s_ymodem_verify_buffer,
                                                        ymodem_queue_sink, NULL,
                                                        OTA_AREA_A_ADDRESS);

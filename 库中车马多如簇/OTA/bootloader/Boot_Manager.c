@@ -316,6 +316,7 @@ void BootManager_BootDownload(void)
     W25Q64_Init();
 
     /* Ymodem 接收，sink 直接写外部 Flash A 区 */
+    Ymodem_SetIo(ota_adapter_uart_read, ota_adapter_uart_write);
     fil_size = Ymodem_ReceiveWithSink(s_read_buffer, boot_download_sink,
                                       NULL, OTA_AREA_A_ADDRESS);
     if (fil_size <= 0)

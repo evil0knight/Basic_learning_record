@@ -77,6 +77,13 @@ en_core_usart_status_t core_usart_receive_to_idle_dma(en_core_usart_instance_t i
                                                       uint8_t *data,
                                                       uint16_t size);
 
+/* DMA + 空闲线同步接收：等待一帧完成后返回实际长度。 */
+en_core_usart_status_t core_usart_receive_to_idle_dma_sync(en_core_usart_instance_t instance,
+                                                           uint8_t *data,
+                                                           uint16_t size,
+                                                           uint16_t *received_size,
+                                                           uint32_t timeout);
+
 /* 注册 RX 回调 */
 en_core_usart_status_t core_usart_register_rx_callback(en_core_usart_instance_t instance,
                                                        usart_rx_callback_t callback);

@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+int32_t ota_adapter_uart_read(uint8_t *data, uint16_t size, uint32_t timeout);
+int32_t ota_adapter_uart_write(const uint8_t *data, uint16_t size, uint32_t timeout);
+
 /*
  * OTA 底层适配层（adapter）
  *

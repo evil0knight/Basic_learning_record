@@ -4,6 +4,12 @@
 /* UART logical index used by Ymodem. / Ymodem使用的UART逻辑编号。 */
 #define YMODEM_UART_INDEX          0U
 
+#define YMODEM_UART_MODE_BLOCKING  0U
+#define YMODEM_UART_MODE_DMA       1U
+#ifndef YMODEM_UART_MODE
+#define YMODEM_UART_MODE           YMODEM_UART_MODE_BLOCKING
+#endif
+
 /* Receive byte timeout loop count; calibrate this value for the target board. */
 /* 单字节接收超时轮询次数；需要按目标板主频校准。 */
 #define YMODEM_BYTE_TIMEOUT_COUNT  0x100000UL

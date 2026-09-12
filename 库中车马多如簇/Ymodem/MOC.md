@@ -30,3 +30,12 @@
 `Receive_Byte()` 采用轮询 `SerialKeyPressed()` 的方式等待单字节，最多执行 `YMODEM_BYTE_TIMEOUT_COUNT` 次；达到上限返回超时并终止当前会话。该宏位于 [ymodem_config.h](./ymodem_config.h)，应结合主频、波特率和 UART 驱动一次轮询耗时实测配置，不能直接照搬默认值。
 
 每 1024 次轮询调用一次 `YMODEM_POLL_HOOK()`。默认是空宏，产品可将它映射为看门狗喂狗、RTOS 让步、DMA 状态维护或超时计数。钩子必须快速返回，不应执行 Flash 擦写或再次等待 UART。
+
+## 资源注入
+
+Ymodem 是无 OS、无线程、无队列的协议中间件。调用前通过 `Ymodem_SetIo()` 注入同步读写函数，并向 `Ymodem_ReceiveWithSink()` 传入协议缓冲区和数据块 Sink。
+
+1. 协议缓冲区由 OTA App 或 Bootloader 静态分配，至少容纳 1K 数据包。
+2. UART 实例、DMA、DMA 接收缓冲区和接收模式配置见 [UART Port](../UART/UART_Port/MOC.md)。
+3. OS 信号量或其他同步资源配置见 [OSAL 资源配置](../代码架构/firmware/01_app/app_init/MOC.md)。
+4. OTA 调用和 Flash Sink 配置见 [OTA MOC](../OTA/MOC.md) 与 [Flash MOC](../Flash/MOC.md)。

@@ -15,6 +15,23 @@ static usart_error_callback_t g_usart_error_callbacks[CORE_USART_MAX] = {NULL};
 
 /* 最近一次 receive_to_idle_dma 的缓冲，空闲中断回调时传回给上层 */
 static uint8_t *g_usart_rx_buffer[CORE_USART_MAX] = {NULL};
+static volatile uint16_t g_usart_dma_rx_size[CORE_USART_MAX] = {0U};
+static volatile uint8_t g_usart_dma_rx_done[CORE_USART_MAX] = {0U};
+
+static void core_usart_dma_sync_callback(uint8_t *data, uint16_t size)
+{
+    uint32_t i;
+
+    for (i = 0U; i < CORE_USART_MAX; i++)
+    {
+        if (g_usart_rx_buffer[i] == data)
+        {
+            g_usart_dma_rx_size[i] = size;
+            g_usart_dma_rx_done[i] = 1U;
+            break;
+        }
+    }
+}
 
 /* 将 STM32 HAL 返回值转换为上层统一的 USART 状态码。 */
 static en_core_usart_status_t core_usart_from_hal(HAL_StatusTypeDef hal_status)
@@ -87,6 +104,8 @@ en_core_usart_status_t core_usart_init(void)
         g_usart_tx_callbacks[i] = NULL;
         g_usart_error_callbacks[i] = NULL;
         g_usart_rx_buffer[i] = NULL;
+        g_usart_dma_rx_size[i] = 0U;
+        g_usart_dma_rx_done[i] = 0U;
     }
 
     return CORE_USART_OK;
@@ -187,6 +206,47 @@ en_core_usart_status_t core_usart_receive_to_idle_dma(en_core_usart_instance_t i
     }
 
     return core_usart_from_hal(hal_status);
+}
+
+en_core_usart_status_t core_usart_receive_to_idle_dma_sync(en_core_usart_instance_t instance,
+                                                           uint8_t *data,
+                                                           uint16_t size,
+                                                           uint16_t *received_size,
+                                                           uint32_t timeout)
+{
+    uint32_t start;
+    en_core_usart_status_t status;
+
+    if ((received_size == NULL) || (core_usart_validate(instance, data, size) != CORE_USART_OK))
+    {
+        return CORE_USART_ERROR;
+    }
+
+    g_usart_dma_rx_done[instance] = 0U;
+    g_usart_dma_rx_size[instance] = 0U;
+    status = core_usart_register_rx_callback(instance, core_usart_dma_sync_callback);
+    if (status != CORE_USART_OK)
+    {
+        return status;
+    }
+
+    status = core_usart_receive_to_idle_dma(instance, data, size);
+    if (status != CORE_USART_OK)
+    {
+        return status;
+    }
+
+    start = HAL_GetTick();
+    while (g_usart_dma_rx_done[instance] == 0U)
+    {
+        if ((timeout != 0U) && ((HAL_GetTick() - start) >= timeout))
+        {
+            return CORE_USART_TIMEOUT;
+        }
+    }
+
+    *received_size = g_usart_dma_rx_size[instance];
+    return CORE_USART_OK;
 }
 
 /* 注册 RX 回调 */
