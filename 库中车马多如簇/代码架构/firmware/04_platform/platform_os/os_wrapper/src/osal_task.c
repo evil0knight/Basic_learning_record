@@ -59,6 +59,40 @@ osal_task_handle_t osal_task_get_current(void)
     return os_task_get_current_impl();
 }
 
+osal_status_t osal_task_notify(osal_task_handle_t task, uint32_t bits)
+{
+    OSAL_RETURN_IF_NULL(task);
+    return os_task_notify_impl(task, bits);
+}
+
+osal_status_t osal_task_notify_from_isr(osal_task_handle_t task,
+                                        uint32_t bits)
+{
+    OSAL_RETURN_IF_NULL(task);
+    return os_task_notify_from_isr_impl(task, bits);
+}
+
+osal_status_t osal_task_notify_and_query(osal_task_handle_t task,
+                                         uint32_t bits, uint32_t *value)
+{
+    OSAL_RETURN_IF_NULL(task);
+    OSAL_RETURN_IF_NULL(value);
+    return os_task_notify_and_query_impl(task, bits, value);
+}
+
+osal_status_t osal_task_notify_wait(uint32_t clear_on_entry,
+                                    uint32_t clear_on_exit, uint32_t *value,
+                                    osal_tick_t timeout)
+{
+    return os_task_notify_wait_impl(clear_on_entry, clear_on_exit, value,
+                                    timeout);
+}
+
+osal_status_t osal_task_notify_value_clear(uint32_t bits)
+{
+    return os_task_notify_value_clear_impl(bits);
+}
+
 osal_status_t osal_critical_enter(void)
 {
     return os_critical_enter_impl();

@@ -20,3 +20,4 @@
 
 # DSH agent temp files (pasted images / vision artifacts)
 .dsh-vision-toolkit/
+.compile_check/

@@ -44,6 +44,7 @@ cortex内核里写了[DMA的原理](../Cortex-M4内核原理/DMA.md)
    stm32f4xx_hal_dma.c
    //开头注释里写了如何启动DMA:HAL_DMA_Start()或者HAL_DMA_PollForTransfer()
    ```
+
    ```
    stm32f4xx_hal_dma.h
    typedef struct __DMA_HandleTypeDef
@@ -108,3 +109,36 @@ cortex内核里写了[DMA的原理](../Cortex-M4内核原理/DMA.md)
    HAL_DMA_RegisterCallback(&hdma_memtomem_dma2_stream0, HAL_DMA_XFER_CPLT_CB_ID, my_dma_TC_Callback);
    /* USER CODE END 2 */
    ```
+6. 或者直接设置PWM的比较器
+
+```
+/**
+ * @brief 一线串口控制程序（单字节指令），使用定时器PWM + DMA方式
+ * @param data 待发送数据
+ */
+void wt588f_send_byte(uint8_t data)
+{
+    // 根据待发送数据，配置cmp数组
+    // 数组前7个元素0，用于产生5.6ms低电平
+    // 数组最后一个元素，用于等待最后一个upd事件
+    static uint32_t cmp_buff[16] = {0};
+    cmp_buff[15] = 800;
+    for (uint8_t i = 7; i < 15; ++i) {
+        if (data & 0x01)
+            cmp_buff[i] = 600; // 数据1对应的pwm比较值
+        else
+            cmp_buff[i] = 200; // 数据0对应的pwm比较值
+        data = data >> 1;
+    }
+
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1); // 开启PWM输出
+    HAL_DMA_Start_IT(                         // 配置并开启DMA
+        htim2.hdma[TIM_DMA_ID_UPDATE],
+        (uint32_t)cmp_buff,
+        (uint32_t)&htim2.Instance->CCR1,
+        16
+    );
+
+    tx_busy = 1; // 设置数据发送为忙状态
+}
+```

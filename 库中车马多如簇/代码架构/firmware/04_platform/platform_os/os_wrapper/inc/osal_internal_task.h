@@ -22,6 +22,15 @@ osal_status_t os_task_resume_impl(osal_task_handle_t task);
 void os_task_delay_impl(osal_tick_t ticks);
 osal_tick_t os_task_get_tick_count_impl(void);
 osal_task_handle_t os_task_get_current_impl(void);
+osal_status_t os_task_notify_impl(osal_task_handle_t task, uint32_t bits);
+osal_status_t os_task_notify_from_isr_impl(osal_task_handle_t task,
+                                           uint32_t bits);
+osal_status_t os_task_notify_and_query_impl(osal_task_handle_t task,
+                                            uint32_t bits, uint32_t *value);
+osal_status_t os_task_notify_wait_impl(uint32_t clear_on_entry,
+                                       uint32_t clear_on_exit,
+                                       uint32_t *value, osal_tick_t timeout);
+osal_status_t os_task_notify_value_clear_impl(uint32_t bits);
 osal_status_t os_critical_enter_impl(void);
 osal_status_t os_critical_exit_impl(void);
 osal_tick_t os_ms_to_ticks_impl(uint32_t milliseconds);

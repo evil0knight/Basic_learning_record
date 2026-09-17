@@ -112,6 +112,125 @@ osal_task_handle_t os_task_get_current_impl(void)
 #endif
 }
 
+osal_status_t os_task_notify_impl(osal_task_handle_t task, uint32_t bits)
+{
+    BaseType_t result;
+
+    if (task == NULL)
+    {
+        return OSAL_ERR_INVALID_POINTER;
+    }
+
+    if (OSAL_PORT_IS_IN_ISR())
+    {
+        BaseType_t should_yield = pdFALSE;
+        result = xTaskNotifyFromISR((TaskHandle_t)task, bits, eSetBits,
+                                    &should_yield);
+        portYIELD_FROM_ISR(should_yield);
+    }
+    else
+    {
+        result = xTaskNotify((TaskHandle_t)task, bits, eSetBits);
+    }
+
+    return (result == pdPASS) ? OSAL_SUCCESS : OSAL_ERROR;
+}
+
+osal_status_t os_task_notify_from_isr_impl(osal_task_handle_t task,
+                                           uint32_t bits)
+{
+    BaseType_t should_yield = pdFALSE;
+    BaseType_t result;
+
+    if (task == NULL)
+    {
+        return OSAL_ERR_INVALID_POINTER;
+    }
+    if (!OSAL_PORT_IS_IN_ISR())
+    {
+        return OSAL_ERROR;
+    }
+
+    result = xTaskNotifyFromISR((TaskHandle_t)task, bits, eSetBits,
+                                &should_yield);
+    portYIELD_FROM_ISR(should_yield);
+
+    return (result == pdPASS) ? OSAL_SUCCESS : OSAL_ERROR;
+}
+
+osal_status_t os_task_notify_and_query_impl(osal_task_handle_t task,
+                                            uint32_t bits, uint32_t *value)
+{
+    BaseType_t result;
+    uint32_t notified_value = 0U;
+
+    if (task == NULL)
+    {
+        return OSAL_ERR_INVALID_POINTER;
+    }
+
+    if (OSAL_PORT_IS_IN_ISR())
+    {
+        BaseType_t should_yield = pdFALSE;
+        result = xTaskNotifyAndQueryFromISR((TaskHandle_t)task, bits, eSetBits,
+                                            &notified_value, &should_yield);
+        portYIELD_FROM_ISR(should_yield);
+    }
+    else
+    {
+        result = xTaskNotifyAndQuery((TaskHandle_t)task, bits, eSetBits,
+                                     &notified_value);
+    }
+
+    if (result != pdPASS)
+    {
+        return OSAL_ERROR;
+    }
+    if (value != NULL)
+    {
+        *value = notified_value;
+    }
+
+    return OSAL_SUCCESS;
+}
+
+osal_status_t os_task_notify_wait_impl(uint32_t clear_on_entry,
+                                       uint32_t clear_on_exit,
+                                       uint32_t *value, osal_tick_t timeout)
+{
+    BaseType_t result;
+    uint32_t notified_value = 0U;
+
+    if (OSAL_PORT_IS_IN_ISR())
+    {
+        return OSAL_ERR_IN_ISR;
+    }
+
+    result = xTaskNotifyWait(clear_on_entry, clear_on_exit, &notified_value,
+                             osal_port_ticks(timeout));
+    if (result != pdPASS)
+    {
+        return OSAL_ERR_TIMEOUT;
+    }
+    if (value != NULL)
+    {
+        *value = notified_value;
+    }
+
+    return OSAL_SUCCESS;
+}
+
+osal_status_t os_task_notify_value_clear_impl(uint32_t bits)
+{
+    if (OSAL_PORT_IS_IN_ISR())
+    {
+        return OSAL_ERR_IN_ISR;
+    }
+
+    (void)ulTaskNotifyValueClear(NULL, bits);
+    return OSAL_SUCCESS;
+}
+
 osal_status_t os_critical_enter_impl(void)
 {
     if (OSAL_PORT_IS_IN_ISR())

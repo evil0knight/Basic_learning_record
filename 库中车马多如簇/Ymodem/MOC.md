@@ -1,41 +1,81 @@
 # Ymodem
 
-[← 模块总览](../MOC.md) | [← 主页](../../index.md) | [← Ymodem传输协议](../../术中自有万钟粟/OTA/Ymodem传输协议.md)
+[← 模块总览](../MOC.md) | [← 主页](../../index.md)
 
----
+## 文件
 
-| 文件                                      | 作用                                                   |
-| ----------------------------------------- | ------------------------------------------------------ |
-| [ymodem.h](./ymodem.h) / [ymodem.c](./ymodem.c) | Ymodem 协议（接收/发送/CRC），数据经 Sink 回调交给上层 |
-| [common.h](./common.h) / [common.c](./common.c) | 工具函数 + UART Port 字节收发                          |
-| [ymodem_config.h](./ymodem_config.h)         | UART 实例编号、超时轮询次数                            |
+| 文件                                      | 作用                                |
+| ----------------------------------------- | ----------------------------------- |
+| [ymodem.h](./ymodem.h) / [ymodem.c](./ymodem.c) | Ymodem 协议、收发、CRC 和 Sink 回调 |
+| [common.h](./common.h) / [common.c](./common.c) | 协议工具函数                        |
+| [ymodem_config.h](./ymodem_config.h)         | UART 实例和收发模式配置             |
 
-## 移植
+## 移植步骤
 
-1. 放入目标工程：
+1. 复制 `ymodem.c/.h`、`common.c/.h` 和 `ymodem_config.h`，加入目标工程编译。
+2. 配置 UART Port 资源。
 
-```text
-03_Middlewares/communication/ymodem/
-├── ymodem.c/.h
-├── common.c/.h
-└── ymodem_config.h
-```
+   ```c
+   static const st_usart_config_t g_usart_configs[CORE_USART_MAX] =
+   {
+       [CORE_USART1] = {
+           .handle = &huart1,
+           .baudrate = 115200U,
+           .timeout = CORE_USART_DEFAULT_TIMEOUT
+       }
+   };
+   ```
+   阻塞模式配置 UART、GPIO、时钟并调用 `MX_USART1_UART_Init()`；DMA 模式还需配置 DMA 接收通道和 UART 空闲线中断。
+3. 选择 Ymodem 接收模式。
 
-2. 同时移植 [UART Port](../UART/MOC.md)（`core_usart_*`）。
-3. 在 `ymodem_config.h` 配置 UART 实例编号。
-4. 将 `ymodem.c`、`common.c` 加入编译。
+   ```c
+   #define YMODEM_RECEIVE_MODE_BLOCKING  0U
+   #define YMODEM_RECEIVE_MODE_DMA       1U
+   #define YMODEM_RECEIVE_MODE           YMODEM_RECEIVE_MODE_BLOCKING
+   ```
+   Bootloader 使用阻塞模式；带 RTOS 的 OTA App 使用 DMA 模式时改为 `YMODEM_RECEIVE_MODE_DMA`。
+4. DMA + RTOS 模式配置信号量。
 
-## 接收等待与平台钩子
+   ```c
+   typedef enum
+   {
+       USER_SEMA_IDX_YMODEM_RX,
+       USER_SEMA_IDX_MAX
+   } user_sema_idx_t;
 
-`Receive_Byte()` 采用轮询 `SerialKeyPressed()` 的方式等待单字节，最多执行 `YMODEM_BYTE_TIMEOUT_COUNT` 次；达到上限返回超时并终止当前会话。该宏位于 [ymodem_config.h](./ymodem_config.h)，应结合主频、波特率和 UART 驱动一次轮询耗时实测配置，不能直接照搬默认值。
+   user_sema_config_t g_user_semaphores[USER_SEMA_IDX_MAX] =
+   {
+       [USER_SEMA_IDX_YMODEM_RX] =
+       {
+           true, true, 1U, 0U, NULL
+       }
+   };
+   ```
+   统一资源初始化后获取句柄：
 
-每 1024 次轮询调用一次 `YMODEM_POLL_HOOK()`。默认是空宏，产品可将它映射为看门狗喂狗、RTOS 让步、DMA 状态维护或超时计数。钩子必须快速返回，不应执行 Flash 擦写或再次等待 UART。
+   ```c
+   osal_sema_handle_t ymodem_rx_semaphore =
+       user_sema_get(USER_SEMA_IDX_YMODEM_RX);
+   ```
+   DMA 回调释放该信号量，Ymodem 接收函数等待该信号量。Bootloader 阻塞模式不配置、不获取信号量。
+5. DMA 模式提供缓冲区并注册 RX 回调；阻塞模式不注册回调。
 
-## 资源注入
+   ```c
+   static uint8_t s_ymodem_rx_buffer[1024];
 
-Ymodem 是无 OS、无线程、无队列的协议中间件。调用前通过 `Ymodem_SetIo()` 注入同步读写函数，并向 `Ymodem_ReceiveWithSink()` 传入协议缓冲区和数据块 Sink。
+   core_usart_register_rx_callback(CORE_USART1, ymodem_rx_callback);
+   core_usart_receive_to_idle_dma(
+       CORE_USART1, s_ymodem_rx_buffer, sizeof(s_ymodem_rx_buffer));
+   ```
+   回调保存接收长度并释放 `USER_SEMA_IDX_YMODEM_RX`。阻塞模式由 Ymodem 直接调用 `core_usart_receive()`。
+6. 注入读写函数和 Flash Sink。
 
-1. 协议缓冲区由 OTA App 或 Bootloader 静态分配，至少容纳 1K 数据包。
-2. UART 实例、DMA、DMA 接收缓冲区和接收模式配置见 [UART Port](../UART/UART_Port/MOC.md)。
-3. OS 信号量或其他同步资源配置见 [OSAL 资源配置](../代码架构/firmware/01_app/app_init/MOC.md)。
-4. OTA 调用和 Flash Sink 配置见 [OTA MOC](../OTA/MOC.md) 与 [Flash MOC](../Flash/MOC.md)。
+   ```c
+   Ymodem_SetIo(ota_adapter_uart_read, ota_adapter_uart_write);
+   Ymodem_ReceiveWithSink(
+       s_ymodem_packet_buffer,
+       ymodem_flash_sink,
+       sink_context,
+       OTA_APP_ADDRESS);
+   ```
+   Sink 负责 Flash 写入、地址递增、最后数据块裁剪和错误返回。详见 [OTA MOC](../OTA/MOC.md) 和 [Flash MOC](../Flash/MOC.md)。

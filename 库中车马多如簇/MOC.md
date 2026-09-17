@@ -41,6 +41,7 @@
 |       SPI       |          硬件SPI、软件SPI与统一Port          | [SPI](./SPI/MOC.md)                                     |
 |       IIC       |       硬件I2C、软件I2C与统一总线Port        | [IIC](./IIC/MOC.md)                                     |
 |     EEPROM      |             掉电保存与AT24C02驱动             | [EEPROM](./EEPROM/MOC.md)                               |
+|       ADC       |       双缓冲采样、DMA/中断可切换、双任务       | [ADC](./ADC/MOC.md)                                     |
 |      屏幕      |             LCD/OLED屏幕驱动与接入             | [屏幕](./屏幕/MOC.md)                                   |
 |    代码架构    |        Wrapper 解耦与 Adapter 挂载源码        | [代码架构](./代码架构/MOC.md)                           |
 |   外设库模板   |     照 Flash 抽象出的外设库骨架，写新外设照它    | [_模板](./_模板/MOC.md)                                 |
