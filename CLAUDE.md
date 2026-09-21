@@ -113,17 +113,46 @@
 
 ## 上传 GitHub 的操作方式
 
-本项目已通过 SSH 与 GitHub 关联。每次用户说"上传 GitHub"时，
-由 Claude 自己依次执行以下命令完成上传：
+本项目已通过 SSH 与 GitHub 关联。公开内容和私有笔记分别上传。
 
-```bash
+### 公开仓库
+
+仓库：`evil0knight/Basic_learning_record`
+
+```powershell
+cd D:\Basic_learning_record
 git pull
 git add .
 git commit -m "本次更新了什么"
 git push
 ```
 
-> 说明：commit message 中的"本次更新了什么"应替换为实际更新内容的简短描述。
+`术中自有万钟粟/求职/` 和 `术中自有万钟粟/日常避坑/` 已加入 `.gitignore`，不会上传到公开仓库。
+
+### 私有笔记仓库
+
+仓库：`evil0knight/private-notes`
+
+修改本地原路径中的私有笔记后，在项目根目录执行同步脚本：
+
+```powershell
+cd D:\Basic_learning_record
+powershell -ExecutionPolicy Bypass -File .\同步私有笔记.ps1
+```
+
+脚本会将两个本地私有目录增量复制到 `private-notes`，自动执行 `git add`、`git commit`、`git push`，并触发私有 Quartz 部署。不会删除私有仓库中的额外文件。
+
+如果只修改了 `private-notes` 内的内容，也可以直接执行：
+
+```powershell
+cd D:\Basic_learning_record\private-notes
+git pull
+git add .
+git commit -m "本次更新了什么"
+git push
+```
+
+说明：commit message 中的"本次更新了什么"应替换为实际更新内容的简短描述。公开仓库和私有仓库不要混用提交命令。
 
 ---
 
