@@ -21,7 +21,8 @@
 | RTT,Ozone,keil里的debug        | [debug方法 笔记](./debug方法/MOC.md)                      |
 | 项目骨架、代码规范、各个层写法 | [嵌入式工程架构 笔记](./嵌入式工程架构/MOC.md)            |
 | 固件空中升级+bootloader        | [OTA 笔记](./OTA/MOC.md)                                  |
-| //特权级笔记,熟人请找我进SVC   | [求职](求职\MOC.md)                                       |
+| 私有 Quartz 站点（需 GitHub 授权） | [求职](https://private-quartz-dlj.pages.dev/求职/MOC)         |
+| 私有 Quartz 站点（需 GitHub 授权） | [日常避坑](https://private-quartz-dlj.pages.dev/日常避坑/MOC) |
 | 低功耗设计与优化               | [低功耗 笔记](./低功耗/MOC.md)                            |
 
 ---
