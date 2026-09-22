@@ -43,3 +43,17 @@
 // ==================== 代码补全设置 ====================
 }
 ```
+
+## 扩展:
+
+1. Office Viewer
+2. C/C++
+3. C/C++ DevTools
+4. C/C++ Extension Pack
+5. C/C++ Themes
+6. Chinese (Simplified) (简体中文) Language Pack for Visual Studio Code
+7. CMake
+8. CMake Tools
+9. GitHub Theme
+10. Keil Assistant
+11. LaTeX Workshop
