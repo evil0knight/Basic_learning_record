@@ -4,7 +4,7 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $privateRoot = Join-Path $root 'private-notes'
 $techName = -join (0x672f, 0x4e2d, 0x81ea, 0x6709, 0x4e07, 0x949f, 0x7c9f | ForEach-Object { [char]$_ })
 $jobName = -join (0x6c42, 0x804c | ForEach-Object { [char]$_ })
-$dailyName = -join (0x65e5, 0x5e38, 0x907f, 0x5751 | ForEach-Object { [char]$_ })
+$dailyName = -join (0x65e5, 0x5e38 | ForEach-Object { [char]$_ })
 
 if (-not (Test-Path (Join-Path $privateRoot '.git'))) {
     throw "private-notes Git repository not found: $privateRoot"

@@ -22,7 +22,7 @@
 | 项目骨架、代码规范、各个层写法 | [嵌入式工程架构 笔记](./嵌入式工程架构/MOC.md)            |
 | 固件空中升级+bootloader        | [OTA 笔记](./OTA/MOC.md)                                  |
 | 私有 Quartz 站点（需 GitHub 授权） | [求职](https://private-quartz-dlj.pages.dev/求职/MOC)         |
-| 私有 Quartz 站点（需 GitHub 授权） | [日常避坑](https://private-quartz-dlj.pages.dev/日常避坑/MOC) |
+| 私有 Quartz 站点（需 GitHub 授权） | [日常](https://private-quartz-dlj.pages.dev/日常/MOC)     |
 | 低功耗设计与优化               | [低功耗 笔记](./低功耗/MOC.md)                            |
 
 ---
