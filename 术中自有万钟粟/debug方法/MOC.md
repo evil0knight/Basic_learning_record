@@ -12,4 +12,5 @@
 | RTT              | SEGGER RTT 实时传输                                     | [RTT](RTT/MOC.md)                       |
 | 下载器与调试接口 | J-Link/ST-Link/DAP-Link/ICE 原理、生态价格、SWD 与 JTAG | [下载器与调试接口](下载器与调试接口.md) |
 | EasyLogger       | 嵌入式日志库，支持彩色分级输出                          | [EasyLogger](EasyLogger.md)             |
-| 离线断点         | 通过 MPU 设置离线断点,判断越界问题                      | [离线断点](离线断点.md)                 |
+| 离线断点         | 通过 MPU 设置离线断点,判断越界问题                      | [MPU离线断点](MPU离线断点.md)           |
+|                  | 通过 FBP 设置离线断点                                   | [FBP离线断点](FBP离线断点.md)           |
