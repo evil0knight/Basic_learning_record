@@ -1,0 +1,9 @@
+# 项目权限：保留沙箱，超出限制的操作按需申请审批。
+# 不使用 never 或 danger-full-access，不整体放开所有命令。
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# 默认禁止沙箱内联网；上传脚本的单独放行规则在 rules/upload.rules。
+# 其他未获授权的联网命令继续按需审批。
+[sandbox_workspace_write]
+network_access = false

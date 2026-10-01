@@ -1,0 +1,36 @@
+# PDLC产品开发生命周期
+
+[← 开发流程规范](./MOC.md) | [← 嵌入式工程架构](../MOC.md) | [← 主页](../../../index.md)
+
+---
+
+> 面向软件工程师的项目目录模板，用于组织工程文件与交付物；全周期阶段、流程图和文档入口见[开发流程规范](./MOC.md)。
+>
+> [GitHub 项目模板](https://github.com/evil0knight/example_project) · [参考文章](https://twd6onxsxva.feishu.cn/docx/V1TWdYUKFoyFLwxAMYIc208InVe)
+
+## 目录结构
+
+```
+project/
+├── 00_Project_Management/       # 项目管理（流程、质量、合规）
+│   ├── 00_需求导入_QFD/          # QFD：客户声音 → 工程指标
+│   ├── 01_需求约束_Pugh/         # Pugh矩阵：多方案对比选型
+│   ├── 02_需求转化_Basic_Statics/ # 需求 → 可量化技术参数
+│   ├── 03_功能图谱_Function_Map/  # 流程节点 → 跳转到 01_Function_Map,都可以画类图和永道图
+│   ├── 04_功能风险管控_DFMEA/     # 设计失效模式与影响分析
+│   ├── 04_法规认证_国内_国外/     # CCC/FCC/CE 等认证
+│   ├── 04_知识产权_国内国外/      # 专利/软著
+│   ├── 05_敏捷开发_Scrum/         # Sprint 迭代
+│   ├── 06_持续集成与测试_DevOps/  # CI/CD、自动化测试
+│   ├── 07_产品生产管理_Six_Sigma/ # 量产质量管理
+│   └── 08_缺陷管理追踪_Jira/      # 缺陷追踪
+├── 00_Reference/                # 参考资料（手册、标准、竞品）
+├── 01_Function_Map/             # 功能列表——先定"做什么"，再分发
+├── 02_Hardware/                 # 硬件（原理图、PCB、BOM）
+├── 03_Firmware/                 # 固件（直接跟硬件打交道的底层代码）
+├── 04_Software/                 # 上位机 / 算法 / 工具软件
+├── 05_Mechanical/               # 机械结构
+├── 06_FCT/                      # 产线自检工具链
+├── 07_Tools/                    # 项目辅助脚本
+└── readme.md                    # 工作流箭头链（路线图，不是简介）
+```

@@ -44,7 +44,7 @@ SP 指向栈的**栈顶**
 
 Cortex-M 有两根栈指针,都是真实存在的寄存器,不过**根据情况映**射到sp寄存器中去↓
 
-- **MSP**：主栈指针，复位后默认用这个，操作系统内核和异常处理也用这个。初始会在栈顶一定满足 `if (((*(__IO uint32_t*)APPLICATION_ADDR) & 0x2FFE0000 ) == 0x20000000)`,[bootloader]()开始用于检验栈顶指针是否合法
+- **MSP**：主栈指针，复位后默认用这个，操作系统内核和异常处理也用这个。初始值取自 APP 向量表首字（当前工程的 `OTA_APP_ADDRESS = 0x0800C000`），Bootloader 启动时通过 `if (((*(__IO uint32_t *)OTA_APP_ADDRESS) & 0x2FFE0000U) == 0x20000000U)` 检验栈顶指针是否合法，具体见 [Bootloader 的 CheckAppValid()](../../库中车马多如簇/OTA/bootloader/Boot_Manager.c#L31)。
 - **PSP**：进程栈指针，跑用户线程时用。线程各自的栈互相隔离，一个线程炸了不会拖垮内核。
 
 ---

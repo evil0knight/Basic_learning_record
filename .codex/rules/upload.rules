@@ -1,0 +1,31 @@
+# 只放行本项目的上传入口，其他命令继续使用原有审批策略。
+# 等价于 Claude 的上传脚本白名单；前缀后允许 -DryRun、-Message 等脚本参数。
+# 不放行任意 PowerShell 命令、其他脚本或单独的 git push。
+
+prefix_rule(
+    pattern = [
+        ["powershell", "powershell.exe", "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"],
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        [
+            "D:/Basic_learning_record/.github/upload.ps1",
+            "D:\\Basic_learning_record\\.github\\upload.ps1",
+            "./.github/upload.ps1",
+            ".\\.github\\upload.ps1",
+        ],
+    ],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = [
+        ["powershell", "powershell.exe", "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"],
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ["./.github/upload.ps1", ".\\.github\\upload.ps1"],
+    ],
+    decision = "allow",
+)
