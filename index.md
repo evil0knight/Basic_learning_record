@@ -48,41 +48,6 @@ title: 首页
       <div class="card-desc">查看我的所有开源项目 →</div>
     </div>
   </a>
-  <a class="card" href="https://github.com/evil0knight/RM_SUPERCAP_JSU" target="_blank">
-    <div class="card-icon">⚡</div>
-    <div class="card-body">
-      <div class="card-title">RM_SUPERCAP_JSU</div>
-      <div class="card-desc">超级电容</div>
-    </div>
-  </a>
-  <a class="card" href="https://github.com/evil0knight/JSU_Infin0" target="_blank">
-    <div class="card-icon">🤖</div>
-    <div class="card-body">
-      <div class="card-title">JSU_Infin0</div>
-      <div class="card-desc">平衡轮腿</div>
-    </div>
-  </a>
-  <a class="card" href="https://github.com/evil0knight/Internship_nanjing_1" target="_blank">
-    <div class="card-icon">👔</div>
-    <div class="card-body">
-      <div class="card-title">南京实习</div>
-      <div class="card-desc">433,WiFi多端通信</div>
-    </div>
-  </a>
-  <a class="card" href="https://github.com/evil0knight/Internship_zhenjiang_2" target="_blank">
-    <div class="card-icon">🏢</div>
-    <div class="card-body">
-      <div class="card-title">镇江实习</div>
-      <div class="card-desc">Internship_zhenjiang_2</div>
-    </div>
-  </a>
-  <a class="card" href="https://github.com/evil0knight/Intelligent_Agricultural_Equipment_Innovation_Competition" target="_blank">
-    <div class="card-icon">🌾</div>
-    <div class="card-body">
-      <div class="card-title">智能农业装备创新大赛</div>
-      <div class="card-desc">Intelligent Agricultural Equipment</div>
-    </div>
-  </a>
 </div>
 
 ---
