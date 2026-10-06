@@ -153,4 +153,11 @@ rss: https://evil0knight.github.io/quartz/index.xml
       <div class="friend-desc">代码是写给人看的，不是写给机器看的，只是顺便计算机可以执行而已</div>
     </div>
   </a>
+  <a class="friend-card" href="https://alistereno.top/" target="_blank">
+    <img class="friend-avatar" src="https://alistereno.top/images/profile/avatar.webp" alt="Alister's Blog" />
+    <div class="friend-info">
+      <div class="friend-name">Alister's Blog</div>
+      <div class="friend-desc">把喜欢的、想到的，都留在这里。</div>
+    </div>
+  </a>
 </div>
