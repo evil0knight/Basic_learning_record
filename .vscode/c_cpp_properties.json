@@ -1,0 +1,30 @@
+{
+    // VS Code C/C++ 扩展配置：用于代码补全、头文件识别和编辑器错误提示。
+    // 不负责实际编译，也不影响笔记、博客发布或文件同步。
+    // VS Code 支持此配置文件中的注释；不再需要项目专用的 C/C++ 提示配置时可删除。
+    "configurations": [
+        {
+            // 配置名称；实际代码分析模式由下面的 intelliSenseMode 指定。
+            "name": "Win32",
+            // 递归搜索当前项目及所有子目录中的头文件。
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            // 供代码分析使用的预定义宏，不会自动传给实际编译命令。
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            // 从本机 GCC 获取系统头文件路径、内置宏等信息；更换工具链后需更新路径。
+            "compilerPath": "E:\\Toolchains\\mingw64\\bin\\gcc.exe",
+            // 分别按 C17 和 GNU C++17 标准分析代码。
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            // 使用 Windows 平台 GCC 的 64 位代码分析模式。
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    // C/C++ 扩展的配置格式版本，不是编译器版本。
+    "version": 4
+}

@@ -1,11 +1,3 @@
-# 本地上传脚本和编辑器配置，不提交到仓库
-/.github/*
-# 保留原有的 GitHub 博客更新工作流
-!/.github/workflows/
-/.github/workflows/*
-!/.github/workflows/trigger-blog.yml
-/.vscode/
-
 # C/C++ 编译生成的无用文件
 *.exe
 *.o
