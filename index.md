@@ -154,13 +154,3 @@ rss: https://evil0knight.github.io/quartz/index.xml
     </div>
   </a>
 </div>
-
-## 金融投资
-
-<a class="card" href="private-notes/日常/财务管理/MOC.md">
-  <div class="card-icon">💰</div>
-  <div class="card-body">
-    <div class="card-title">金融投资</div>
-    <div class="card-desc">基金、股票、银行、保障、商品、衍生品、海外卡与税收基础</div>
-  </div>
-</a>
