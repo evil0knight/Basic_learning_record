@@ -90,6 +90,7 @@ FOC算法需要强大的硬件平台作为载体，主要包括三大核心部�
 | --- | --- | --- |
 | 高速数学运算（浮点/定点） | ARM Cortex-M4/M7内核，DSP指令集，FPU | STM32F4/F7/H7系列，GD32F4，ATSAME70 |
 | 高精度定时器 | 高级定时器（带死区控制、互补输出） | TIM1/TIM8 (STM32)， TCC (Microchip SAM) |
+
 | 快速ADC采样 | 多通道同步采样ADC，采样率>1MSPS | STM32的ADC1/ADC2， 12位以上精度 |
 | 通信接口 | UART, CAN, SPI (连接传感器或上位机) | 通用外设 |
 
