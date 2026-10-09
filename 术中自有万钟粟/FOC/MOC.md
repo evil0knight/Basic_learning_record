@@ -60,18 +60,12 @@
 
 ### 第 4 层：调制映射层（SVPWM Modulation）
 
-原理参考：[SVPWM原理](SVPWM原理.md),spwm原理
-
-* **4.1 [SVPWM算法](SVPWM算法.md)（扇区判断与合成时间计算）**
+* **[SVPWM算法](SVPWM算法.md)**
   * **输入：** 期望电压分量 **$V_\alpha^*, V_\beta^*$**、当前直流母线电压 **$V_{bus}$**
   * **处理：**
     1. 计算电压空间矢量相位，判断其所在的 60° 扇区（Sector 1 ~ 6）。
     2. 计算相邻非零基础矢量 **$T_1, T_2$** 以及零矢量 **$T_0, T_7$** 的作用时间。
   * **输出：** 三相高低电平有效导通时间 **$T_a, T_b, T_c$**
-* **4.2 [SVPWM代码实现](SVPWM代码实现.md)（定时器比较寄存器更新）**
-  * **输入：** 导通时间 **$T_a, T_b, T_c$**、定时器计数周期 **$T_{pwm}$**
-  * **处理：** 映射为微控制器定时器比较值（Compare Register CCR）
-  * **输出：** 6 路互补 PWM 开关信号（**$PWM_U^+, PWM_U^-, PWM_V^+, PWM_V^-, PWM_W^+, PWM_W^-$**，带硬件死区时间 Dead-time）
 
 ### 第 5 层：物理硬件层（Power Electronics & Transducers）
 
