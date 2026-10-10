@@ -18,10 +18,11 @@
 2. 如果你对需求有任何不确定性,必须主动提问,而不是凭空猜测
 3. 如果发现更简单,更高效的实现思路,必须主动提出优化建议
 4. 如果感到思路混乱或者需求矛盾,必须立刻停下,清晰的标注出你不清楚的点,并请求澄清.
-5. 1. 创建文件的时候:                                    看[创建文件](.claude\skills\创建文件.md)
+5. 1. 创建文件的时候:                                   看[创建文件](.claude\skills\创建文件.md)
    2. 迁移或者重组文件的时候:                  看[重组文件](.claude\skills\重组文件.md)
    3. 写文件的时候:                                        看[写md文件](.claude\skills\写md文件.md)
-   4. 用户明确要求上传 GitHub 时：直接运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:/Basic_learning_record/.github/upload.ps1"`。不提前读取脚本、查询 Git 状态、列目录或做预览，检查由脚本负责；执行后简短报告结果。仅询问或引用日志时不执行上传。
+   4. 写代码.c.h的时候：				   看[写C和H代码](.claude/skills/写C和H代码.md)
+   5. 用户明确要求上传 GitHub 时：直接运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:/Basic_learning_record/.github/upload.ps1"`。不提前读取脚本、查询 Git 状态、列目录或做预览，检查由脚本负责；执行后简短报告结果。仅询问或引用日志时不执行上传。
 
 ## 边界:
 
