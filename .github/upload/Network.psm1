@@ -50,11 +50,36 @@ function ConvertTo-UploadShellLiteral {
 function Initialize-UploadNetwork {
     $proxy = Get-UploadProxy
     Assert-UploadExitAddress $proxy
-    $gitExe = (Get-Command git -CommandType Application -ErrorAction Stop).Source
-    $gitRoot = Split-Path (Split-Path $gitExe -Parent) -Parent
-    $connect = Join-Path $gitRoot 'mingw64/bin/connect.exe'
-    $ssh = Join-Path $gitRoot 'usr/bin/ssh.exe'
-    if (-not (Test-Path -LiteralPath $connect) -or -not (Test-Path -LiteralPath $ssh)) {
+    # Windows PowerShell 5.1 可能返回多个同名 git.exe。逐个候选推导 Git 根目录，
+    # 并选择同时包含 connect.exe 和 ssh.exe 的安装，避免数组污染或选中 mingw64\bin\git.exe
+    # 后多推导一层目录。
+    $gitCommands = @(Get-Command git -CommandType Application -All -ErrorAction Stop)
+    $gitRoot = $null
+    $connect = $null
+    $ssh = $null
+    foreach ($gitCommand in $gitCommands) {
+        $gitExe = [string]$gitCommand.Source
+        $gitPath = [IO.Path]::GetFullPath($gitExe)
+        $gitParent = Split-Path $gitPath -Parent
+        $candidateRoot = $null
+        if ((Split-Path $gitParent -Leaf) -ieq 'cmd') {
+            $candidateRoot = Split-Path $gitParent -Parent
+        }
+        elseif ((Split-Path $gitParent -Leaf) -ieq 'bin' -and
+                (Split-Path (Split-Path $gitParent -Parent) -Leaf) -ieq 'mingw64') {
+            $candidateRoot = Split-Path (Split-Path $gitParent -Parent) -Parent
+        }
+        if (-not $candidateRoot) { continue }
+        $candidateConnect = Join-Path $candidateRoot 'mingw64/bin/connect.exe'
+        $candidateSsh = Join-Path $candidateRoot 'usr/bin/ssh.exe'
+        if ((Test-Path -LiteralPath $candidateConnect) -and (Test-Path -LiteralPath $candidateSsh)) {
+            $gitRoot = $candidateRoot
+            $connect = $candidateConnect
+            $ssh = $candidateSsh
+            break
+        }
+    }
+    if (-not $gitRoot) {
         throw '未找到 Git for Windows 自带的 connect.exe 或 ssh.exe，请检查 Git 安装。'
     }
     $proxyCommand = 'ProxyCommand="{0}" -H {1} %h %p' -f $connect.Replace('\', '/'), $proxy
