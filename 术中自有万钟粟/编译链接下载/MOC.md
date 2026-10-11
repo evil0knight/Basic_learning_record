@@ -36,3 +36,4 @@
 | [差分升级](差分升级.md)                                 | —                   |
 | [hex驱动直接引导](hex驱动直接引导.md)                   | —                   |
 | [单片机烧录：从RAM到Flash](单片机烧录：从RAM到Flash.md) | 下载代码             |
+| [下载器与调试接口](下载器与调试接口.md) | J-Link/ST-Link/DAP-Link/ICE 原理、生态价格、SWD 与 JTAG |

@@ -8,7 +8,7 @@
 
 [api价格换算与API中转站挑选](api价格换算.md)
 
-[Claude Code封号机制深度调查报告](https://bytedance.sg.larkoffice.com/docx/QNsIdi8VFoKm00xY8SRlkXxygve)
+[Claude Code封号机制深度调查报告](https://bytedance.sg.larkoffice.com/docx/QNsIdi8VFoKm00xY8SRlkXxygve),[claude账号防封博客文章(未实验)](https://www.neomelt.cloud/posts/claude-sign-up-guide)
 
 ---
 
@@ -19,8 +19,6 @@
 ---------2026/6/18
 
 ---
-
-
 
 ## 如何接入API:
 

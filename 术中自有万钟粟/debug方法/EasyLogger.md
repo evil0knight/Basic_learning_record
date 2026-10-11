@@ -8,6 +8,34 @@
 
 ---
 
+## 原理:
+
+规范格式,打包信息,利用[RTT的底层传输技术](RTT\原理.md)传输
+
+他打包了日志级别①前缀,②时间戳,③任务名称,④文件名称,⑤函数名称,⑥代码行号还有⑦正文内容
+
+这些是通过C语言自带的宏定义和预定义标识符的功劳,编译器天生就自带了几个特殊的宏:
+
+* `__FILE__`：编译器一看到这个词，就会自动把它替换成当前正在编译的文件名字符串。
+* `__LINE__`：编译器会自动把它替换成当前的行号。
+* `__FUNCTION__` （或 `__func__`）：编译器会把它替换成当前的函数名。
+
+Easylog没有提供一个真正的log_e函数,而是提供一个宏定义,类似:
+
+```
+// Easylog 底层的宏定义包装（简化版）
+#define log_e(format, ...)   \
+    easylog_output(LEVEL_ERROR, __FILE__, __FUNCTION__, __LINE__, format, ##__VA_ARGS__)
+```
+
+编译的预处理阶段会把他展开成
+
+```
+easylog_output(LEVEL_ERROR, "motor_ctrl.c", "FOC_Current_Loop", 125, "Motor speed error");
+```
+
+对于当前时间,他会给留一个空函数,比如 `elog_port_get_time()`在这个函数里,把获取时间的函数放进去
+
 ## keil配置
 
 1. 我放到 `库中车马多如簇\EasyLogger-master\easylogger`里了
