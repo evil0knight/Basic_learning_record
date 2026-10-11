@@ -4,7 +4,7 @@
 
 ---
 
-**下载地址：** [https://www.segger.com/downloads/jlink/](https://www.segger.com/downloads/jlink/)
+**下载地址：** [https://www.segger.com/downloads/jlink/#Ozone](https://www.segger.com/downloads/jlink/#Ozone)
 
 ### 配置:
 
