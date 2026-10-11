@@ -15,3 +15,5 @@
 | 离线断点       | 通过 MPU 判断越界问题                  | [MPU离线断点](MPU离线断点.md)      |
 |                | 通过 FBP 设置Debug断点                 | [FBP离线断点](FBP离线断点.md)      |
 |                | 通过DWT判断越界问题+精准时间戳         | [DWT](DWT.md) |
+|                | 通过ITM输出跟踪                        | [ITM](ITM.md) |
+|                | 通过ETM做指令跟踪                      | [ETM](ETM.md) |

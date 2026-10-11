@@ -8,7 +8,9 @@
 
 ## 原理
 
-和[EasyLogger](EasyLogger.md)不同，SystemView 不会打包日志，因为这会增加运行时算力开销,相对于EasyLogger一个日志要50个字节,这个可能只要2到4个字节
+和[EasyLogger](EasyLogger.md)不同，
+
+SystemView 不会打包日志，因为这会增加运行时算力开销(相对于EasyLogger一个日志要50个字节,这个可能只要2到4个字节)
 
 他会放一帧数据到[RTT](RTT/MOC.md)缓冲区:
 
@@ -38,4 +40,10 @@
 
 SystemView 将这些事件数据以图形化的方式展现，为后续调整任务优先级和分析程序调用链提供依据。
 
+![1791723631058](image/Systemview/1791723631058.png)
+
 ## 移植教程:
+
+> [立芯嵌入式](https://twd6onxsxva.feishu.cn/docx/AzZRdjhewoZSHnxj4i6cANgsnAh)
+>
+> [软件下载官网](https://www.segger.com/downloads/systemview/),我已经下载在E:\ProgramFile\SystemView

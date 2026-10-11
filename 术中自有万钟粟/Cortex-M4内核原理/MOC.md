@@ -1,4 +1,4 @@
-﻿# Cortex-M4内核原理 — 知识地图
+# Cortex-M4内核原理 — 知识地图
 
 [← 返回技术栈](../MOC.md)
 
@@ -24,6 +24,9 @@
 | XPSR/PRIMASK/FAULTMASK/BASEPRI/CONTROL，MRS/MSR 访问 | [特殊寄存器.md](特殊寄存器.md)           |
 | FPU 寄存器、双栈指针与状态寄存器索引                 | [剩余寄存器.md](剩余寄存器.md)           |
 | DWT寄存器(调试和计时)                                | [DWT](DWT.md)                            |
+| ITM寄存器(跟踪输出)                                  | [ITM](ITM.md)                            |
+| FPB寄存器(硬件断点)                                  | [FPB](FPB.md)                            |
+| ETM寄存器(指令跟踪)                                  | [ETM](ETM.md)                            |
 
 ---
 
