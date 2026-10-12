@@ -89,11 +89,13 @@ foreach ($repository in $repositories) {
     try {
         $state = Get-UploadRepositoryState $repository.Root $repository.Url $repository.Public
         $blogPending = $repository.Public -and (Test-BasicBlogPending $repository.Root)
-        if ($state.Pending -or $blogPending) {
+        $privateBlogPending = (-not $repository.Public) -and (Test-PrivateBlogPending $repository.Root)
+        if ($state.Pending -or $blogPending -or $privateBlogPending) {
             Write-Host "[$name] 待处理；本地缓存显示未推送提交：$($state.Ahead)"
             if (-not $state.RemoteKnown) { Write-Host '尚无远程 main 缓存，需要联网核实。' }
             if ($state.Status) { Write-Host $state.Status }
             if ($blogPending) { Write-Host '存在待补发的公开博客更新通知。' }
+            if ($privateBlogPending) { Write-Host '存在待补发的私有博客更新通知。' }
             $pending += $state
         }
         else { Write-Host "[$name] 无本地更新，跳过。" }

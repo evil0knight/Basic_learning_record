@@ -6,11 +6,11 @@
 
 ## 一、Park变换的核心思想
 
-在上一章的Clarke变换中，我们将三相静止坐标系（ABC）下的变量转换到了两相静止坐标系（α-β）。然而，电机转子是旋转的，其磁场在空间中以电角速度 $\omega$ 旋转。为了实现对转子磁场的直接、解耦控制，我们需要将变量转换到一个与转子磁场同步旋转的坐标系中，这就是 两相旋转坐标系（d-q坐标系） 。
+两相静止坐标系（α-β）通过一个电角度$\theta_e$转换成两相旋转坐标系（d-q坐标系） 。
 
-Park变换（又称2s/2r变换）的物理意义在于：将静止的观察视角，转变为骑在转子磁场上、随其一同旋转的观察视角。在这个旋转的视角下，原本在静止坐标系中呈正弦变化的交流量（如电流、电压），就变成了相对恒定的直流量，从而极大简化了控制器的设计。
-
-核心目标：通过一个旋转变换，将静止坐标系（α-β）中的矢量投影到与转子磁场同步旋转的直轴（d轴）和交轴（q轴）上，从而实现对转矩分量（q轴电流）和磁场分量（d轴电流）的独立控制。
+* **输入：** 静止坐标系电流 **$I_\alpha, I_\beta$**、电角度 **$\theta_e$**
+* **处理：** 随转子旋转的坐标系投影变换
+* **输出：** 直流旋转电流反馈值 **$I_d$**（直轴/励磁电流）、**$I_q$**（交轴/转矩电流）
 
 ## 二、数学推导
 
@@ -20,23 +20,12 @@ Park变换（又称2s/2r变换）的物理意义在于：将静止的观察视�
 
 将矢量 $I_s$ 分别向d轴和q轴投影，利用三角函数关系，可以得到其在旋转坐标系下的分量：
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 I_d &= I_\alpha \cos\theta_e + I_\beta \sin\theta_e \\
 I_q &= -I_\alpha \sin\theta_e + I_\beta \cos\theta_e
-\end{aligned}$$
-
-### 2.2 矩阵形式
-
-将上述标量方程写成紧凑的矩阵形式，即得到Park变换的正变换公式：
-**$I_{dq} = P(\theta) \cdot I_{\alpha\beta}$**
-| [ | I d | ] | = | [ | cosθ e | sinθ e | ] | · | [ | I α | ] |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ | I q | ] | -sinθ e | cosθ e | I β |  |  |  |  |  |  |
-
-### 2.3 逆变换
-
-逆 Park 变换已拆分为独立模块，详见[逆 Park 变换](逆Park变换.md)。完整的正变换、逆变换代码和调用流程见[坐标变换代码实现](坐标变换代码实现.md)。
-### 💡 关键理解点
+\end{aligned}
+$$
 
 - d轴（直轴） ：与转子永磁体磁场方向对齐，控制d轴电流（$I_d$）可以增强或削弱气隙磁场（用于弱磁控制）。
 - q轴（交轴） ：超前d轴90度电角度，控制q轴电流（$I_q$）直接产生电磁转矩。在永磁同步电机（PMSM）中，转矩与 $I_q$ 成正比。
@@ -44,84 +33,20 @@ I_q &= -I_\alpha \sin\theta_e + I_\beta \cos\theta_e
 
 ## 三、软件实现（C语言）
 
-在嵌入式系统中，Park变换的实现需要高效且避免浮点运算（如果主控无FPU）。通常采用定点数运算或查表法（LUT）计算三角函数。
+与 FOC 其他模块(Clarke/逆Park/SVPWM/电流环)风格统一，这里给出一份面向带FPU的 MCU 的浮点实现，MISRA 风格、带空指针校验。完整文件见 [相关代码/Park.c](相关代码/Park.c)。
 
-### 3.1 数据结构定义
+**优化要点：**
 
-```c
-/* FOC常用数据结构 */
-typedef struct {
-    float alpha;   // α轴分量
-    float beta;    // β轴分量
-} AlphaBeta_t;
+1. **一次性求 sin/cos**：Park 公式中 sin(θe) 和 cos(θe) 各出现两次，先算一遍存成局部变量再复用，避免调两次 `sinf`/`cosf`。
+2. **参数校验前置**：空指针直接返回错误码，避免访存异常。
+3. **两种接口**：
+   - `park_transform()`：内部直接 `sinf`/`cosf`，简单但较慢（约 60~200 个时钟周期，取决于平台）。
+   - `park_transform_sc()`：由调用方传入预算好的 sin/cos。FOC 主循环里 Park 与反 Park 共用同一个 θe，查一次表拿到 sin/cos 分别喂给两个函数，省一次查表。
+4. **三角函数查表优化**：Park 与反 Park 共用同一张 1024 点 sin LUT（位掩码取模自动处理负角度和多圈环绕），已独立成模块。LUT 以 `const` 常量形式**直接预算嵌入 Flash**，开机即可用，不需要运行时 init，也不占 RAM。控制中断里 `sin_lut_sincos(θe, &sin_t, &cos_t)` 一次拿到 sin/cos，分别喂给 `park_transform_sc()` 和 `inverse_park_sc()`，整个 FOC 循环只查一次表。
 
-typedef struct {
-    float d;       // d轴分量（直轴，磁场分量）
-    float q;       // q轴分量（交轴，转矩分量）
-} DQ_t;
+---
 
-typedef struct {
-    float sin_val;
-    float cos_val;
-} Trig_Components_t;
-```
+## 相关代码
 
-### 3.2 Park变换函数实现
-
-```c
-/**
-  * @brief  Park正变换：从静止坐标系(α,β)变换到旋转坐标系(d,q)
-  * @param  pInput: 指向输入结构体（α-β分量）的指针
-  * @param  pOutput: 指向输出结构体（d-q分量）的指针
-  * @param  pTrig: 指向包含sinθ和cosθ的结构体指针
-  * @retval 无
-  */
-void Park_Transform(AlphaBeta_t *pInput, DQ_t *pOutput, Trig_Components_t *pTrig)
-{
-    /* I_d = I_α * cosθ + I_β * sinθ */
-    pOutput->d = pInput->alpha * pTrig->cos_val + pInput->beta * pTrig->sin_val;
-
-    /* I_q = -I_α * sinθ + I_β * cosθ */
-    pOutput->q = -pInput->alpha * pTrig->sin_val + pInput->beta * pTrig->cos_val;
-}
-```
-
-### 3.3 代码实现
-
-本页保留 Park 正变换实现；逆 Park 实现统一见[逆 Park 变换](逆Park变换.md)，完整坐标变换流程见[坐标变换代码实现](坐标变换代码实现.md)。
-### 3.4 三角函数计算优化
-
-在实时控制中，频繁调用标准库的sin/cos函数开销巨大。常用优化方法：
-
-| 方法 | 原理 | 精度 | 速度 | 适用场景 |
-| --- | --- | --- | --- | --- |
-| 查表法(LUT) | 预计算sin/cos值存入数组，根据角度索引查表 | 中高（取决于表大小） | 极快 | 资源有限的MCU，固定频率控制 |
-| 泰勒展开 | 在零点附近用多项式逼近 | 中（取决于阶数） | 较快 | 有FPU的MCU，角度范围小 |
-| CORDIC算法 | 通过迭代移位和加减计算 | 可配置 | 中（迭代次数决定） | 无硬件乘除器的MCU，ASIC/FPGA |
-| 硬件FPU | 直接调用数学库 | 高 | 快（依赖硬件） | 高性能MCU（如Cortex-M4/M7） |
-
-```c
-/* 示例：查表法获取三角函数值（假设角度已归一化到0-4095对应0-2π） */
-#define TRIG_TABLE_SIZE 4096
-float sin_table[TRIG_TABLE_SIZE];
-float cos_table[TRIG_TABLE_SIZE];
-
-void Init_TrigTable(void) {
-    for(int i=0; i<TRIG_TABLE_SIZE; i++) {
-        float angle = 2.0f * PI * i / TRIG_TABLE_SIZE;
-        sin_table[i] = sinf(angle);
-        cos_table[i] = cosf(angle);
-    }
-}
-
-Trig_Components_t Get_TrigValues(uint16_t angle_idx) {
-    Trig_Components_t trig;
-    trig.sin_val = sin_table[angle_idx];
-    trig.cos_val = cos_table[angle_idx];
-    return trig;
-}
-```
-
-## 四、在FOC控制环中的位置
-
-Park变换是FOC控制算法承上启下的核心环节。下图展示了其在典型FOC控制架构中的位置：
+- [Park.c](相关代码/Park.c)
+- [sin_lut.c](相关代码/sin_lut.c) / [sin_lut.h](相关代码/sin_lut.h) — 共享 sin/cos 查表模块（与反 Park 复用）
