@@ -33,7 +33,7 @@ $$
 
 ## 三、软件实现（C语言）
 
-与 FOC 其他模块(Clarke/逆Park/SVPWM/电流环)风格统一，这里给出一份面向带FPU的 MCU 的浮点实现，MISRA 风格、带空指针校验。完整文件见 [相关代码/Park.c](相关代码/Park.c)。
+与 FOC 其他模块(Clarke/逆Park/SVPWM/电流环)风格统一，这里给出一份面向带FPU的 MCU 的浮点实现，MISRA 风格、带空指针校验。完整文件见 [相关代码/Park.c](相关代码/Park.c)
 
 **优化要点：**
 
