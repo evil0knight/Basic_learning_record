@@ -32,7 +32,7 @@
   * **输入：** 原始编码器读数 **$\theta_{raw}$**、电机极对数 **$P$**、零点电偏置角 **$\theta_{offset}$**
   * **处理：** 坐标校正与极对数倍增：**$\theta_e = P \cdot \theta_m + \theta_{offset}$**
   * **输出：** 实时电角度 **$\theta_e$**、机械角度 **$\theta_m$**
-  * **无感替代：** 省掉编码器时改用 [观测器](观测器.md)，从 **$V_\alpha, V_\beta, I_\alpha, I_\beta$** 和电机参数 **$R_s, L_s, \psi_f$** 直接估计 **$\hat{\theta}_e, \hat{\omega}_e$**
+  * **无感替代：** 省掉编码器时改用 [观测器](观测器.md)，从(3.2 [逆Park变换](逆Park变换.md)的) **$V_\alpha, V_\beta, I_\alpha, I_\beta$** 和电机参数 **$R_s, L_s, \psi_f$** 直接估计 **$\hat{\theta}_e, \hat{\omega}_e$**
 * **2.2 [PLL锁相环](PLL锁相环.md)（相位跟踪与平滑）**
   * **输入：** 观测器输出的粗糙 **$\hat{\theta}_e$**（或反电动势 **$\hat{e}_\alpha, \hat{e}_\beta$**），也可用于编码器/霍尔信号的速度提取
   * **处理：** 相位检测器 **$\to$** PI 环路滤波器 **$\to$** 积分器（VCO）
