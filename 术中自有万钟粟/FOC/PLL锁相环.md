@@ -54,6 +54,6 @@ $$
 
 ## 相关代码
 
-- [pll.c](./相关代码/pll.c) — PLL模块(Park投影 + PID库 + 角度积分wrap)
+- [pll.c](../../库中车马多如簇/FOC/pll.c) — PLL模块(Park投影 + PID库 + 角度积分wrap)
 - [PID.h](../../库中车马多如簇/PID/PID.h) — 环路PI复用项目通用PID库
-- [sin_lut.h](./相关代码/sin_lut.h) — 共享sin/cos查表(与Park/反Park复用)
+- [sin_lut.h](../../库中车马多如簇/FOC/sin_lut.h) — 共享sin/cos查表(与Park/反Park复用)

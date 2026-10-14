@@ -60,6 +60,21 @@ function Send-PrivateBlogNotification {
     finally { [Net.ServicePointManager]::SecurityProtocol = $previousTls }
 }
 
+function Invoke-CloudflarePagesDeployHook {
+    param([string]$Proxy)
+    $hook = $env:CLOUDFLARE_PAGES_DEPLOY_HOOK
+    if ([string]::IsNullOrWhiteSpace($hook) -or $hook -eq '你的 Deploy Hook URL') { return $false }
+    if ($hook -notmatch '^https://') { throw 'CLOUDFLARE_PAGES_DEPLOY_HOOK 必须是 https:// 开头的 Deploy Hook URL。' }
+    try {
+        $params = @{ UseBasicParsing = $true; Method = 'Post'; Uri = $hook; TimeoutSec = 30; ErrorAction = 'Stop' }
+        if (-not [string]::IsNullOrWhiteSpace($Proxy)) { $params.Proxy = "http://$Proxy" }
+        $response = Invoke-WebRequest @params
+        if ([int]$response.StatusCode -lt 200 -or [int]$response.StatusCode -ge 300) { throw 'Unexpected API response' }
+        Write-Host '[私有博客] Cloudflare Pages 部署已触发。'
+        return $true
+    }
+    catch { throw '私有笔记已上传，但 Cloudflare Pages 触发失败；请检查 Deploy Hook URL 和网络。' }
+}
 function Invoke-PrivateUpload {
     param($State, [string]$CommitMessage, $Transport)
     $ErrorActionPreference = 'Stop'
@@ -75,7 +90,7 @@ function Invoke-PrivateUpload {
         $commit = [IO.File]::ReadAllText($pendingPath).Trim()
         $included = Invoke-UploadGit $State.Root @('merge-base', '--is-ancestor', $commit, 'refs/remotes/origin/main')
         if ($included.Code -ne 0) { throw '私有笔记提交尚未进入远程 main，保留通知记录等待下次上传。' }
-        Send-PrivateBlogNotification $pendingPath $Transport.Proxy
+        Send-PrivateBlogNotification $pendingPath $Transport.Proxy`r`n        $null = Invoke-CloudflarePagesDeployHook $Transport.Proxy
     }
 }
 

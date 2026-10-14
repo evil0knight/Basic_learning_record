@@ -33,7 +33,7 @@ $$
 
 ## 三、软件实现（C语言）
 
-与 FOC 其他模块(Clarke/逆Park/SVPWM/电流环)风格统一，这里给出一份面向带FPU的 MCU 的浮点实现，MISRA 风格、带空指针校验。完整文件见 [相关代码/Park.c](相关代码/Park.c)
+与 FOC 其他模块(Clarke/逆Park/SVPWM/电流环)风格统一，这里给出一份面向带FPU的 MCU 的浮点实现，MISRA 风格、带空指针校验。完整文件见 [相关代码/Park.c](../../库中车马多如簇/FOC/Park.c)
 
 **优化要点：**
 
@@ -48,5 +48,5 @@ $$
 
 ## 相关代码
 
-- [Park.c](相关代码/Park.c)
-- [sin_lut.c](相关代码/sin_lut.c) / [sin_lut.h](相关代码/sin_lut.h) — 共享 sin/cos 查表模块（与反 Park 复用）
+- [Park.c](../../库中车马多如簇/FOC/Park.c)
+- [sin_lut.c](../../库中车马多如簇/FOC/sin_lut.c) / [sin_lut.h](../../库中车马多如簇/FOC/sin_lut.h) — 共享 sin/cos 查表模块（与反 Park 复用）

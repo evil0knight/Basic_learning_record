@@ -1,8 +1,8 @@
 # FOC
 
-[← 返回上级 MOC](../MOC.md) | [← 返回主页](../../index.md)
+[← 返回上级 MOC](../MOC.md) | [← FOC 代码 MOC](../../库中车马多如簇/FOC/MOC.md) | [← 返回主页](../../index.md)
 
-> [FOC 速成路线](速成路线.md)
+> [FOC 速成路线](速成路线.md) | [FOC 代码目录](../../库中车马多如簇/FOC/MOC.md)
 
 ### 第 1 层：三闭环外环层（Cascade Control Loops）
 

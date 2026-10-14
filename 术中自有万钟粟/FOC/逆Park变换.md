@@ -37,5 +37,5 @@ $$
 
 ## 相关代码
 
-- [Inverse_Park.c](./相关代码/Inverse_Park.c)
-- [sin_lut.c](./相关代码/sin_lut.c) / [sin_lut.h](./相关代码/sin_lut.h) — 共享sin/cos查表模块，与Park变换复用同一张LUT
+- [Inverse_Park.c](../../库中车马多如簇/FOC/Inverse_Park.c)
+- [sin_lut.c](../../库中车马多如簇/FOC/sin_lut.c) / [sin_lut.h](../../库中车马多如簇/FOC/sin_lut.h) — 共享sin/cos查表模块，与Park变换复用同一张LUT

@@ -71,9 +71,9 @@ MTPA 的实现通常有以下几种方式：
 
 ## 相关代码
 
-- [mtpa.c](./相关代码/mtpa.c) — **以中间件形式挂在速度环与电流环之间**:启用则 `mtpa_apply(te_ref, &id_ref, &iq_ref)` 一行完成,不启用自动退回 $i_d=0$,电流环接口完全不动。内部通过 `MTPA_USE_LUT` 宏切换「公式法 / 查表法」
-- [current_loop.c](./相关代码/current_loop.c) — 下游电流环,无论是否挂 MTPA 都只认 $(i_d^*, i_q^*)$
-- [speed_loop.c](./相关代码/speed_loop.c) — 上游速度环,启用 MTPA 时输出语义升级为转矩指令
+- [mtpa.c](../../库中车马多如簇/FOC/mtpa.c) — **以中间件形式挂在速度环与电流环之间**:启用则 `mtpa_apply(te_ref, &id_ref, &iq_ref)` 一行完成,不启用自动退回 $i_d=0$,电流环接口完全不动。内部通过 `MTPA_USE_LUT` 宏切换「公式法 / 查表法」
+- [current_loop.c](../../库中车马多如簇/FOC/current_loop.c) — 下游电流环,无论是否挂 MTPA 都只认 $(i_d^*, i_q^*)$
+- [speed_loop.c](../../库中车马多如簇/FOC/speed_loop.c) — 上游速度环,启用 MTPA 时输出语义升级为转矩指令
 
 ### 中间件挂载方式
 

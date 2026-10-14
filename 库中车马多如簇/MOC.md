@@ -36,6 +36,7 @@
 |     Ymodem     |         文件传输协议，源码 + 协议笔记         | [Ymodem](./Ymodem/MOC.md)                               |
 |       AES       | 对称加密，128/192/256 bit CBC，源码 + OTA 使用 | [AES](./AES/MOC.md)                                     |
 |       MD5       |          散列摘要，OTA 固件完整性校验           | [MD5](./MD5/MOC.md)                                     |
+|       FOC       |       磁场定向控制笔记与相关代码       | [FOC MOC](./FOC/MOC.md)                  |
 |       PID       |       通用 PID、功能位组合与饱和反馈       | [PID](./PID/MOC.md)                                     |
 |       OTA       |       APP后台下载与BootLoader安装       | [OTA](./OTA/MOC.md)                                     |
 |      看门狗      |       IWDG/WWDG统一Wrapper与Backend       | [看门狗](./看门狗/MOC.md)                                |
