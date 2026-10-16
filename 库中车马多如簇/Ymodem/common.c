@@ -13,13 +13,12 @@
 /* 包含头文件 *****************************************************************/
 #include "common.h"
 #include "ymodem.h"
-#include "usart_port.h"
-#include "ymodem_config.h"
+#include "BspTime.h"
 /* 变量 ----------------------------------------------------------------------*/
 pFunction Jump_To_Application;
-//uint32_t JumpAddress;
+uint32_t JumpAddress;
 uint32_t BlockNbr = 0, UserMemoryMask = 0;
-uint32_t FlashProtection = 0;
+__IO uint32_t FlashProtection = 0;
 
 
 /*******************************************************************************
@@ -200,9 +199,26 @@ uint32_t GetIntegerInput(int32_t * num)
 *******************************************************************************/
 uint32_t SerialKeyPressed(uint8_t *key)
 {
-    /* timeout=0：非阻塞检查 RXNE，有数据读回 CORE_USART_OK，没数据返回超时 */
-    return (core_usart_receive((en_core_usart_instance_t)YMODEM_UART_INDEX,
-                               key, 1U, 0U) == CORE_USART_OK) ? 1U : 0U;
+
+//    if ( USART_GetFlagStatus(USART2, USART_FLAG_RXNE) != RESET)
+//    {
+//        *key = (uint8_t)USART2->DR;
+//        return 1;
+//    }
+//    else
+//    {
+//        return 0;
+//    }
+	
+    if ( USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
+    {
+        *key = (uint8_t)USART1->DR;
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }	
 }
 
 /*******************************************************************************
@@ -219,12 +235,12 @@ uint8_t GetKey(void)
     uint8_t key = 0;
 
     //等待按键按下
-    // while (IS_TIMEOUT_1MS(eTim2, 6000))
-    // {
-    //     if (SerialKeyPressed((uint8_t*)&key)) break;
-    // }
-    // return key;
+    while (IS_TIMEOUT_1MS(eTim2, 6000))
+    {
+        if (SerialKeyPressed((uint8_t*)&key)) break;
+    }
     return key;
+
 }
 
 /*******************************************************************************
@@ -238,8 +254,23 @@ uint8_t GetKey(void)
 *******************************************************************************/
 void SerialPutChar(uint8_t c)
 {
-    (void)core_usart_transmit((en_core_usart_instance_t)YMODEM_UART_INDEX,
-                              &c, 1U, 1000U);
+	  
+	  GPIO_SetBits(GPIOB,GPIO_Pin_9);//发送使能
+
+//    USART_SendData(USART2, c);
+//    while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
+//    {
+//    }
+	  USART_ClearFlag(USART1,USART_IT_TC);	
+	  USART_ClearFlag(USART1,USART_IT_TXE);
+
+	  USART_SendData(USART1, c);
+    while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
+    {
+
+    }	
+		
+		GPIO_ResetBits(GPIOB,GPIO_Pin_9);//接收使能
 }
 
 /*******************************************************************************
@@ -253,16 +284,13 @@ void SerialPutChar(uint8_t c)
 *******************************************************************************/
 void Serial_PutString(uint8_t *s)
 {
-    if (s == NULL)
-    {
-        return;
-    }
-
+	  GPIO_SetBits(GPIOB,GPIO_Pin_9);//发送使能
     while (*s != '\0')
     {
         SerialPutChar(*s);
         s++;
     }
+		GPIO_ResetBits(GPIOB,GPIO_Pin_9);//接收使能
 }
 
 
@@ -277,38 +305,37 @@ void Serial_PutString(uint8_t *s)
 *******************************************************************************/
 void GetInputString (uint8_t * buffP)
 {
-	(void)buffP;
-	// uint32_t bytes_read = 0;
-    // uint8_t c = 0;
-    // do
-    // {
-    //     c = GetKey();
-    //     if (c == '\r')
-    //         break;
-    //     if (c == '\b')// Backspace 按键  
-    //     {
-    //         if (bytes_read > 0)
-    //         {
-    //             SerialPutString("\b \b");
-    //             bytes_read --;
-    //         }
-    //         continue;
-    //     }
-    //     if (bytes_read >= CMD_STRING_SIZE )
-    //     {
-    //         SerialPutString("Command string size overflow\r\n");
-    //         bytes_read = 0;
-    //         continue;
-    //     }
-    //     if (c >= 0x20 && c <= 0x7E)
-    //     {
-    //         buffP[bytes_read++] = c;
-    //         SerialPutChar(c);
-    //     }
-    // }
-    // while (1);
-    // SerialPutString(("\n\r"));
-    // buffP[bytes_read] = '\0';
+    uint32_t bytes_read = 0;
+    uint8_t c = 0;
+    do
+    {
+        c = GetKey();
+        if (c == '\r')
+            break;
+        if (c == '\b')// Backspace 按键  
+        {
+            if (bytes_read > 0)
+            {
+                SerialPutString("\b \b");
+                bytes_read --;
+            }
+            continue;
+        }
+        if (bytes_read >= CMD_STRING_SIZE )
+        {
+            SerialPutString("Command string size overflow\r\n");
+            bytes_read = 0;
+            continue;
+        }
+        if (c >= 0x20 && c <= 0x7E)
+        {
+            buffP[bytes_read++] = c;
+            SerialPutChar(c);
+        }
+    }
+    while (1);
+    SerialPutString(("\n\r"));
+    buffP[bytes_read] = '\0';
 }
 
 /*******************************************************************************
@@ -320,22 +347,21 @@ void GetInputString (uint8_t * buffP)
   * @历史记录:     
      <作者>    <时间>      <修改记录>
 *******************************************************************************/
-uint32_t FLASH_PagesMask(uint32_t Size)
+uint32_t FLASH_PagesMask(__IO uint32_t Size)
 {
-    // uint32_t pagenumber = 0x0;
-    // uint32_t size = Size;
+    uint32_t pagenumber = 0x0;
+    uint32_t size = Size;
 
-    // if ((size % PAGE_SIZE) != 0)
-    // {
-    //     pagenumber = (size / PAGE_SIZE) + 1;
-    // }
-    // else
-    // {
-    //     pagenumber = size / PAGE_SIZE;
-    // }
-    // return pagenumber;
-    (void)Size;
-    return 0U;
+    if ((size % PAGE_SIZE) != 0)
+    {
+        pagenumber = (size / PAGE_SIZE) + 1;
+    }
+    else
+    {
+        pagenumber = size / PAGE_SIZE;
+    }
+    return pagenumber;
+
 }
 
 /*******************************************************************************
@@ -349,62 +375,62 @@ uint32_t FLASH_PagesMask(uint32_t Size)
 *******************************************************************************/
 void FLASH_DisableWriteProtectionPages(void)
 {
-    // uint32_t useroptionbyte = 0, WRPR = 0;
-    // uint16_t var1 = OB_IWDG_SW, var2 = OB_STOP_NoRST, var3 = OB_STDBY_NoRST;
-    // FLASH_Status status = FLASH_BUSY;
+    uint32_t useroptionbyte = 0, WRPR = 0;
+    uint16_t var1 = OB_IWDG_SW, var2 = OB_STOP_NoRST, var3 = OB_STDBY_NoRST;
+    FLASH_Status status = FLASH_BUSY;
 
-    // WRPR = FLASH_GetWriteProtectionOptionByte();
+    WRPR = FLASH_GetWriteProtectionOptionByte();
 
-    // //测试是否写保护
-    // if ((WRPR & UserMemoryMask) != UserMemoryMask)
-    // {
-    //     useroptionbyte = FLASH_GetUserOptionByte();
+    //测试是否写保护
+    if ((WRPR & UserMemoryMask) != UserMemoryMask)
+    {
+        useroptionbyte = FLASH_GetUserOptionByte();
 
-    //     UserMemoryMask |= WRPR;
+        UserMemoryMask |= WRPR;
 
-    //     status = FLASH_EraseOptionBytes();
+        status = FLASH_EraseOptionBytes();
 
-    //     if (UserMemoryMask != 0xFFFFFFFF)
-    //     {
-    //         status = FLASH_EnableWriteProtection((uint32_t)~UserMemoryMask);
-    //     }
-    //     //用处选项字是否有编程
-    //     if ((useroptionbyte & 0x07) != 0x07)
-    //     {
-    //         //重新保存选项字
-    //         if ((useroptionbyte & 0x01) == 0x0)
-    //         {
-    //             var1 = OB_IWDG_HW;
-    //         }
-    //         if ((useroptionbyte & 0x02) == 0x0)
-    //         {
-    //             var2 = OB_STOP_RST;
-    //         }
-    //         if ((useroptionbyte & 0x04) == 0x0)
-    //         {
-    //             var3 = OB_STDBY_RST;
-    //         }
+        if (UserMemoryMask != 0xFFFFFFFF)
+        {
+            status = FLASH_EnableWriteProtection((uint32_t)~UserMemoryMask);
+        }
+        //用处选项字是否有编程
+        if ((useroptionbyte & 0x07) != 0x07)
+        {
+            //重新保存选项字
+            if ((useroptionbyte & 0x01) == 0x0)
+            {
+                var1 = OB_IWDG_HW;
+            }
+            if ((useroptionbyte & 0x02) == 0x0)
+            {
+                var2 = OB_STOP_RST;
+            }
+            if ((useroptionbyte & 0x04) == 0x0)
+            {
+                var3 = OB_STDBY_RST;
+            }
 
-    //         FLASH_UserOptionByteConfig(var1, var2, var3);
-    //     }
+            FLASH_UserOptionByteConfig(var1, var2, var3);
+        }
 
-    //     if (status == FLASH_COMPLETE)
-    //     {
-    //         SerialPutString("Write Protection disabled...\r\n");
+        if (status == FLASH_COMPLETE)
+        {
+            SerialPutString("Write Protection disabled...\r\n");
 
-    //         SerialPutString("...and a System Reset will be generated to re-load the new option bytes\r\n");
-    //         //系统复位重新加载选项字
-    //         NVIC_SystemReset();
-    //     }
-    //     else
-    //     {
-    //         SerialPutString("Error: Flash write unprotection failed...\r\n");
-    //     }
-    // }
-    // else
-    // {
-    //     SerialPutString("Flash memory not write protected\r\n");
-    // }
+            SerialPutString("...and a System Reset will be generated to re-load the new option bytes\r\n");
+            //系统复位重新加载选项字
+            NVIC_SystemReset();
+        }
+        else
+        {
+            SerialPutString("Error: Flash write unprotection failed...\r\n");
+        }
+    }
+    else
+    {
+        SerialPutString("Flash memory not write protected\r\n");
+    }
 }
 
 /*******************************************************************************
@@ -418,41 +444,41 @@ void FLASH_DisableWriteProtectionPages(void)
 *******************************************************************************/
 void Main_Menu(void)
 {
-// 	FLASH_Status FLASHstatus;//定义一个flash操作状态变量
-//     uint8_t key = 0;
-//     static uint8_t uStatus = 0;
-//     BlockNbr = (BackAppAddress - 0x08000000) >> 12;
+	  FLASH_Status FLASHstatus;//定义一个flash操作状态变量
+    uint8_t key = 0;
+    static uint8_t uStatus = 0;
+    BlockNbr = (BackAppAddress - 0x08000000) >> 12;
 
 
-// #if defined (STM32F10X_MD) || defined (STM32F10X_MD_VL)
-//     UserMemoryMask = ((uint32_t)~((1 << BlockNbr) - 1));
-// #else /* USE_STM3210E_EVAL */
-//     if (BlockNbr < 62)
-//     {
-//         UserMemoryMask = ((uint32_t)~((1 << BlockNbr) - 1));
-//     }
-//     else
-//     {
-//         UserMemoryMask = ((uint32_t)0x80000000);
-//     }
-// #endif /* (STM32F10X_MD) || (STM32F10X_MD_VL) */
-//      //返回flash写保护选择字节的值
-//     if ((FLASH_GetWriteProtectionOptionByte() & UserMemoryMask) != UserMemoryMask)
-//     {
-//         FlashProtection = 1;
-//     }
-//     else
-//     {
-//         FlashProtection = 0;
-//     }
+#if defined (STM32F10X_MD) || defined (STM32F10X_MD_VL)
+    UserMemoryMask = ((uint32_t)~((1 << BlockNbr) - 1));
+#else /* USE_STM3210E_EVAL */
+    if (BlockNbr < 62)
+    {
+        UserMemoryMask = ((uint32_t)~((1 << BlockNbr) - 1));
+    }
+    else
+    {
+        UserMemoryMask = ((uint32_t)0x80000000);
+    }
+#endif /* (STM32F10X_MD) || (STM32F10X_MD_VL) */
+     //返回flash写保护选择字节的值
+    if ((FLASH_GetWriteProtectionOptionByte() & UserMemoryMask) != UserMemoryMask)
+    {
+        FlashProtection = 1;
+    }
+    else
+    {
+        FlashProtection = 0;
+    }
 
 
 
-//      /* Download user application in the Flash */
-// 		SerialDownload();   //使用YModem协议接收app bin文件
-// //		SerialPutString( "\r下载完成\n\r");//              				
+     /* Download user application in the Flash */
+		SerialDownload();   //使用YModem协议接收app bin文件
+//		SerialPutString( "\r下载完成\n\r");//              				
 
-// 		SerialPutString("Auto jump App \r\n");
+		SerialPutString("Auto jump App \r\n");
 
 
 //    }

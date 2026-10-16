@@ -16,7 +16,7 @@
 /* 包含头文件 *****************************************************************/
 #include "stdio.h"
 #include "string.h"
-//#include "stm32f10x.h"
+#include "stm32f10x.h"
 #include "ymodem.h"
 
 
@@ -26,24 +26,27 @@ typedef  void (*pFunction)(void);
 //* 宏 ------------------------------------------------------------------------*/
 #define CMD_STRING_SIZE       128
 
-// #define BackAppAddress     0x0803D000   //下载的升级包存储位置
+#define BackAppAddress     0x0803D000   //下载的升级包存储位置
 
-// #define ApplicationAddress 0x08003000   //运行的APP存储位置
-//#if defined (STM32F10X_MD) || defined (STM32F10X_MD_VL)
-// #define PAGE_SIZE                         (0x400)    /* 1 Kbyte */
-// #define FLASH_SIZE                        (0x20000)  /* 128 KBytes */
-//#elif defined STM32F10X_CL
-// #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
-// #define FLASH_SIZE                        (0x40000)  /* 256 KBytes */
-//#elif defined STM32F10X_HD || defined (STM32F10X_HD_VL)
-// #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
-// #define FLASH_SIZE                        (0x40000)  /* 512 KBytes */
-//#elif defined STM32F10X_XL
-// #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
-// #define FLASH_SIZE                        (0x100000) /* 1 MByte */
-//#else 
-// #error "Please select first the STM32 device to be used (in stm32f10x.h)"    
-//#endif
+#define ApplicationAddress 0x08003000   //运行的APP存储位置
+#if defined (STM32F10X_MD) || defined (STM32F10X_MD_VL)
+ #define PAGE_SIZE                         (0x400)    /* 1 Kbyte */
+ #define FLASH_SIZE                        (0x20000)  /* 128 KBytes */
+#elif defined STM32F10X_CL
+ #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
+ #define FLASH_SIZE                        (0x40000)  /* 256 KBytes */
+#elif defined STM32F10X_HD || defined (STM32F10X_HD_VL)
+ #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
+ #define FLASH_SIZE                        (0x40000)  /* 512 KBytes */
+#elif defined STM32F10X_XL
+ #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
+ #define FLASH_SIZE                        (0x100000) /* 1 MByte */
+#else 
+ #error "Please select first the STM32 device to be used (in stm32f10x.h)"    
+#endif
+
+//计算上传文件大小 
+#define FLASH_IMAGE_SIZE                   (uint32_t) (FLASH_SIZE - (BackAppAddress - 0x08000000))
 
 #define IS_AF(c)  ((c >= 'A') && (c <= 'F'))
 #define IS_af(c)  ((c >= 'a') && (c <= 'f'))
@@ -67,11 +70,11 @@ uint8_t GetKey(void);
 void SerialPutChar(uint8_t c);
 void Serial_PutString(uint8_t *s);
 void GetInputString(uint8_t * buffP);
-//uint32_t FLASH_PagesMask(__IO uint32_t Size);
-//void FLASH_DisableWriteProtectionPages(void);
-//void Main_Menu(void);
-//void SerialDownload(void);
-//void SerialUpload(void);
+uint32_t FLASH_PagesMask(__IO uint32_t Size);
+void FLASH_DisableWriteProtectionPages(void);
+void Main_Menu(void);
+void SerialDownload(void);
+void SerialUpload(void);
 
 #endif  /* _COMMON_H */
 

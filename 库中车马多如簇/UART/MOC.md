@@ -2,6 +2,8 @@
 
 [← 返回 MOC](../MOC.md) | [← 主页](../../index.md)
 
+[← OTA](../../术中自有万钟粟/OTA/MOC.md)
+
 > [下载串口驱动](https://pan.baidu.com/s/1OfEdpC5rkB4MYNhvWFjdkQ?pwd=4444)
 
 UART 外设库：platform_mcu 层 Port（`core_usart_*`），HAL + DMA + 回调。

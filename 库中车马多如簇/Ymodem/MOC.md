@@ -2,80 +2,80 @@
 
 [← 模块总览](../MOC.md) | [← 主页](../../index.md)
 
+[← 返回文件传输协议](../../术中自有万钟粟/OTA/文件传输协议.md)
+
 ## 文件
 
-| 文件                                      | 作用                                |
-| ----------------------------------------- | ----------------------------------- |
-| [ymodem.h](./ymodem.h) / [ymodem.c](./ymodem.c) | Ymodem 协议、收发、CRC 和 Sink 回调 |
-| [common.h](./common.h) / [common.c](./common.c) | 协议工具函数                        |
-| [ymodem_config.h](./ymodem_config.h)         | UART 实例和收发模式配置             |
+- [ymodem.h](./ymodem.h)
+- [ymodem.c](./ymodem.c)
+- [common.h](./common.h)
+- [common.c](./common.c)
 
-## 移植步骤
+## 输入输出
 
-1. 复制 `ymodem.c/.h`、`common.c/.h` 和 `ymodem_config.h`，加入目标工程编译。
-2. 配置 UART Port 资源。
+当前版本通过串口接收 Ymodem 文件，并直接擦写 STM32F1 内部 Flash。
 
-   ```c
-   static const st_usart_config_t g_usart_configs[CORE_USART_MAX] =
-   {
-       [CORE_USART1] = {
-           .handle = &huart1,
-           .baudrate = 115200U,
-           .timeout = CORE_USART_DEFAULT_TIMEOUT
-       }
-   };
-   ```
-   阻塞模式配置 UART、GPIO、时钟并调用 `MX_USART1_UART_Init()`；DMA 模式还需配置 DMA 接收通道和 UART 空闲线中断。
-3. 选择 Ymodem 接收模式。
+```text
+电脑发送 .bin → SerialKeyPressed → Ymodem_Receive → Flash
+电脑接收应答 ← SerialPutChar     ← C / ACK / NAK / CA
+```
 
-   ```c
-   #define YMODEM_RECEIVE_MODE_BLOCKING  0U
-   #define YMODEM_RECEIVE_MODE_DMA       1U
-   #define YMODEM_RECEIVE_MODE           YMODEM_RECEIVE_MODE_BLOCKING
-   ```
-   Bootloader 使用阻塞模式；带 RTOS 的 OTA App 使用 DMA 模式时改为 `YMODEM_RECEIVE_MODE_DMA`。
-4. DMA + RTOS 模式配置信号量。
+| 接口                                 | 输入                                                      | 输出                                                           |
+| ------------------------------------ | --------------------------------------------------------- | -------------------------------------------------------------- |
+| `Ymodem_Receive(buf)`              | 至少 1024 字节、按 4 字节对齐的临时缓冲区；文件从串口读取 | 文件写入 `BackAppAddress` 起始的 Flash；返回文件长度或错误码 |
+| `Ymodem_Transmit(buf, name, size)` | 待发送数据地址、文件名、字节数                            | 通过串口发送文件；返回 0 表示成功，非 0 表示失败               |
 
-   ```c
-   typedef enum
-   {
-       USER_SEMA_IDX_YMODEM_RX,
-       USER_SEMA_IDX_MAX
-   } user_sema_idx_t;
+接收时 `buf` 只暂存当前数据包，不保存整个文件；文件名存入 `ymodem.c` 中的全局数组 `file_name`。接收函数阻塞执行，返回后才继续执行调用方代码。
 
-   user_sema_config_t g_user_semaphores[USER_SEMA_IDX_MAX] =
-   {
-       [USER_SEMA_IDX_YMODEM_RX] =
-       {
-           true, true, 1U, 0U, NULL
-       }
-   };
-   ```
-   统一资源初始化后获取句柄：
+| `Ymodem_Receive` 返回值 | 含义                            |
+| ------------------------- | ------------------------------- |
+| `> 0`                   | 接收完成，返回文件字节数        |
+| `0`                     | 发送端取消或错误次数超限        |
+| `-1`                    | 文件大小检查失败                |
+| `-2`                    | Flash 写入后读回不一致          |
+| `-3`                    | 收到用户取消字符 `A` 或 `a` |
 
-   ```c
-   osal_sema_handle_t ymodem_rx_semaphore =
-       user_sema_get(USER_SEMA_IDX_YMODEM_RX);
-   ```
-   DMA 回调释放该信号量，Ymodem 接收函数等待该信号量。Bootloader 阻塞模式不配置、不获取信号量。
-5. DMA 模式提供缓冲区并注册 RX 回调；阻塞模式不注册回调。
+## 使用方法
 
-   ```c
-   static uint8_t s_ymodem_rx_buffer[1024];
+1. 将四个源文件加入工程，提供 STM32F1 标准外设库依赖；处理下文列出的原工程依赖。
+2. 初始化串口，适配收发函数，确认 Flash 下载分区及容量。
+3. 调用 `Ymodem_Receive`，随后在电脑串口工具中选择 **Ymodem 发送**，发送 `.bin` 文件；两端串口参数必须一致。
+4. 根据返回值处理结果。接收完成仅表示下载到 Flash，不会自动搬运固件或跳转 APP。
 
-   core_usart_register_rx_callback(CORE_USART1, ymodem_rx_callback);
-   core_usart_receive_to_idle_dma(
-       CORE_USART1, s_ymodem_rx_buffer, sizeof(s_ymodem_rx_buffer));
-   ```
-   回调保存接收长度并释放 `USER_SEMA_IDX_YMODEM_RX`。阻塞模式由 Ymodem 直接调用 `core_usart_receive()`。
-6. 注入读写函数和 Flash Sink。
+以下为接收调用片段，前提是串口、Flash 分区和工程依赖已配置完成：
 
-   ```c
-   Ymodem_SetIo(ota_adapter_uart_read, ota_adapter_uart_write);
-   Ymodem_ReceiveWithSink(
-       s_ymodem_packet_buffer,
-       ymodem_flash_sink,
-       sink_context,
-       OTA_APP_ADDRESS);
-   ```
-   Sink 负责 Flash 写入、地址递增、最后数据块裁剪和错误返回。详见 [OTA MOC](../OTA/MOC.md) 和 [Flash MOC](../Flash/MOC.md)。
+```c
+#include "common.h"
+
+/* 使用 uint32_t 数组，保证 Flash 按字读取时的对齐。 */
+static uint32_t rx_buffer[PACKET_1K_SIZE / sizeof(uint32_t)];
+
+int32_t receive_firmware(void)
+{
+    int32_t size;
+
+    FLASH_Unlock();
+    size = Ymodem_Receive((uint8_t *)rx_buffer);
+    FLASH_Lock();
+
+    return size;
+}
+```
+
+## 移植重点
+
+| 文件 / 函数                                             | 需要适配的内容                                                                                          |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [common.c](./common.c) · `SerialKeyPressed(key)`      | 这里判断需不需要开始协议                                                                                |
+| [common.c](./common.c) · `SerialPutChar(c)`           | 发送一个字节。当前使用 USART1，并通过 PB9 控制 RS485 收发方向；普通 UART 应去掉方向控制                 |
+| [common.h](./common.h) · `BackAppAddress`             | 文件下载地址，当前为 `0x0803D000`；`ApplicationAddress` 为 `0x08003000`，本接收函数不向该地址写入 |
+| [common.h](./common.h) · `PAGE_SIZE` / `FLASH_SIZE` | 根据芯片实际页大小、容量和分区调整                                                                      |
+| [ymodem.c](./ymodem.c) · `Ymodem_Receive`             | 换芯片或存储介质时，替换 `FLASH_ErasePage`、`FLASH_ProgramWord` 及直接读地址校验的操作              |
+| [ymodem.c](./ymodem.c) · `Receive_Byte`               | 当前超时是循环次数，不是毫秒；更换主频或运行环境后应适配                                                |
+
+## 当前依赖与待修正处
+
+- `common.c` 依赖原工程的 `BspTime.h`，用于 `GetKey()` 的超时；`Main_Menu()` 还调用原工程 `download.c` 中的 `SerialDownload()`。这四个文件尚未完全独立，需补齐依赖或剥离不用的菜单功能。
+- 接收路径读取了 CRC 字节，但没有实际校验 CRC；存在 CRC 计算函数不代表接收时已使用。
+- 文件大小检查使用总 Flash 容量，没有按 `BackAppAddress` 到下载分区末尾的可用空间限制，使用前应修正边界检查。
+- 当前仅恢复原工程代码，未完成独立工程编译和硬件传输验证。

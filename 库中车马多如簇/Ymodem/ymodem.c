@@ -25,26 +25,20 @@
   
 /* Includes ------------------------------------------------------------------*/
 #include "common.h"
-#include "usart_port.h"
-#include "ymodem_config.h"
+#include "stm32f10x_flash.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint8_t file_name[FILE_NAME_LENGTH];
-static ymodem_data_sink_fn_t s_data_sink;
-static void *s_data_sink_context;
-static uint32_t s_sink_start_address;
-static ymodem_read_fn_t s_read_fn;
-static ymodem_write_fn_t s_write_fn;
-
-void Ymodem_SetIo(ymodem_read_fn_t read_fn, ymodem_write_fn_t write_fn)
-{
-    s_read_fn = read_fn;
-    s_write_fn = write_fn;
-}
-
-/* UART Port 注入的逻辑串口；阻塞或 DMA 实现由 Port 配置决定。 */
+uint32_t FlashDestination = BackAppAddress; 
+uint16_t PageSize = PAGE_SIZE;
+uint32_t EraseCounter = 0x0;
+uint32_t NbrOfPage = 0;
+FLASH_Status FLASHStatus = FLASH_COMPLETE;
+uint32_t RamSource;
+extern uint8_t tab_1024[1024];
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -58,12 +52,14 @@ void Ymodem_SetIo(ymodem_read_fn_t read_fn, ymodem_write_fn_t write_fn)
   */
 static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
 {
-  if (s_read_fn == NULL)
+  while (timeout-- > 0)
   {
-    return -1;
+    if (SerialKeyPressed(c) == 1)
+    {
+      return 0;
+    }
   }
-  YMODEM_POLL_HOOK();
-  return (s_read_fn(c, 1U, timeout) == 0) ? 0 : -1;
+  return -1;
 }
 
 /**
@@ -73,8 +69,8 @@ static  int32_t Receive_Byte (uint8_t *c, uint32_t timeout)
   */
 static uint32_t Send_Byte (uint8_t c)
 {
-  return ((s_write_fn != NULL) &&
-          (s_write_fn(&c, 1U, YMODEM_BYTE_TIMEOUT_COUNT) == 0)) ? 0U : 1U;
+  SerialPutChar(c);
+  return 0;
 }
 
 /**
@@ -136,12 +132,6 @@ static int32_t Receive_Packet (uint8_t *data, int32_t *length, uint32_t timeout)
   {
     return -1;
   }
-  if (Cal_CRC16(data + PACKET_HEADER, packet_size) !=
-      (uint16_t)(((uint16_t)data[PACKET_HEADER + packet_size] << 8) |
-                 data[PACKET_HEADER + packet_size + 1U]))
-  {
-    return -1;
-  }
   *length = packet_size;
   return 0;
 }
@@ -151,29 +141,19 @@ static int32_t Receive_Packet (uint8_t *data, int32_t *length, uint32_t timeout)
   * @param  buf: Address of the first byte
   * @retval The size of the file
   */
-static int32_t Ymodem_ReceiveCore(uint8_t *buf)
+int32_t Ymodem_Receive (uint8_t *buf)
 {
-  uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD],
-           file_size[FILE_SIZE_LENGTH],
-           *file_ptr;
-  int32_t i, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
-  uint32_t storage_offset = 0U;
+  uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD], file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
+  int32_t i, j, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
 
-  (void)buf; /* sink 模式不再用于回读校验，保留参数兼容 */
-
-  if ((s_data_sink == NULL) ||
-      (core_usart_init() != CORE_USART_OK) ||
-      (YMODEM_VERIFY_BUFFER_SIZE < PACKET_1K_SIZE))
-  {
-    return -1;
-  }
+  /* Initialize FlashDestination variable */
+  FlashDestination = BackAppAddress;
 
   for (session_done = 0, errors = 0, session_begin = 0; ;)//初始化变量，进入循环
   {
-    for (packets_received = 0, file_done = 0; ;)
+    for (packets_received = 0, file_done = 0, buf_ptr = buf; ;)
     {
-      switch (Receive_Packet(packet_data, &packet_length,
-                             YMODEM_BYTE_TIMEOUT_COUNT))
+      switch (Receive_Packet(packet_data, &packet_length, NAK_TIMEOUT))
       {
         case 0:
           errors = 0;
@@ -202,14 +182,12 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
                   if (packet_data[PACKET_HEADER] != 0)
                   {
                     /* Filename packet has valid data */
-                    for (i = 0, file_ptr = packet_data + PACKET_HEADER;
-                         (*file_ptr != 0) && (i < (FILE_NAME_LENGTH - 1));)
+                    for (i = 0, file_ptr = packet_data + PACKET_HEADER; (*file_ptr != 0) && (i < FILE_NAME_LENGTH);)
                     {
                       file_name[i++] = *file_ptr++;
                     }
                     file_name[i++] = '\0';
-                    for (i = 0, file_ptr ++;
-                         (*file_ptr != ' ') && (i < (FILE_SIZE_LENGTH - 1));)
+                    for (i = 0, file_ptr ++; (*file_ptr != ' ') && (i < FILE_SIZE_LENGTH);)
                     {
                       file_size[i++] = *file_ptr++;
                     }
@@ -217,7 +195,8 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
                     Str2Int(file_size, &size);
 
                     /* Test the size of the image to be sent */
-                    if (size <= 0)
+                    /* Image size is greater than Flash size */
+                    if (size > (FLASH_SIZE - 1))
                     {
                       /* End session */
                       Send_Byte(CA);
@@ -225,6 +204,16 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
                       return -1;
                     }
 
+                    /* Erase the needed pages where the user application will be loaded */
+                    /* Define the number of page to be erased */
+                    NbrOfPage = FLASH_PagesMask(size);
+
+                    /* Erase the FLASH pages */
+										//擦除App
+                    for (EraseCounter = 0; (EraseCounter < NbrOfPage) && (FLASHStatus == FLASH_COMPLETE); EraseCounter++)
+                    {
+                      FLASHStatus = FLASH_ErasePage(FlashDestination + (PageSize * EraseCounter));
+                    }
                     Send_Byte(ACK);
                     Send_Byte(CRC16);
                   }
@@ -240,27 +229,23 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
                 /* Data packet */
                 else
                 {
-                  uint32_t remain = (uint32_t)size - storage_offset;
-                  uint32_t write_size = ((uint32_t)packet_length < remain)
-                                            ? (uint32_t)packet_length
-                                            : remain;
-
-                  if ((remain == 0U) || (write_size == 0U))
+                  memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
+                  RamSource = (uint32_t)buf;
+                  for (j = 0;(j < packet_length) && (FlashDestination <  BackAppAddress + size);j += 4)
                   {
-                    Send_Byte(CA);
-                    Send_Byte(CA);
-                    return -2;
-                  }
+                    /* Program the data received into STM32F10x Flash */
+                    FLASH_ProgramWord(FlashDestination, *(uint32_t*)RamSource);
 
-                  if (s_data_sink(packet_data + PACKET_HEADER, write_size,
-                                  s_sink_start_address + storage_offset,
-                                  s_data_sink_context) != 0)
-                  {
-                    Send_Byte(CA);
-                    Send_Byte(CA);
-                    return -2;
+                    if (*(uint32_t*)FlashDestination != *(uint32_t*)RamSource)
+                    {
+                      /* End session */
+                      Send_Byte(CA);
+                      Send_Byte(CA);
+                      return -2;
+                    }
+                    FlashDestination += 4;
+                    RamSource += 4;
                   }
-                  storage_offset += write_size;
                   Send_Byte(ACK);
                 }
                 packets_received ++;
@@ -273,10 +258,10 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
           Send_Byte(CA);
           return -3;
         default:
-          if (session_begin > 0)
-          {
+//          if (session_begin > 0)
+//          {
             errors ++;
-          }
+//          }
           if (errors > MAX_ERRORS)
           {
             Send_Byte(CA);
@@ -299,21 +284,6 @@ static int32_t Ymodem_ReceiveCore(uint8_t *buf)
   return (int32_t)size;
 }
 
-int32_t Ymodem_ReceiveWithSink(uint8_t *buf, ymodem_data_sink_fn_t sink,
-                              void *context, uint32_t start_address)
-{
-  int32_t result;
-  if (sink == NULL) return -1;
-  s_data_sink = sink;
-  s_data_sink_context = context;
-  s_sink_start_address = start_address;
-  result = Ymodem_ReceiveCore(buf);
-  s_data_sink = NULL;
-  s_data_sink_context = NULL;
-  s_sink_start_address = 0U;
-  return result;
-}
-
 /**
   * @brief  check response using the ymodem protocol
   * @param  buf: Address of the first byte
@@ -321,7 +291,6 @@ int32_t Ymodem_ReceiveWithSink(uint8_t *buf, ymodem_data_sink_fn_t sink,
   */
 int32_t Ymodem_CheckResponse(uint8_t c)
 {
-  (void)c;
   return 0;
 }
 
@@ -494,7 +463,6 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
   {
     FileName[i] = sendFileName[i];
   }
-  FileName[FILE_NAME_LENGTH - 1U] = '\0';
   CRC16_F = 1;       
     
   /* Prepare first block */
@@ -585,7 +553,14 @@ uint8_t Ymodem_Transmit (uint8_t *buf, const uint8_t* sendFileName, uint32_t siz
         {
            buf_ptr += pktSize;  
            size -= pktSize;
-           blkNumber++;
+           if (blkNumber == (FLASH_IMAGE_SIZE/1024))
+           {
+             return 0xFF; /*  error */
+           }
+           else
+           {
+              blkNumber++;
+           }
         }
         else
         {

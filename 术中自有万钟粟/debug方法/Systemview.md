@@ -46,4 +46,4 @@ SystemView 将这些事件数据以图形化的方式展现，为后续调整任
 
 > [立芯嵌入式](https://twd6onxsxva.feishu.cn/docx/AzZRdjhewoZSHnxj4i6cANgsnAh)
 >
-> [软件下载官网](https://www.segger.com/downloads/systemview/),我已经下载在E:\ProgramFile\SystemView
+> [软件下载链接](https://pan.baidu.com/s/1Pj8yoqYs0g3AuMM01VQF8w?pwd=vstc&_at_=1792110291199)(官网没有配套文件,必须用这个来自课程文件里的)
