@@ -13,8 +13,11 @@
 | [osal_config.h](./osal_config.h) | OS选择和公共配置 |
 | [osal_error.h](./osal_error.h) | 统一错误码 |
 | [osal_task.h](./osal_task.h) | 任务接口 |
+| [osal_event.h](./osal_event.h) | 事件组接口 |
 | [osal_queue.h](./osal_queue.h) | 队列接口 |
 | [osal_mutex.h](./osal_mutex.h) | 互斥量接口 |
 | [osal_sema.h](./osal_sema.h) | 信号量接口 |
 | [osal_timer.h](./osal_timer.h) | 软件定时器接口 |
 | [osal_heap.h](./osal_heap.h) | 堆内存接口 |
+
+`osal_task.h` 中还包含任务通知接口。任务通知直接使用目标任务的通知值，适合一对一唤醒；`osal_event.h` 的事件组适合多个任务或 ISR 共享多个位事件。

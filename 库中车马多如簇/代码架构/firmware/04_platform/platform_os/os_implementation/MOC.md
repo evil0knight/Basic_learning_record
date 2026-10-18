@@ -9,7 +9,8 @@
 | 资源 | FreeRTOS实现 |
 | --- | --- |
 | 公共适配 | [os_freertos.h](./freertos/inc/os_freertos.h) |
-| 任务 | [os_impl_task.c](./freertos/src/os_impl_task.c) |
+| 任务、任务通知 | [os_impl_task.c](./freertos/src/os_impl_task.c) |
+| 事件组 | [os_impl_event.c](./freertos/src/os_impl_event.c) |
 | 队列 | [os_impl_queue.c](./freertos/src/os_impl_queue.c) |
 | 互斥量 | [os_impl_mutex.c](./freertos/src/os_impl_mutex.c) |
 | 信号量 | [os_impl_sema.c](./freertos/src/os_impl_sema.c) |

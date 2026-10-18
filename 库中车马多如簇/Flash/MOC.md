@@ -1,122 +1,41 @@
 # Flash
 
-[← 模块总览](../MOC.md) | [裸机使用 Driver](./裸机使用Driver.md)
+[← 返回模块索引](../MOC.md) | [← 主页](../../index.md)
 
-> [Flash知识](./知识/MOC.md)
+[←OTA_MOC](..\..\术中自有万钟粟\OTA\MOC.md)
 
-外部 Flash（W25Q64）驱动栈：事件驱动 + 单任务串行，天然互斥（无需 mutex）。
+> [Flash 知识](./知识/MOC.md)
 
-## 文件结构
+---
 
-| 目录                                                                                 | 位置（目标工程）                           |
-| ------------------------------------------------------------------------------------ | ------------------------------------------ |
-| [bsp_wrapper_flash](./bsp_wrapper_flash/bsp_wrapper_flash.h)                            | `02_Platform/platform_bsp/flash/`        |
-| [bsp_adapter_port_flash](./bsp_adapter_port_flash/bsp_adapter_port_flash.h)             | `02_Platform/platform_bsp/flash/`（OS / 裸机二选一，`FLASH_BARE_METAL` 切换） |
-| [W25Q](./W25Q/MOC.md)                                                                   | `03_Bsp/bsp_storage/`                    |
-| [service_externflash_manage](./service_externflash_manage/service_externflash_manage.h) | `01_Service/service_externflash_manage/` |
-| [STM32F411](./STM32F411/MOC.md)                                                         | `03_Bsp/bsp_storage/`                    |
+> 请求：外部->事件组 →异步task-> 消息队列->flash_handler
+> 完成：flash_handler->回调 → 信号量-> 异步task→ 事件组->外部
 
-## 接入目标工程
+## 关键文件
 
-### 1. 申请资源
-
-**① 两个任务**
-
-[user_task_reso_config.h](../代码架构/firmware/01_app/app_init/user_task_config/user_task_reso_config.h)(填写步骤见 [app_init 笔记](../代码架构/firmware/01_app/app_init/MOC.md))的 `user_task_idx_t` 枚举加索引：
-
-```c
-typedef enum
-{
-    /* 已有索引... */
-    USER_TASK_IDX_EXT_FLASH_DRV,    /* flash_handler_thread */
-    USER_TASK_IDX_EXT_FLASH_TASK,   /* storage_manager_task */
-    USER_TASK_IDX_MAX
-} user_task_idx_t;
-```
-
-[user_task_reso_config.c](../代码架构/firmware/01_app/app_init/user_task_config/user_task_reso_config.c)(填写步骤见 [app_init 笔记](../代码架构/firmware/01_app/app_init/MOC.md)) 的 `g_user_tasks[]` 配置表填（顺序与枚举一致）：
-
-```c
-user_task_config_t g_user_tasks[USER_TASK_IDX_MAX] =
-{
-    /* 启用, 名称, 入口, 栈大小, 优先级, 参数, 句柄 */
-    {true, "ExtFlashDrv",  flash_handler_thread, 1024U, 3U, &flash_handler_all_input_arg, NULL},
-    {true, "ExtFlashTask", storage_manager_task, 1024U, 2U, NULL, NULL}
-};
-```
-
-> `flash_handler_all_input_arg` 由 [bsp_adapter_port_flash](./bsp_adapter_port_flash/bsp_adapter_port_flash.c) 定义，作为 Handler 线程的 argument。
-
-**② 一个信号量**（外部 Flash 完成信号量）
-
-[user_task_reso_config.h](../代码架构/firmware/01_app/app_init/user_task_config/user_task_reso_config.h)(填写步骤见 [app_init 笔记](../代码架构/firmware/01_app/app_init/MOC.md)) 的 `user_sema_idx_t` 枚举加索引：
-
-```c
-typedef enum
-{
-    /* 已有索引... */
-    USER_SEMA_IDX_EXT_FLASH,
-    USER_SEMA_IDX_MAX
-} user_sema_idx_t;
-```
-
-[user_task_reso_config.c](../代码架构/firmware/01_app/app_init/user_task_config/user_task_reso_config.c)(填写步骤见 [app_init 笔记](../代码架构/firmware/01_app/app_init/MOC.md))的 `g_user_semaphores[]` 配置表填：
-
-```c
-user_sema_config_t g_user_semaphores[USER_SEMA_IDX_MAX] =
-{
-    /* 启用, 是否二值, 最大计数, 初始计数, 句柄 */
-    {true, true, 1U, 0U, NULL}
-};
-```
-
-> 事件组由 `storage_manager_task` 内部创建，不需要资源表申请。
-
-代码里按索引取句柄：`user_sema_get(USER_SEMA_IDX_EXT_FLASH)`。
-
-### 2. 配置宏
-
-在 [bsp_adapter_port_flash.h](./bsp_adapter_port_flash/bsp_adapter_port_flash.h) 配置：
-
- `FLASH_SPI_PORT`Flash 用的 SPI 槽位号，即 `spi_port_config.h` 的 `g_spi_slots[]` 数组下标（0~7）
-
-`FLASH_SPI_TIMEOUT_MS`单次 SPI 传输超时（毫秒）
-
-### 3. 注册流程
-
-1. 先完成 [SPI Port](../SPI/MOC.md) 移植，`spi_port_config.h` 里为 Flash 配置一个 SPI slot；
-2. 在目标工程 `app_periph_register()` 里调用：
-
-```c
-#include "bsp_adapter_port_flash.h"
-
-void app_periph_register(void)
-{
-    /* 其他外设注册... */
-    bsp_adapter_flash_register();
-}
-```
-
-3. 上层通过异步读写服务访问（`addr` 为绝对地址，分区由业务层自己定义）：
-
-```c
-#include "service_externflash_manage.h"
-
-extern_flash_write(addr, data, size);   /* 写，内部先擦后写 */
-extern_flash_read(addr, size, buf);     /* 读 */
-extern_flash_erase(addr, size);         /* 擦除扇区 */
-```
-
-### 4. 可复用与解耦
-
-| 组件                                          | 是否 flash 专用               |
-| --------------------------------------------- | ----------------------------- |
-| `spi_w25q64_interface_t`（SPI 逐字节接口）  | 通用，其他 SPI 器件可照此模式 |
-| 事件驱动 Handler 模式（事件队列 + 单任务）    | 通用，其他 BSP 外设可照此模式 |
-| 函数表注册（`externflash_drv_t` + `reg`） | 通用，其他 Wrapper 可照此模式 |
-| W25Q64 寄存器操作 / 命令码                    | flash 专用                    |
-
-## 依赖
-
-- OSAL（队列 / 信号量 / 事件组 / 任务 / 延时 / 临界区）
-- SPI Port（core_spi 逐字节接口）—— 见 [SPI](../SPI/MOC.md)
+- [service_externflash_manage.h](./service_externflash_manage/service_externflash_manage.h) / [service_externflash_manage.c](./service_externflash_manage/service_externflash_manage.c)：
+  这里有个storage_manager_**task**(void *argument),在C文件中,通过**事件组的方式**去通知**异步擦写flashtask**
+  还有暴露一些操控这个任务的函数,他是最顶层的接口,其他的地方想控制flash就调用这里的函数
+- [externflash_manage_port.h](./service_externflash_manage/externflash_manage_port.h) / [externflash_manage_port.c](./service_externflash_manage/externflash_manage_port.c)：
+  这里完全就是调用wrapper层提供上来的,这里是业务层的一层解耦,
+  负责写异步擦写flash的service代码的人员只从这里看函数.
+- [bsp_wrapper_flash.h](./bsp_wrapper_flash/bsp_wrapper_flash.h) / [bsp_wrapper_flash.c](./bsp_wrapper_flash/bsp_wrapper_flash.c)：
+  这里就是上层开发者使用下层服务的基层,把他当成一个对象实例,直接是面向对象的思想
+  再做一层封装,检查合法性,防止adapter更换
+  对外提供方便的函数使用,把集成号的结构体通过函数,安全的开放
+- [bsp_adapter_port_flash.h](./bsp_adapter_port_flash/bsp_adapter_port_flash.h) / [bsp_adapter_port_flash.c](./bsp_adapter_port_flash/bsp_adapter_port_flash.c)：
+  输入做一层薄封装,集成handler资源并封装成一个操作结构体,想供wrapper实例调用
+  在 `bsp_adapter_flash_register`去把底层的资源,挂载在这个操作结构体上
+  wrapper向他提供register函数,他在 `bsp_adapter_flash_register`最底下去使用 `wrapper_register`函数防止上下层耦合
+  然后这个操作函数提供给wrapper层的实例去使用
+  这里会挂载所有的函数,包括event的回调函数
+- [bsp_flash_handler.h](./bsp_storage/handler/Inc/bsp_flash_handler.h) / [bsp_flash_handler.c](./bsp_storage/handler/Src/bsp_flash_handler.c)：
+  event里包含了回调函数指针,底层回调的时候可以直接借助event回调,
+  flash_handler_event_put这里给外部使用,发送队列事件给handler
+  flash_event_handle这里在handler的task里根据事件,执行具体driver
+  flash_handler_thread这里使用argue挂载资源,注册handler实例,等待队列消息去使用driver
+  使用好了之后,直接使用event里传过来的指针执行回调函数read_finish_callback,里面释放信号量提醒上层
+- [bsp_w25q64_driver.h](./bsp_storage/driver/W25Q64/Inc/bsp_w25q64_driver.h) / [bsp_w25q64_driver.c](./bsp_storage/driver/W25Q64/Src/bsp_w25q64_driver.c)：
+  这里写具体的操作函数,然后需要什么资源要从adapter注册到handler,
+  再通过handler初始化的时候,用driver向上提供的w25q64_inst注册进来
+- [bsp_chipflash_driver.h](./bsp_storage/driver/STM32F411/bsp_chipflash_driver.h) / [bsp_chipflash_driver.c](./bsp_storage/driver/STM32F411/bsp_chipflash_driver.c)：STM32F411 片内 Flash Driver 接口与实现。

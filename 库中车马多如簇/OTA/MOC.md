@@ -6,13 +6,13 @@ OTA 升级中间件：APP 端后台下载，BootLoader 端解密安装与回退�
 
 ## 文件结构
 
-| 文件                                                                                              | 作用                              | 移植时            |
-| ------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------- |
-| [ota_config.h](ota_config.h)                                                                         | 地址 / 密钥 / 尺寸                | 换产品改这里      |
-| [ota_adapter.h](ota_adapter.h) / [ota_adapter.c](ota_adapter.c)                                         | 复位 / 跳转 / UI / 命令接收       | 换芯片/产品改这里 |
-| [service_ota_manager.h](app/service_ota_manager.h) / [service_ota_manager.c](app/service_ota_manager.c) | APP 端状态机 + 标志区读写 + 下载  | 不改              |
+| 文件                                                                                                                          | 作用                              | 移植时            |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------- |
+| [ota_config.h](ota_config.h)                                                                                                     | 地址 / 密钥 / 尺寸                | 换产品改这里      |
+| [ota_adapter.h](ota_adapter.h) / [ota_adapter.c](ota_adapter.c)                                                                     | 复位 / 跳转 / UI / 命令接收       | 换芯片/产品改这里 |
+| [service_ota_manager.h](app/service_ota_manager.h) / [service_ota_manager.c](app/service_ota_manager.c)                             | APP 端状态机 + 标志区读写 + 下载  | 不改              |
 | [ota_flash_handler.h](app/ota_flash_handler/ota_flash_handler.h) / [ota_flash_handler.c](app/ota_flash_handler/ota_flash_handler.c) | 外部 Flash 块管理（A/B 双块读写） | 不改              |
-| [Boot_Manager.h](bootloader/Boot_Manager.h) / [Boot_Manager.c](bootloader/Boot_Manager.c)               | BootLoader 升级状态机             | 不改              |
+| [Boot_Manager.h](bootloader/Boot_Manager.h) / [Boot_Manager.c](bootloader/Boot_Manager.c)                                           | BootLoader 升级状态机             | 不改              |
 
 ## 如何使用
 
@@ -153,9 +153,3 @@ APP 端有两个任务：
 | `APP_Check_NewApp` (0x22222222) | `Boot_Manager_Rollback_Backup_Area()` | 从 B 区解密回退到 APP 区                                                                                                      | 设 `APP_Valid` + 软复位        | 清所有标志 + 软复位                                 |
 | `APP_AreaAToAreaB` (0x33333333) | `Boot_Manager_AareaToBarea()`         | A 区复制到 B 区（备份）                                                                                                       | 设 `APP_Valid` + 软复位        | 设 B 区状态 0                                       |
 | `APP_Valid` (0x44444444) / 其他 | `BootManager_JumpToApp()`             | 跳转 APP                                                                                                                      | -                                | -                                                   |
-
-## 如何移植
-
-换产品 / 换芯片时：地址 / 密钥在 [ota_config.h](ota_config.h) 里配，复位 / 跳转 / UI / 命令接收在 [ota_adapter.c](ota_adapter.c) 里实现。
-
-依赖：[Ymodem](../Ymodem/MOC.md)、[Flash](../Flash/MOC.md)、[AES](../AES/MOC.md)、[MD5](../MD5/MOC.md)、[看门狗](../看门狗/MOC.md)。

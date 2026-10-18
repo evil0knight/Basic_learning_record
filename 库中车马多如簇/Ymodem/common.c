@@ -189,7 +189,7 @@ uint32_t GetIntegerInput(int32_t * num)
 
 /*******************************************************************************
   * @函数名称：SerialKeyPressed
-  * @函数说明：测试超级终端是否有按键按下
+  * @函数说明：是否收到数据，有则读取一个字节
   * @输入参数：key:按键
   * @输出参数：无
   * @返回参数：1：正确
@@ -264,7 +264,7 @@ void SerialPutChar(uint8_t c)
 	  USART_ClearFlag(USART1,USART_IT_TC);	
 	  USART_ClearFlag(USART1,USART_IT_TXE);
 
-	  USART_SendData(USART1, c);
+	  USART_SendData(USART1, c);//堵塞发送
     while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
     {
 

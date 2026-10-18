@@ -9,3 +9,4 @@
 #define CFG_SEMA_XXX_INIT_COUNT 0U
 
 #endif
+
