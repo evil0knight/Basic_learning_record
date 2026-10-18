@@ -1,351 +1,383 @@
+/******************************************************************************
+ * Copyright (C) 2026 XXXXXXXXXXX, Inc.(Gmbh) or its affiliates.
+ *
+ * All Rights Reserved.
+ *
+ * @file service_ota_manager.c
+ *
+ * @par dependencies
+ * - service_ota_manager.h
+ * - ota_flash_handler.h
+ * - ota_config.h
+ * - ymodem.h
+ * - user_task_reso_config.h
+ * - osal.h
+ *
+ * @author YA
+ *
+ * @brief OTA 服务状态机、升级标志和数据接收任务模板。
+ *
+ * Processing flow:
+ *
+ * 请求下载 -> 接收镜像 -> 保存镜像 -> 更新标志 -> 等待复位。
+ *
+ * @version V1.0
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ *****************************************************************************/
 #include "service_ota_manager.h"
-#include <string.h>
-#include "ota_adapter.h"
+
 #include "ota_flash_handler.h"
-#include "stm32f411_flash_handler.h"
+#include "ota_config.h"
+#include "ymodem.h"
 #include "user_task_reso_config.h"
 #include "osal.h"
-#include "ymodem.h"
-#include "service_watchdog_monitor.h"
 
-/*
- * OTA 状态机与后台下载
- *
- * 依赖映射：
- *   - 标志区内部 Flash 擦写                        -> stm32f411_flash_handler_erase/write/read
- *   - 软复位                                       -> ota_adapter_system_reset
- *   - UI 状态/进度/确认                            -> ota_adapter_ui_*
- *   - 数据队列                                     -> user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA)
- *   - 外部 Flash 互斥量                            -> user_mutex_get(USER_MUTEX_IDX_OTA_EXT_FLASH)
- *   - 下载命令接收                                 -> ota_adapter_wait_download_request
- *   - Ymodem 接收                                  -> Ymodem_ReceiveWithSink + 手动握手
- *   - 看门狗                                      -> watchdog_register/unregister
- *
- * 注：文件大小只能从 Ymodem_ReceiveWithSink 返回值拿（下载结束后），
- *     故消费者不显示实时百分比。
- */
 
+#ifndef __WEAK
+#if defined(__GNUC__)
+#define __WEAK __attribute__((weak))
+#else
+#define __WEAK
+#endif
+#endif
+
+
+/* Bootloader 与 App 共享的升级标志缓存。 */
 st_App_Info_t AppInfo;
-uint32_t g_u32_datalength = 0U;   /* 当前数据块长度，全局传长度（与指针队列配套） */
 
-static E_Ota_State s_otaState = WaitReqDownload;
+/* 当前队列数据块长度。 */
+uint32_t g_u32_datalength = 0U;
 
-/* 双缓冲槽：数据队列元素是槽指针(uint8_t*)，长度走全局 g_u32_datalength */
-#define OTA_DATA_SLOT_COUNT 2U
-typedef struct
+static E_Ota_State s_ota_state = WaitReqDownload;
+static uint8_t s_ymodem_buffer[BUFFER_SIZE];
+
+
+/**
+ * @brief 等待产品层触发一次 OTA 下载请求。
+ *
+ * @return int : 非 0 表示收到请求，0 表示继续等待。
+ */
+__WEAK int ota_download_request(void)
 {
-    uint8_t data[OTA_BUFFER_SIZE];
-    volatile uint8_t busy;
-} st_data_slot_t;
+    return 0;
+}
 
-static uint8_t s_ymodem_verify_buffer[OTA_BUFFER_SIZE];
-static st_data_slot_t s_slots[OTA_DATA_SLOT_COUNT];
-static volatile int32_t s_writer_error = 0;
-static volatile uint32_t s_written_size = 0U;
 
-/* ===== 标志区读写（内部 Flash，反码镜像）===== */
-
-void set_app_flag_value(en_App_FlagType_t AppFlagType, uint32_t AppFlagValue)
+/**
+ * @brief 请求系统复位。
+ *
+ * @return void : 无返回值。
+ */
+__WEAK void ota_system_reset(void)
 {
-    switch (AppFlagType)
+}
+
+
+/**
+ * @brief 擦除片内 Flash 区域。
+ *
+ * @param[in] address : 擦除起始地址。
+ * @param[in] size : 擦除长度，单位为字节。
+ * @return void : 无返回值。
+ */
+__WEAK void ota_internal_flash_erase(uint32_t address, uint32_t size)
+{
+    (void)address;
+    (void)size;
+}
+
+
+/**
+ * @brief 向片内 Flash 写入数据。
+ *
+ * @param[in] address : 写入起始地址。
+ * @param[in] data : 待读写入的数据。
+ * @param[in] size : 写入长度，单位为字节。
+ * @return void : 无返回值。
+ */
+__WEAK void ota_internal_flash_write(uint32_t address,
+                                     const uint8_t *data,
+                                     uint32_t size)
+{
+    (void)address;
+    (void)data;
+    (void)size;
+}
+
+
+/**
+ * @brief 从片内 Flash 读取数据。
+ *
+ * @param[in] address : 读取起始地址。
+ * @param[out] data : 读取数据的缓冲区。
+ * @param[in] size : 读取长度，单位为字节。
+ * @return void : 无返回值。
+ */
+__WEAK void ota_internal_flash_read(uint32_t address,
+                                    uint8_t *data,
+                                    uint32_t size)
+{
+    (void)address;
+    (void)data;
+    (void)size;
+}
+
+
+/**
+ * @brief 现在是否允许开始下载或确认安装
+ * 比如检查按键有没有触发升级,上位机有没有发送上机命令
+ *
+ * @return int : 非 0 表示收到请求，0 表示继续等待。
+ */
+static int ota_wait_download_request(void)
+{
+    return ota_download_request();
+}
+
+
+/**
+ * @brief 更新一个应用标志并写入反码
+ *        这里用反码是为了保证不会写错:
+ *        读取的时候会比对一下,如果有不对应的,就说明有写错了
+ * @param[in] type : 应用标志字段。
+ * @param[in] value : 应用标志值。
+ * @return void : 无返回值。
+ */
+void set_app_flag_value(en_App_FlagType_t type, uint32_t value)
+{
+    /* 根据字段类型更新对应的值和反码。 */
+    switch (type)
     {
         case App_RunState:
-            AppInfo.u32_App_RunState = AppFlagValue;
-            AppInfo.u32_App_RunState_Anti = ~AppFlagValue;
+            /* 保存 App 当前运行状态及其反码。 */
+            AppInfo.u32_App_RunState = value;
+            AppInfo.u32_App_RunState_Anti = ~value;
             break;
+
         case App_AreaASize:
-            AppInfo.u32_App_AreaASize = AppFlagValue;
-            AppInfo.u32_App_AreaASize_Anti = ~AppFlagValue;
+            /* 保存外部 Flash A 区镜像大小及其反码。 */
+            AppInfo.u32_App_AreaASize = value;
+            AppInfo.u32_App_AreaASize_Anti = ~value;
             break;
+
         case App_AreaBState:
-            AppInfo.u32_App_AreaBState = AppFlagValue;
-            AppInfo.u32_App_AreaBState_Anti = ~AppFlagValue;
+            /* 保存外部 Flash B 区状态及其反码。 */
+            AppInfo.u32_App_AreaBState = value;
+            AppInfo.u32_App_AreaBState_Anti = ~value;
             break;
+
         case App_AreaBSize:
-            AppInfo.u32_App_AreaBSize = AppFlagValue;
-            AppInfo.u32_App_AreaBSize_Anti = ~AppFlagValue;
+            /* 保存外部 Flash B 区镜像大小及其反码。 */
+            AppInfo.u32_App_AreaBSize = value;
+            AppInfo.u32_App_AreaBSize_Anti = ~value;
             break;
+
         default:
+            /* 未知字段不执行 Flash 写入。 */
             return;
     }
 
-    osal_critical_enter();
-    if ((stm32f411_flash_handler_erase(OTA_APP_FLAG_ADDRESS, sizeof(st_App_Info_t)) != STM32F411_FLASH_OK) ||
-        (stm32f411_flash_handler_write(OTA_APP_FLAG_ADDRESS, (const uint8_t *)&AppInfo,
-                                       sizeof(st_App_Info_t)) != STM32F411_FLASH_OK))
-    {
-        osal_critical_exit();
-        return;
-    }
-    osal_critical_exit();
+    /* 临界区内更新标志，避免写入过程中被并发访问。 */
+    (void)osal_critical_enter();
+
+    /* 先擦除旧标志，再写入新的值和反码。 */
+    ota_internal_flash_erase(AppFlagAddress, sizeof(AppInfo));
+    ota_internal_flash_write(AppFlagAddress,
+                             (const uint8_t *)&AppInfo,
+                             sizeof(AppInfo));
+
+    /* 完成片内 Flash 操作后退出临界区。 */
+    (void)osal_critical_exit();
 }
 
-uint8_t read_app_flag_value(en_App_FlagType_t AppFlagType, uint32_t *p_u32_AppFlagValue)
-{
-    uint8_t result = 1U;
 
-    if (p_u32_AppFlagValue == NULL)
+/**
+ * @brief 读取并校验一个应用标志
+ *        接上面,读取的时候校验,防止flash写入失败(flash写多了会坏)
+ *
+ * @param[in] type : 应用标志字段。
+ * @param[out] value : 返回应用标志值。
+ * @return uint8_t : 0 表示成功，1 表示失败。
+ */
+uint8_t read_app_flag_value(en_App_FlagType_t type, uint32_t *value)
+{
+    if (NULL == value)
     {
         return 1U;
     }
 
-    (void)stm32f411_flash_handler_read(OTA_APP_FLAG_ADDRESS, (uint8_t *)&AppInfo,
-                                       sizeof(st_App_Info_t));
+    ota_internal_flash_read(AppFlagAddress,
+                            (uint8_t *)&AppInfo,
+                            sizeof(AppInfo));
 
-    switch (AppFlagType)
+    switch (type)
     {
         case App_RunState:
-            if (AppInfo.u32_App_RunState == ~AppInfo.u32_App_RunState_Anti)
+            if (AppInfo.u32_App_RunState ==
+                ~AppInfo.u32_App_RunState_Anti)
             {
-                *p_u32_AppFlagValue = AppInfo.u32_App_RunState;
-                result = 0U;
+                *value = AppInfo.u32_App_RunState;
+                return 0U;
             }
             break;
+
         case App_AreaASize:
-            if (AppInfo.u32_App_AreaASize == ~AppInfo.u32_App_AreaASize_Anti)
+            if (AppInfo.u32_App_AreaASize ==
+                ~AppInfo.u32_App_AreaASize_Anti)
             {
-                *p_u32_AppFlagValue = AppInfo.u32_App_AreaASize;
-                result = 0U;
+                *value = AppInfo.u32_App_AreaASize;
+                return 0U;
             }
             break;
+
         case App_AreaBState:
-            if (AppInfo.u32_App_AreaBState == ~AppInfo.u32_App_AreaBState_Anti)
+            if (AppInfo.u32_App_AreaBState ==
+                ~AppInfo.u32_App_AreaBState_Anti)
             {
-                *p_u32_AppFlagValue = AppInfo.u32_App_AreaBState;
-                result = 0U;
+                *value = AppInfo.u32_App_AreaBState;
+                return 0U;
             }
             break;
+
         case App_AreaBSize:
-            if (AppInfo.u32_App_AreaBSize == ~AppInfo.u32_App_AreaBSize_Anti)
+            if (AppInfo.u32_App_AreaBSize ==
+                ~AppInfo.u32_App_AreaBSize_Anti)
             {
-                *p_u32_AppFlagValue = AppInfo.u32_App_AreaBSize;
-                result = 0U;
+                *value = AppInfo.u32_App_AreaBSize;
+                return 0U;
             }
             break;
+
         default:
             break;
     }
 
-    return result;
+    return 1U;
 }
 
-/* ===== 下载 Sink：复制到双缓冲槽，发槽指针，再握手等消费者写完 ===== */
 
-static int32_t ymodem_queue_sink(const uint8_t *data, uint32_t size,
-                                 uint32_t address, void *context)
-{
-    uint8_t *slot_data;
-    uint32_t slot_index;
-    (void)address;
-    (void)context;
-
-    if ((data == NULL) || (size == 0U) || (size > OTA_BUFFER_SIZE))
-        return -1;
-
-    for (;;)
-    {
-        if (s_writer_error != 0) return -1;
-        for (slot_index = 0U; slot_index < OTA_DATA_SLOT_COUNT; ++slot_index)
-            if (s_slots[slot_index].busy == 0U) break;
-        if (slot_index < OTA_DATA_SLOT_COUNT) break;
-        osal_task_delay(osal_ms_to_ticks(1U));
-    }
-
-    s_slots[slot_index].busy = 1U;
-    memcpy(s_slots[slot_index].data, data, size);
-    g_u32_datalength = size;                    /* 全局传长度 */
-    slot_data = s_slots[slot_index].data;
-
-    if (osal_queue_send(user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA), &slot_data,
-                        OSAL_WAIT_FOREVER) != OSAL_SUCCESS)
-    {
-        s_slots[slot_index].busy = 0U;
-        return -1;
-    }
-
-    /* 握手：消费者(高优先级)写 Flash 时持互斥量，此处阻塞直到写完。 */
-    (void)osal_mutex_take(user_mutex_get(USER_MUTEX_IDX_OTA_EXT_FLASH), OSAL_WAIT_FOREVER);
-    (void)osal_mutex_give(user_mutex_get(USER_MUTEX_IDX_OTA_EXT_FLASH));
-
-    return 0;
-}
-
-/* ===== 确认等待 ===== */
-
-static int wait_confirmation(void)
-{
-    uint32_t confirmCount = 0U;
-
-    while (ota_adapter_ui_confirm_read() == 0U)
-    {
-        osal_task_delay(osal_ms_to_ticks(50U));
-        confirmCount++;
-        if (confirmCount >= 2000U)  /* 100 秒超时 */
-        {
-            break;
-        }
-    }
-    return (ota_adapter_ui_confirm_read() == 1U) ? 1 : 0;
-}
-
-/* ===== OTA 控制任务（状态机）===== */
-
+/**
+ * @brief 执行 OTA 下载、确认和复位状态机。
+ *
+ * @param[in] argument : 任务参数，模板当前未使用。
+ * @return void : 无返回值。
+ */
 void ota_task_runnable(void *argument)
 {
-    int32_t appDataLength = 0;
-    (void)argument;
+    int32_t image_size; /* 保存本次 Ymodem 接收的镜像大小。 */
+
+    (void)argument; /* 当前模板不使用任务参数。 */
 
     for (;;)
     {
-        switch (s_otaState)
+        switch (s_ota_state)
         {
             case WaitReqDownload:
-            {
-                ota_adapter_ui_state_write(0U); /* 空闲 */
-
-                /* 等命令是长时间阻塞，先注销看门狗避免被误判卡死 */
-                watchdog_unregister(osal_task_get_current());
-
-                if (ota_adapter_wait_download_request() != 0)
+                /* 等待产品层发起新的 OTA 下载请求。 */
+                if (ota_wait_download_request() != 0)
                 {
-                    /* 收到命令，重新注册看门狗（600 秒超时） */
-                    watchdog_register(osal_task_get_current(), 600000U, "OTA_task");
-
-                    ota_adapter_ui_state_write(1U); /* 请求下载确认 */
-                    if (wait_confirmation() == 1)
-                    {
-                        s_otaState = OtaDownload;
-                        ota_adapter_ui_state_write(0U);
-                    }
-                    else
-                    {
-                        s_otaState = WaitReqDownload;
-                    }
+                    /* 收到请求后进入镜像接收状态。 */
+                    s_ota_state = OtaDownload;
                 }
                 break;
-            }
 
             case OtaDownload:
-            {
-                ota_adapter_ui_progress_write(0U);
-                W25Q64_Init();
-                Ymodem_SetIo(ota_adapter_uart_read, ota_adapter_uart_write);
-                appDataLength = Ymodem_ReceiveWithSink(s_ymodem_verify_buffer,
-                                                       ymodem_queue_sink, NULL,
-                                                       OTA_AREA_A_ADDRESS);
-                ota_adapter_ui_progress_write(100U);
+                /* 清零ram缓存，准备接收新的镜像。 */
+                ota_flash_init();
 
-                if ((appDataLength > 0) && (s_writer_error == 0))
+                /* 接收 Ymodem 镜像，数据由 OTA Flash 封装负责保存。 */
+                image_size = Ymodem_Receive(s_ymodem_buffer);
+                if ((image_size > 0) &&
+                    (ota_flash_write_data_end() == 0U))//提交最后一个未满扇区成功
                 {
-                    s_otaState = WaitReqUpdate;
-                    if (W25Q64_WriteData_End(BLOCKA) != 0U)
-                    {
-                        s_otaState = WaitReqDownload;
-                        break;
-                    }
-                    set_app_flag_value(App_AreaASize, (uint32_t)appDataLength);
+                    /* 保存镜像大小，供 Bootloader 后续搬运和校验。 */
+                    set_app_flag_value(App_AreaASize,
+                                       (uint32_t)image_size);
+
+                    /* 标记镜像已经下载完成，等待安装确认。 */
                     set_app_flag_value(App_RunState, APP_WAIT_UPDATE);
+                    s_ota_state = WaitReqUpdate;
                 }
                 else
                 {
-                    s_otaState = WaitReqDownload;
+                    /* 接收或尾部写入失败，回到等待下载状态。 */
+                    s_ota_state = WaitReqDownload;
                 }
                 break;
-            }
 
             case WaitReqUpdate:
-            {
-                ota_adapter_ui_state_write(2U); /* 下载完成待安装 */
-                ota_adapter_ui_confirm_write(0U);
-
-                if (wait_confirmation() == 1)
+                /* 等待产品层确认安装刚接收的镜像。 */
+                if (ota_wait_download_request() != 0)
                 {
-                    s_otaState = OtaEnd;
+                    /* 收到确认后进入结束状态。 */
+                    s_ota_state = OtaEnd;
                 }
                 else
                 {
-                    s_otaState = WaitReqDownload;
+                    /* 未确认时回到等待下载请求状态。 */
+                    s_ota_state = WaitReqDownload;
                 }
                 break;
-            }
 
             case OtaEnd:
-            {
+                /* 给外部 Flash 写入和上层处理留出稳定时间。 */
                 osal_task_delay(osal_ms_to_ticks(1000U));
+
+                /* 请求系统复位，由 Bootloader 接管镜像安装。 */
                 SoftReset();
                 break;
-            }
 
             default:
+                /* 状态异常时恢复到初始等待状态。 */
+                s_ota_state = WaitReqDownload;
                 break;
         }
     }
 }
 
-/* OTA 完成后触发系统复位 */
+
+/**
+ * @brief 调用产品层的系统复位实现。
+ *
+ * @return void : 无返回值。
+ */
 void SoftReset(void)
 {
-    ota_adapter_system_reset();
+    ota_system_reset();
 }
 
-/* ===== 下载数据写任务（消费者）===== */
 
+/**
+ * @brief 从 App 数据队列取出数据并写入外部 Flash。
+ *
+ * @param[in] argument : 任务参数，模板当前未使用。
+ * @return void : 无返回值。
+ */
 void download_app_data_task_runnable(void *argument)
 {
-    uint8_t *pData = NULL;
-    uint32_t slot_index;
+    uint8_t *data;
+
     (void)argument;
 
     for (;;)
     {
-        if (user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA) == NULL)
+        if (NULL == user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA))
         {
             osal_task_delay(osal_ms_to_ticks(10U));
             continue;
         }
 
-        if (osal_queue_receive(user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA), &pData,
-                               OSAL_WAIT_FOREVER) != OSAL_SUCCESS)
+        if (OSAL_SUCCESS ==
+            osal_queue_receive(user_queue_get(USER_QUEUE_IDX_OTA_APP_DATA),
+                               &data,
+                               OSAL_WAIT_FOREVER))
         {
-            continue;
-        }
-
-        if (pData == NULL)
-        {
-            s_writer_error = 1;
-            continue;
-        }
-
-        /* 写 Flash 前注册看门狗（5 秒超时），写完注销 */
-        watchdog_register(osal_task_get_current(), 5000U, "DwAppData_task");
-
-        /* 持互斥量写外部 Flash（串行化） */
-        if (osal_mutex_take(user_mutex_get(USER_MUTEX_IDX_OTA_EXT_FLASH), OSAL_WAIT_FOREVER) == OSAL_SUCCESS)
-        {
-            if (W25Q64_WriteData(BLOCKA, pData, g_u32_datalength) == 0U)
+            if ((NULL != data) &&
+                (ota_flash_write_data(data, g_u32_datalength) != 0U))
             {
-                s_written_size += g_u32_datalength;
-            }
-            else
-            {
-                s_writer_error = 1;
-            }
-            osal_mutex_give(user_mutex_get(USER_MUTEX_IDX_OTA_EXT_FLASH));
-        }
-        else
-        {
-            s_writer_error = 1;
-        }
-
-        watchdog_unregister(osal_task_get_current());
-
-        /* 释放对应的双缓冲槽 */
-        for (slot_index = 0U; slot_index < OTA_DATA_SLOT_COUNT; ++slot_index)
-        {
-            if (pData == s_slots[slot_index].data)
-            {
-                s_slots[slot_index].busy = 0U;
-                break;
+                s_ota_state = WaitReqDownload;
             }
         }
     }

@@ -33,7 +33,7 @@ void watchdog_port_init(void)
     s_hiwdg.Init.Reload = 2500U;
     if (HAL_IWDG_Init(&s_hiwdg) != HAL_OK)
     {
-        /* 手表工程此处走 Error_Handler() */
+        /* Error_Handler() */
     }
 }
 

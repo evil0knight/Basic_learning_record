@@ -2,7 +2,7 @@
 
 [← 返回模块索引](../MOC.md) | [← 主页](../../index.md)
 
-[←OTA_MOC](..\..\术中自有万钟粟\OTA\MOC.md)
+[← 返回 OTA 升级](../../术中自有万钟粟/OTA/MOC.md) |
 
 > [Flash 知识](./知识/MOC.md)
 
