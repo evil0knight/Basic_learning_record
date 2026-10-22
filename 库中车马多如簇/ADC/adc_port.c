@@ -55,7 +55,7 @@ static en_core_adc_instance_t core_adc_instance_from_handle(
     return CORE_ADC_MAX;
 }
 
-/* 校验实例、缓冲区、长度和句柄，避免把非法参数传给 HAL。 */
+/* 校验实例、缓冲区、长度和句柄，避免把非法参数传给 HAL */
 static en_core_adc_status_t core_adc_validate(
     en_core_adc_instance_t instance,
     const uint16_t *p_buffer,

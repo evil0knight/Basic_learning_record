@@ -22,7 +22,7 @@
 - [bsp_wrapper_flash.h](./bsp_wrapper_flash/bsp_wrapper_flash.h) / [bsp_wrapper_flash.c](./bsp_wrapper_flash/bsp_wrapper_flash.c)：
   这里就是上层开发者使用下层服务的基层,把他当成一个对象实例,直接是面向对象的思想
   再做一层封装,检查合法性,防止adapter更换
-  对外提供方便的函数使用,把集成号的结构体通过函数,安全的开放
+  对外提供方便的函数使用,把集成好的结构体通过函数,安全的开放
 - [bsp_adapter_port_flash.h](./bsp_adapter_port_flash/bsp_adapter_port_flash.h) / [bsp_adapter_port_flash.c](./bsp_adapter_port_flash/bsp_adapter_port_flash.c)：
   输入做一层薄封装,集成handler资源并封装成一个操作结构体,想供wrapper实例调用
   在 `bsp_adapter_flash_register`去把底层的资源,挂载在这个操作结构体上

@@ -1,6 +1,6 @@
 # GPIO Port
 
-[← platform_mcu](../MOC.md) | [← 代码架构库](../../../../MOC.md) | [← 主页](../../../../../../index.md)
+[← platform_mcu](../MOC.md) | [← firmware](../../../MOC.md) | [← 主页](../../../../../../index.md)
 
 ---
 
