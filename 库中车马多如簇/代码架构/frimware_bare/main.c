@@ -46,13 +46,22 @@ int main(void)
         return 1;
     }
     while (1) {
+        /*-------------------- 表驱事件处理 begin --------------------*/
         if (APP_STATUS_OK !=
             get_event_flag(APP_EVENT_MESSAGE_READY, &u32_flags)) {
+            //这里轮询查询是否"有事件"(不管什么事件)
             return 1;
         }
         if (0U != u32_flags) {
+            //清除"有事件"标志位,
             (void)clear_event_flag(APP_EVENT_MESSAGE_READY);
+            //去处理具体事件
             (void)do_read_message();
         }
+        /*--------------------- 表驱事件处理 end ---------------------*/
+        /*-------------------- 周期轮询任务 begin --------------------*/
+        1;
+
+        /*--------------------- 周期轮询任务 end ---------------------*/
     }
 }

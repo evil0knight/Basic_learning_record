@@ -42,6 +42,7 @@ typedef enum {
 typedef struct {
     msg_source_t source_id;
     uint16_t    u16_length;
+    //array数组    uint8_t8位无符号整数     data数据,用于接收存放数据帧
     uint8_t     au8_data[APP_MESSAGE_DATA_LEN];
 } event_message_t;
 

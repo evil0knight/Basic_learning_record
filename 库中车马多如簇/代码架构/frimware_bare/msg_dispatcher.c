@@ -80,7 +80,7 @@ app_status_t msg_dispatcher_dispatch(
 }
 
 /**
- * @brief 排空消息队列，返回遇到的首个错误。
+ * @brief 排空(逐条取出所有)消息队列，返回遇到的首个错误。
  *
  * @note 无输入参数。
  * @return app_status_t：成功或具体错误状态。
