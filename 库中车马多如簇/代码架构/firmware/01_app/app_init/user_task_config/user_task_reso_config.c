@@ -33,13 +33,62 @@
 #define __WEAK
 #endif
 #endif
+/**
+ * @brief 执行 thread_5ms_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 
 __WEAK void thread_5ms_task(void *argument);
+/**
+ * @brief 执行 sensor_polling_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void sensor_polling_task(void *argument);
+/**
+ * @brief 执行 display_refresh_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void display_refresh_task(void *argument);
+/**
+ * @brief 执行 low_power_monitor_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void low_power_monitor_task(void *argument);
+/**
+ * @brief 执行 server_watchdog_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void server_watchdog_task(void *argument);
+/**
+ * @brief 执行 adc_transfer_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void adc_transfer_task(void *argument);
+/**
+ * @brief 执行 adc_sample_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void adc_sample_task(void *argument);
 
 
@@ -300,6 +349,13 @@ osal_event_handle_t user_event_get(user_event_idx_t index)
 
 
 //预定义task写这里
+/**
+ * @brief 执行 thread_5ms_task 操作。
+ *
+ * @param[in] argument : 函数调用参数。
+ * @return __WEAK void : 函数执行结果。
+ *
+ */
 __WEAK void thread_5ms_task(void *argument)
 {
     (void)argument;

@@ -63,9 +63,29 @@ typedef struct
     app_state_t next_state;
     state_action_t pf_action;
 } transition_t;
+/**
+ * @brief 执行 app_control_init 操作。
+ *
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 
 app_status_t app_control_init(void);
+/**
+ * @brief 执行 app_control_event_map 操作。
+ *
+ * @param[in] event : 函数调用参数。
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 app_status_t app_control_event_map(app_event_t event);
+/**
+ * @brief 执行 app_control_get_current 操作。
+ *
+ * @param[in] p_state : 函数调用参数。
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 app_status_t app_control_get_current(app_state_t * const p_state);
 
 #endif /* APP_CONTROL_H */

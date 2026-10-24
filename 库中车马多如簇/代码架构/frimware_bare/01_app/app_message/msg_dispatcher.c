@@ -30,6 +30,13 @@
 #include "msg_queue.h"
 
 #include <stddef.h>
+/**
+ * @brief 执行 msg_dispatcher_dispatch 操作。
+ *
+ * @param[in] event : 函数调用参数。
+ * @return static app_status_t : 函数执行结果。
+ *
+ */
 
 static app_status_t msg_dispatcher_dispatch(app_event_t event)
 {

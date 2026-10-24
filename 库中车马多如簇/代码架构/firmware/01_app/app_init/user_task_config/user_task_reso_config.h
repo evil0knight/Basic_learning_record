@@ -121,14 +121,61 @@ extern user_queue_config_t g_user_queues[USER_QUEUE_IDX_MAX];
 extern user_mutex_config_t g_user_mutexes[USER_MUTEX_IDX_MAX];
 extern user_sema_config_t g_user_semaphores[USER_SEMA_IDX_MAX];
 extern user_event_config_t g_user_events[USER_EVENT_IDX_MAX];
+/**
+ * @brief 执行 user_os_resources_init 操作。
+ *
+ * @return osal_status_t : 函数执行结果。
+ *
+ */
 
 osal_status_t user_os_resources_init(void);
+/**
+ * @brief 执行 user_os_resources_deinit 操作。
+ *
+ * @return void : 无返回值。
+ *
+ */
 void user_os_resources_deinit(void);
+/**
+ * @brief 执行 user_task_get 操作。
+ *
+ * @param[in] index : 函数调用参数。
+ * @return osal_task_handle_t : 函数执行结果。
+ *
+ */
 
 osal_task_handle_t user_task_get(user_task_idx_t index);
+/**
+ * @brief 执行 user_queue_get 操作。
+ *
+ * @param[in] index : 函数调用参数。
+ * @return osal_queue_handle_t : 函数执行结果。
+ *
+ */
 osal_queue_handle_t user_queue_get(user_queue_idx_t index);
+/**
+ * @brief 执行 user_mutex_get 操作。
+ *
+ * @param[in] index : 函数调用参数。
+ * @return osal_mutex_handle_t : 函数执行结果。
+ *
+ */
 osal_mutex_handle_t user_mutex_get(user_mutex_idx_t index);
+/**
+ * @brief 执行 user_sema_get 操作。
+ *
+ * @param[in] index : 函数调用参数。
+ * @return osal_sema_handle_t : 函数执行结果。
+ *
+ */
 osal_sema_handle_t user_sema_get(user_sema_idx_t index);
+/**
+ * @brief 执行 user_event_get 操作。
+ *
+ * @param[in] index : 函数调用参数。
+ * @return osal_event_handle_t : 函数执行结果。
+ *
+ */
 osal_event_handle_t user_event_get(user_event_idx_t index);
 
 #endif /* USER_TASK_RESO_CONFIG_H */

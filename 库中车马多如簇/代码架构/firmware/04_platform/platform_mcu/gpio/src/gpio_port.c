@@ -1,3 +1,28 @@
+/******************************************************************************
+ * Copyright (C) 2026 XXXXXXXXXXX, Inc.(Gmbh) or its affiliates.
+ *
+ * All Rights Reserved.
+ *
+ * @file gpio_port.c
+ *
+ * @par dependencies
+ * - gpio_port.h
+ * - string.h
+ *
+ * @author YA
+ *
+ * @brief 源文件，用于实现本模块接口及相关功能。
+ *
+ * Processing flow:
+ *
+ * 参数检查 -> 执行模块操作 -> 返回处理结果。
+ *
+ * @version V1.0 2026-10-24
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ ******************************************************************************/
+
 #include "gpio_port.h"
 
 #include <string.h>

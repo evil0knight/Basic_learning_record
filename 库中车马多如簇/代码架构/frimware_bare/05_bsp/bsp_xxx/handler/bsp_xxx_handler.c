@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Copyright (C) 2026 YA.
  *
  * All Rights Reserved.
@@ -30,6 +30,11 @@
 extern void (*pf_pin_interrupt_callback)(void *, void *);
 extern void (*pf_dma_interrupt_callback)(void *, void *);
 
+/**
+ * @brief 注册 XXX 外部中断回调。
+ * @param[in] pf_callback 中断回调函数指针。
+ * @return bsp_xxx_status_t 注册结果。
+ */
 static bsp_xxx_status_t bsp_xxx_register_int_callback(
     bsp_xxx_isr_callback_t pf_callback)
 {
@@ -42,6 +47,11 @@ static bsp_xxx_status_t bsp_xxx_register_int_callback(
     return BSP_XXX_OK;
 }
 
+/**
+ * @brief 注册 XXX DMA 中断回调。
+ * @param[in] pf_callback 中断回调函数指针。
+ * @return bsp_xxx_status_t 注册结果。
+ */
 static bsp_xxx_status_t bsp_xxx_register_dma_callback(
     bsp_xxx_isr_callback_t pf_callback)
 {

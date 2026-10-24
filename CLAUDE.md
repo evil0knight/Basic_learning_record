@@ -22,7 +22,13 @@
    2. 迁移或者重组文件的时候:                  看[重组文件](.claude\skills\重组文件.md)
    3. 写文件,搭建框架,增加索引的时候:  看[写md文件](.claude\skills\写md文件.md)
    4. 写代码.c.h的时候：				    看[写C和H代码](.claude/skills/写C和H代码.md)
-   5. 用户明确要求上传 GitHub 时：直接运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:/Basic_learning_record/.github/upload.ps1"`。不提前读取脚本、查询 Git 状态、列目录或做预览，检查由脚本负责；执行后简短报告结果。仅询问或引用日志时不执行上传。
+   5. 用户明确要求上传 GitHub 时：直接运行 
+---
+
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:/Basic_learning_record/.github/upload.ps1"
+
+---
+   不提前读取脚本、查询 Git 状态、列目录或做预览，检查由脚本负责；执行后简短报告结果。仅询问或引用日志时不执行上传。
 
 ## 边界:
 

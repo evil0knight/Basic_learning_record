@@ -41,6 +41,13 @@ typedef struct
 } bsp_adapter_xxx_context_t;
 
 static bsp_adapter_xxx_context_t g_bsp_adapter_xxx;
+/**
+ * @brief 执行 bsp_adapter_xxx_port_init 操作。
+ *
+ * @param[in] p_context : 函数调用参数。
+ * @return static bsp_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_xxx_status_t bsp_adapter_xxx_port_init(void *p_context)
@@ -52,6 +59,15 @@ static bsp_xxx_status_t bsp_adapter_xxx_port_init(void *p_context)
 
     return BSP_XXX_OK;
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_port_control 操作。
+ *
+ * @param[in] p_context : 函数调用参数。
+ * @param[in] command : 函数调用参数。
+ * @param[in] p_argument : 函数调用参数。
+ * @return static bsp_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_xxx_status_t bsp_adapter_xxx_port_control(
@@ -68,12 +84,24 @@ static bsp_xxx_status_t bsp_adapter_xxx_port_control(
     (void)p_argument;
     return BSP_XXX_OK;
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_critical_enter 操作。
+ *
+ * @return static bsp_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_xxx_status_t bsp_adapter_xxx_critical_enter(void)
 {
     return BSP_XXX_OK;
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_critical_exit 操作。
+ *
+ * @return static bsp_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_xxx_status_t bsp_adapter_xxx_critical_exit(void)
@@ -88,6 +116,13 @@ static const bsp_xxx_port_ops_t g_bsp_adapter_xxx_port_ops =
     .pf_critical_enter = bsp_adapter_xxx_critical_enter,
     .pf_critical_exit = bsp_adapter_xxx_critical_exit
 };
+/**
+ * @brief 执行 bsp_adapter_xxx_status_convert 操作。
+ *
+ * @param[in] status : 函数调用参数。
+ * @return static bsp_wrapper_xxx_status_t : 函数执行结果。
+ *
+ */
 
 static bsp_wrapper_xxx_status_t bsp_adapter_xxx_status_convert(
     bsp_xxx_status_t status)
@@ -104,6 +139,13 @@ static bsp_wrapper_xxx_status_t bsp_adapter_xxx_status_convert(
             return BSP_WRAPPER_XXX_ERROR;
     }
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_init 操作。
+ *
+ * @param[in] p_context : 函数调用参数。
+ * @return static bsp_wrapper_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_wrapper_xxx_status_t bsp_adapter_xxx_init(void *p_context)
@@ -129,6 +171,16 @@ static bsp_wrapper_xxx_status_t bsp_adapter_xxx_init(void *p_context)
     p_adapter->index = 0U;
     return BSP_WRAPPER_XXX_OK;
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_control 操作。
+ *
+ * @param[in] p_context : 函数调用参数。
+ * @param[in] index : 函数调用参数。
+ * @param[in] command : 函数调用参数。
+ * @param[in] p_argument : 函数调用参数。
+ * @return static bsp_wrapper_xxx_status_t : 函数执行结果。
+ *
+ */
 
 
 static bsp_wrapper_xxx_status_t bsp_adapter_xxx_control(
@@ -151,6 +203,12 @@ static bsp_wrapper_xxx_status_t bsp_adapter_xxx_control(
                                 command,
                                 p_argument));
 }
+/**
+ * @brief 执行 bsp_adapter_xxx_register 操作。
+ *
+ * @return void : 无返回值。
+ *
+ */
 
 
 void bsp_adapter_xxx_register(void)

@@ -96,6 +96,13 @@ osal_status_t osal_queue_peek(osal_queue_handle_t queue, void *data,
     OSAL_RETURN_IF_NULL(data);
     return os_queue_peek_impl(queue, data, timeout);
 }
+/**
+ * @brief 执行 osal_queue_messages_waiting 操作。
+ *
+ * @param[in] queue : 函数调用参数。
+ * @return size_t : 函数执行结果。
+ *
+ */
 
 size_t osal_queue_messages_waiting(osal_queue_handle_t queue)
 {

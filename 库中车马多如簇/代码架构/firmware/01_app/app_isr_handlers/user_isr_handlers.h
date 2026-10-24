@@ -1,9 +1,26 @@
-/**
+/******************************************************************************
+ * Copyright (C) 2026 XXXXXXXXXXX, Inc.(Gmbh) or its affiliates.
+ *
+ * All Rights Reserved.
+ *
  * @file user_isr_handlers.h
+ *
+ * @par dependencies
+ * - stddef.h
+ *
+ * @author YA
+ *
  * @brief 声明 HAL 中断回调指针。
  *
- * HAL 回调直接调用本文件声明的设备回调指针。
- */
+ * Processing flow:
+ *
+ * Handler 挂载回调 -> HAL 中断入口调用回调。
+ *
+ * @version V1.0 2026-10-24
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ ******************************************************************************/
 #ifndef FIRMWARE_USER_ISR_HANDLERS_H
 #define FIRMWARE_USER_ISR_HANDLERS_H
 

@@ -25,6 +25,12 @@
 #define MSG_DISPATCHER_H
 
 #include "../app_control/app_control.h"
+/**
+ * @brief 执行 do_read_message 操作。
+ *
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 
 app_status_t do_read_message(void);
 

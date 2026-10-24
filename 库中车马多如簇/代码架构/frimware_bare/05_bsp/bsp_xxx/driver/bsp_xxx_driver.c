@@ -25,12 +25,28 @@
 #include "bsp_xxx_driver.h"
 
 #include <stddef.h>
+/**
+ * @brief 执行 bsp_xxx_int_interrupt_callback 操作。
+ *
+ * @param[in] p_object : 函数调用参数。
+ * @param[in] p_data : 函数调用参数。
+ * @return static void : 函数执行结果。
+ *
+ */
 
 static void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data)
 {
     (void)p_object;
     (void)p_data;
 }
+/**
+ * @brief 执行 bsp_xxx_dma_interrupt_callback 操作。
+ *
+ * @param[in] p_object : 函数调用参数。
+ * @param[in] p_data : 函数调用参数。
+ * @return static void : 函数执行结果。
+ *
+ */
 
 static void bsp_xxx_dma_interrupt_callback(void *p_object, void *p_data)
 {

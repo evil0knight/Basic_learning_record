@@ -105,6 +105,13 @@ static const bsp_xxx_port_ops_t g_bsp_adapter_xxx_port_ops =
     .pf_critical_enter = bsp_adapter_xxx_critical_enter,
     .pf_critical_exit = bsp_adapter_xxx_critical_exit
 };
+/**
+ * @brief 执行 bsp_adapter_xxx_status_convert 操作。
+ *
+ * @param[in] status : 函数调用参数。
+ * @return static bsp_wrapper_xxx_status_t : 函数执行结果。
+ *
+ */
 
 static bsp_wrapper_xxx_status_t bsp_adapter_xxx_status_convert(
     bsp_xxx_status_t status)

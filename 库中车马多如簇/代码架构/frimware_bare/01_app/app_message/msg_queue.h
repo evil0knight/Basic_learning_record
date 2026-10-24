@@ -40,9 +40,32 @@ typedef struct
 } msg_queue_t;
 
 extern msg_queue_t g_msg_queue;
+/**
+ * @brief 执行 queue_init 操作。
+ *
+ * @param[in] p_queue : 函数调用参数。
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 
 app_status_t queue_init(msg_queue_t * const p_queue);
+/**
+ * @brief 执行 queue_push 操作。
+ *
+ * @param[in] p_queue : 函数调用参数。
+ * @param[in] event : 函数调用参数。
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 app_status_t queue_push(msg_queue_t * const p_queue, app_event_t event);
+/**
+ * @brief 执行 queue_pop 操作。
+ *
+ * @param[in] p_queue : 函数调用参数。
+ * @param[in] p_event : 函数调用参数。
+ * @return app_status_t : 函数执行结果。
+ *
+ */
 app_status_t queue_pop(
     msg_queue_t * const p_queue,
     app_event_t * const p_event);
