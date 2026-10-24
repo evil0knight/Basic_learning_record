@@ -1,54 +1,139 @@
+/******************************************************************************
+ * Copyright (C) 2026 XXXXXXXXXXX, Inc.(Gmbh) or its affiliates.
+ *
+ * All Rights Reserved.
+ *
+ * @file bsp_xxx_driver.c
+ *
+ * @par dependencies
+ * - bsp_xxx_driver.h
+ * - stddef.h
+ *
+ * @author YA
+ *
+ * @brief 实现 XXX Driver 的绑定、初始化、控制和中断回调接口。
+ *
+ * Processing flow:
+ *
+ * 检查参数 -> 初始化 Port -> 交付 Driver 回调 -> 标记 Driver 已初始化。
+ *
+ * @version V1.0
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ ******************************************************************************/
 #include "bsp_xxx_driver.h"
 
 #include <stddef.h>
 
-bsp_xxx_status_t bsp_xxx_driver_bind(bsp_xxx_driver_t *driver,
-                                     const bsp_xxx_port_ops_t *port_ops,
-                                     void *port_context)
+static void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data)
 {
-    if ((driver == NULL) || (port_ops == NULL) ||
-        (port_ops->init == NULL) || (port_ops->control == NULL))
+    (void)p_object;
+    (void)p_data;
+}
+
+static void bsp_xxx_dma_interrupt_callback(void *p_object, void *p_data)
+{
+    (void)p_object;
+    (void)p_data;
+}
+
+/**
+ * @brief 将平台操作接口绑定到 XXX Driver。
+ * @param[in,out] p_driver XXX Driver 对象指针。
+ * @param[in] p_port_ops 平台操作接口表指针。
+ * @param[in] p_port_context 平台操作上下文指针。
+ * @return bsp_xxx_status_t 操作状态。
+ */
+bsp_xxx_status_t bsp_xxx_driver_bind(
+    bsp_xxx_driver_t * const p_driver,
+    const bsp_xxx_port_ops_t * const p_port_ops,
+    void * const p_port_context)
+{
+    if ((p_driver == NULL) || (p_port_ops == NULL) ||
+        (p_port_ops->pf_init == NULL) ||
+        (p_port_ops->pf_control == NULL) ||
+        (p_port_ops->pf_critical_enter == NULL) ||
+        (p_port_ops->pf_critical_exit == NULL))
     {
         return BSP_XXX_ERR_ARGUMENT;
     }
-    if (driver->initialized)
+    if (p_driver->initialized)
     {
         return BSP_XXX_ERR_STATE;
     }
 
-    driver->port_ops = port_ops;
-    driver->port_context = port_context;
+    p_driver->p_port_ops = p_port_ops;
+    p_driver->p_port_context = p_port_context;
     return BSP_XXX_OK;
 }
 
-bsp_xxx_status_t bsp_xxx_driver_init(bsp_xxx_driver_t *driver)
+/**
+ * @brief 初始化 XXX Driver 并挂载其中断回调。
+ * @param[in,out] p_driver XXX Driver 对象指针。
+ * @param[in] pf_int_callback_register 外部中断回调挂载函数。
+ * @param[in] pf_dma_callback_register DMA 回调挂载函数。
+ * @return bsp_xxx_status_t 操作状态。
+ */
+bsp_xxx_status_t bsp_xxx_driver_init(
+    bsp_xxx_driver_t * const p_driver,
+    bsp_xxx_callback_register_t pf_int_callback_register,
+    bsp_xxx_callback_register_t pf_dma_callback_register)
 {
     bsp_xxx_status_t status;
 
-    if ((driver == NULL) || (driver->port_ops == NULL))
+    if ((p_driver == NULL) || (p_driver->p_port_ops == NULL) ||
+        (pf_int_callback_register == NULL) ||
+        (pf_dma_callback_register == NULL))
     {
         return BSP_XXX_ERR_ARGUMENT;
     }
-    if (driver->initialized)
+    if (p_driver->initialized)
     {
         return BSP_XXX_OK;
     }
 
-    status = driver->port_ops->init(driver->port_context);
-    if (status == BSP_XXX_OK)
+    status = p_driver->p_port_ops->pf_init(p_driver->p_port_context);
+    if (status != BSP_XXX_OK)
     {
-        driver->initialized = true;
+        return status;
     }
-    return status;
+
+    status = pf_int_callback_register(bsp_xxx_int_interrupt_callback);
+    if (status != BSP_XXX_OK)
+    {
+        return status;
+    }
+
+    status = pf_dma_callback_register(bsp_xxx_dma_interrupt_callback);
+    if (status != BSP_XXX_OK)
+    {
+        return status;
+    }
+
+    p_driver->initialized = true;
+    return BSP_XXX_OK;
 }
 
-bsp_xxx_status_t bsp_xxx_driver_control(bsp_xxx_driver_t *driver,
-                                        uint32_t command, void *argument)
+/**
+ * @brief 向已初始化的 XXX Driver 转发控制命令。
+ * @param[in] p_driver XXX Driver 对象指针。
+ * @param[in] command 控制命令。
+ * @param[in] p_argument 命令参数指针。
+ * @return bsp_xxx_status_t 操作状态。
+ */
+bsp_xxx_status_t bsp_xxx_driver_control(
+    bsp_xxx_driver_t * const p_driver,
+    uint32_t command,
+    void * const p_argument)
 {
-    if ((driver == NULL) || !driver->initialized ||
-        (driver->port_ops == NULL))
+    if ((p_driver == NULL) || !p_driver->initialized ||
+        (p_driver->p_port_ops == NULL) ||
+        (p_driver->p_port_ops->pf_control == NULL))
     {
         return BSP_XXX_ERR_STATE;
     }
-    return driver->port_ops->control(driver->port_context, command, argument);
+
+    return p_driver->p_port_ops->pf_control(
+        p_driver->p_port_context, command, p_argument);
 }

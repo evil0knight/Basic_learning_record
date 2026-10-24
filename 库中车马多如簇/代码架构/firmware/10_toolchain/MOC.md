@@ -1,22 +1,21 @@
-# toolchain
+﻿# 10_toolchain
 
-[← firmware](../MOC.md) | [← 嵌入式工程架构](../../../../术中自有万钟粟/嵌入式工程架构/MOC.md) | [← 模块总览](../../../MOC.md) | [← 主页](../../../../index.md)
+[返回工程根目录](../MOC.md) | [返回代码架构](../../MOC.md) | [返回主页](../../../../index.md)
 
----
+## 关键文件
 
-存放 Keil、CMake 等工程文件、链接脚本和构建配置。
+- `MDK-ARM/project.uvprojx`：Keil 工程文件和源文件列表。
+- `MDK-ARM/project.uvoptx`：Keil 调试和下载配置。
+- `MDK-ARM/DebugConfig/`：调试器配置。
+- `MDK-ARM/RTE/`：Keil 运行时环境配置。
+- `MDK-ARM/stm32g474xx_flash.sct`：Flash/RAM 链接布局。
+- `.vscode/`、构建脚本和其他编译配置：工程构建辅助文件。
 
-| 文件/目录 | 作用 |
-| --- | --- |
-| `Toolchain/keil/` | Keil工程文件 |
-| `Toolchain/iar/` | IAR工程文件 |
-| `Toolchain/cmake/` | CMake构建文件 |
-| `Toolchain/linker/` | 链接脚本 |
+## 调用顺序
 
-## toolchain配置:
-
-1. 选择一种编译器工程：Keil、IAR 或 CMake。
-2. 添加 `firmware/`、`Platform/`、`Bsp/`、`Core/` 和 `Drivers/` 源文件。
-3. 配置所有 `inc/`、`Inc/` 目录为头文件搜索路径。
-4. 配置芯片、编译器、链接脚本和启动文件。
-5. 重新生成工程时检查新增文件是否仍在工程列表中。
+```text
+MDK-ARM / build configuration
+    -> compiler and assembler
+    -> linker script
+    -> firmware image
+```

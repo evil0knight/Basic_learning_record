@@ -1,36 +1,64 @@
-#ifndef BSP_XXX_HANDLER_H
-#define BSP_XXX_HANDLER_H
+/******************************************************************************
+ * Copyright (C) 2026 XXXXXXXXXXX, Inc.(Gmbh) or its affiliates.
+ *
+ * All Rights Reserved.
+ *
+ * @file bsp_xxx_handler.h
+ *
+ * @par dependencies
+ * - bsp_xxx_driver.h
+ *
+ * @author YA
+ *
+ * @brief 提供 XXX 设备 Handler 的基础接口。
+ *
+ * Processing flow:
+ *
+ * Handler 初始化 -> Driver 初始化和回调挂载 -> Handler 控制。
+ *
+ * @version V1.0
+ *
+ * @note 1 tab == 4 spaces!
+ *
+ ******************************************************************************/
+#ifndef FIRMWARE_BSP_XXX_HANDLER_H
+#define FIRMWARE_BSP_XXX_HANDLER_H
 
-#include <stddef.h>
 #include <stdint.h>
 
-#include "bsp_xxx_driver.h"
-
-#ifndef BSP_XXX_MAX_INSTANCES
-#define BSP_XXX_MAX_INSTANCES 8U
-#endif
+#include "../driver/bsp_xxx_driver.h"
 
 typedef struct
 {
-    void (*enter)(void *context);
-    void (*exit)(void *context);
-    void *context;
-} bsp_xxx_lock_t;
-
-typedef struct
-{
-    bsp_xxx_driver_t *drivers[BSP_XXX_MAX_INSTANCES];
-    size_t count;
-    const bsp_xxx_lock_t *lock;
+    bsp_xxx_driver_t *p_driver;
 } bsp_xxx_handler_t;
 
-bsp_xxx_status_t bsp_xxx_handler_init(bsp_xxx_handler_t *handler,
-                                      const bsp_xxx_lock_t *lock);
-bsp_xxx_status_t bsp_xxx_handler_register(bsp_xxx_handler_t *handler,
-                                          bsp_xxx_driver_t *driver,
-                                          uint32_t *index);
-bsp_xxx_status_t bsp_xxx_handler_control(bsp_xxx_handler_t *handler,
-                                         uint32_t index, uint32_t command,
-                                         void *argument);
+/**
+ * @brief 初始化 XXX Handler、Driver 和中断回调挂载。
+ * @param[in,out] p_handler XXX Handler 对象指针。
+ * @param[in,out] p_driver XXX Driver 对象指针。
+ * @param[in] p_port_ops 平台接口表指针。
+ * @param[in] p_port_context 平台接口上下文指针。
+ * @return bsp_xxx_status_t 操作状态。
+ */
+bsp_xxx_status_t bsp_xxx_handler_init(
+    bsp_xxx_handler_t * const p_handler,
+    bsp_xxx_driver_t * const p_driver,
+    const bsp_xxx_port_ops_t * const p_port_ops,
+    void * const p_port_context);
 
-#endif
+/**
+ * @brief 向 XXX Driver 转发控制命令。
+ * @param[in] p_handler XXX Handler 对象指针。
+ * @param[in] index 设备索引。单设备 Handler 只接受 0。
+ * @param[in] command 控制命令。
+ * @param[in] p_argument 命令参数指针。
+ * @return bsp_xxx_status_t 操作状态。
+ */
+bsp_xxx_status_t bsp_xxx_handler_control(
+    bsp_xxx_handler_t * const p_handler,
+    uint32_t index,
+    uint32_t command,
+    void * const p_argument);
+
+#endif /* FIRMWARE_BSP_XXX_HANDLER_H */

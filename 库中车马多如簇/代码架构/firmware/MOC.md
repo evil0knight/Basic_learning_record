@@ -1,30 +1,26 @@
-# firmware
+﻿# firmware
 
-[←MOC](../MOC.md) | [←主页](../../../index.md)
-[←返回嵌入式工程架构](../../../术中自有万钟粟/嵌入式工程架构/MOC.md)
+[返回代码架构](../MOC.md) | [返回主页](../../../index.md)
 
----
+## 关键目录
 
-下载当前 firmware 文件夹。
+- [01_app](./01_app/app_init/MOC.md)：应用初始化、ISR 回调和用户任务。
+- [02_service](./02_service/MOC.md)：业务服务和功能流程。
+- [03_config](./03_config/MOC.md)：板级、功能、RTOS、CubeMX 和版本配置。
+- [04_platform](./04_platform/platform_bsp/MOC.md)：Platform MCU、BSP Adapter 和 Wrapper。
+- [05_bsp](./05_bsp/MOC.md)：设备 Handler 和 Driver。
+- [06_middlewares](./06_middlewares/MOC.md)：算法、通信、文件系统、图形库和 Vendor 组件。
+- [07_os](./07_os/MOC.md)：OS 适配和系统资源。
+- [08_core](./08_core/MOC.md)：芯片启动、系统初始化和中断入口。
+- [09_drivers](./09_drivers/MOC.md)：CMSIS、芯片 HAL 和底层驱动包。
+- [10_toolchain](./10_toolchain/MOC.md)：编译器、Keil 工程和链接脚本。
 
-| 根目录   | 1级                                               | 2级                                                          | 3级                                                                             |
-| -------- | ------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| firmware | 01_app                                            | [app_init](./01_app/app_init/MOC.md)                 |                                                                                 |
-|          |                                                   | [app_isr_handlers](./01_app/app_isr_handlers/MOC.md) |                                                                                 |
-|          |                                                   | [ui](./01_app/ui/MOC.md)                             |                                                                                 |
-|          | [02_service](./02_service/MOC.md)         |                                                              |                                                                                 |
-|          | [03_config](./03_config/MOC.md)           |                                                              |                                                                                 |
-|          | 04_platform                                       | [platform_bsp](./04_platform/platform_bsp/MOC.md)      | bsp_wrapper                                                                     |
-|          |                                                   |                                                              | bsp_adapter                                                                     |
-|          |                                                   | [platform_mcu](./04_platform/platform_mcu/MOC.md)    | [GPIO Port](./04_platform/platform_mcu/gpio/MOC.md)                     |
-|          |                                                   | platform_os                                                  | [inc](./04_platform/platform_os/inc/MOC.md)                             |
-|          |                                                   |                                                              | [os_wrapper](./04_platform/platform_os/os_wrapper/MOC.md)               |
-|          |                                                   |                                                              | [os_implementation](./04_platform/platform_os/os_implementation/MOC.md) |
-|          | 05_bsp                                            | bsp_xxx                                                      | [driver](./05_bsp/bsp_xxx/driver/MOC.md)                                |
-|          |                                                   |                                                              | [handler](./05_bsp/bsp_xxx/handler/MOC.md)                              |
-|          | [06_middlewares](./06_middlewares/MOC.md) |                                                              |                                                                                 |
-|          | [07_os](./07_os/MOC.md)                   |                                                              |                                                                                 |
-|          | [08_core](./08_core/MOC.md)               |                                                              |                                                                                 |
-|          | [09_drivers](./09_drivers/MOC.md)         |                                                              |                                                                                 |
-|          | [10_toolchain](./10_toolchain/MOC.md)     |                                                              |                                                                                 |
-|          | [11_utils](./11_utils/MOC.md)             |                                                              |                                                                                 |
+## 调用顺序
+
+```text
+Core 启动
+    -> Platform MCU / OS 初始化
+    -> BSP Driver / Handler
+    -> Service
+    -> App
+```

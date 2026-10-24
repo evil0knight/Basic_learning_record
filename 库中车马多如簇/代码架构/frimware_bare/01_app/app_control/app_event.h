@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Copyright (C) 2026 YA.
  *
  * All Rights Reserved.
@@ -10,23 +10,22 @@
  *
  * @author YA
  *
- * @brief 表驱法裸机框架：app_event.h
+ * @brief 定义应用状态、事件和处理状态码。
  *
- * 处理流程：中断入队，主循环按消息表与状态表处理。
+ * Processing flow:
+ *
+ * Driver 产生事件，应用控制层按事件查表处理。
  *
  * @version V1.0
  *
  * @note 1 tab == 4 spaces!
  *
  *****************************************************************************/
-
 #ifndef APP_EVENT_H
 #define APP_EVENT_H
 
-//********************************Includes*********************************//
-//********************************Includes*********************************//
-
-typedef enum {
+typedef enum
+{
     APP_STATUS_OK = 0,
     APP_STATUS_INVALID_PARAM,
     APP_STATUS_QUEUE_EMPTY,
@@ -35,12 +34,17 @@ typedef enum {
     APP_STATUS_IO_ERROR
 } app_status_t;
 
-typedef enum {
+typedef enum
+{
     EVENT_NONE = 0,
+    EVENT_UART1_RX_READY,
+    EVENT_CAN1_RX_READY,
+    EVENT_ADC_READY,
     EVENT_START,
     EVENT_STOP,
     EVENT_FAULT,
     EVENT_MAX
 } app_event_t;
 
-#endif
+#endif /* APP_EVENT_H */
+

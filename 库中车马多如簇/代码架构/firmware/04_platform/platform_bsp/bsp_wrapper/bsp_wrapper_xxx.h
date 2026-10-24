@@ -1,5 +1,5 @@
-#ifndef BSP_WRAPPER_XXX_H
-#define BSP_WRAPPER_XXX_H
+#ifndef FIRMWARE_BSP_WRAPPER_XXX_H
+#define FIRMWARE_BSP_WRAPPER_XXX_H
 
 #include <stdbool.h>
 #include <stdint.h>
