@@ -23,6 +23,7 @@
  *
  *****************************************************************************/
 #include "msg_queue.h"
+#include "../../04_platform/platform_mcu/critical/inc/critical_port.h"
 
 #include <stddef.h>
 
@@ -54,21 +55,39 @@ app_status_t queue_init(msg_queue_t * const p_queue)
  */
 app_status_t queue_push(msg_queue_t * const p_queue, app_event_t event)
 {
+    uint32_t u32_irq_state;
+    app_status_t en_status = APP_STATUS_OK;
+
+    //----------------------------参数校验begin----------------------------//
     if ((NULL == p_queue) ||
         ((unsigned int)event >= (unsigned int)EVENT_MAX))
     {
         return APP_STATUS_INVALID_PARAM;
     }
-    if (((uint8_t)MSG_QUEUE_SIZE <= p_queue->u8_count))
-    {
-        return APP_STATUS_QUEUE_FULL;
-    }
+    //-----------------------------参数校验end-----------------------------//
 
-    p_queue->a_buffer[p_queue->u8_head] = event;
-    p_queue->u8_head =
-        (uint8_t)((p_queue->u8_head + 1U) % MSG_QUEUE_SIZE);
-    p_queue->u8_count++;
-    return APP_STATUS_OK;
+    // 保存中断状态，保护满队列检查、事件写入和游标更新。
+    if (PLATFORM_CRITICAL_OK != platform_critical_enter(&u32_irq_state))
+    {
+        return APP_STATUS_IO_ERROR;
+    }
+    if ((uint8_t)MSG_QUEUE_SIZE <= p_queue->u8_count)
+    {
+        en_status = APP_STATUS_QUEUE_FULL;
+    }
+    else
+    {
+        p_queue->a_buffer[p_queue->u8_head] = event;
+        p_queue->u8_head =
+            (uint8_t)((p_queue->u8_head + 1U) % MSG_QUEUE_SIZE);
+        p_queue->u8_count++;
+    }
+    // 满队列也从这里退出，恢复调用前的中断状态。
+    if (PLATFORM_CRITICAL_OK != platform_critical_exit(u32_irq_state))
+    {
+        return APP_STATUS_IO_ERROR;
+    }
+    return en_status;
 }
 
 /**
@@ -81,20 +100,38 @@ app_status_t queue_pop(
     msg_queue_t * const p_queue,
     app_event_t * const p_event)
 {
+    uint32_t u32_irq_state;
+    app_status_t en_status = APP_STATUS_OK;
+
+    //----------------------------参数校验begin----------------------------//
     if ((NULL == p_queue) || (NULL == p_event))
     {
         return APP_STATUS_INVALID_PARAM;
     }
+    //-----------------------------参数校验end-----------------------------//
+
+    // 保护空队列检查、事件读取和游标更新，避免中断入队交错。
+    if (PLATFORM_CRITICAL_OK != platform_critical_enter(&u32_irq_state))
+    {
+        return APP_STATUS_IO_ERROR;
+    }
     if (0U == p_queue->u8_count)
     {
-        return APP_STATUS_QUEUE_EMPTY;
+        en_status = APP_STATUS_QUEUE_EMPTY;
     }
-
-    *p_event = p_queue->a_buffer[p_queue->u8_tail];
-    p_queue->u8_tail =
-        (uint8_t)((p_queue->u8_tail + 1U) % MSG_QUEUE_SIZE);
-    p_queue->u8_count--;
-    return APP_STATUS_OK;
+    else
+    {
+        *p_event = p_queue->a_buffer[p_queue->u8_tail];
+        p_queue->u8_tail =
+            (uint8_t)((p_queue->u8_tail + 1U) % MSG_QUEUE_SIZE);
+        p_queue->u8_count--;
+    }
+    // 恢复原状态后，调用者才能继续查表和解码。
+    if (PLATFORM_CRITICAL_OK != platform_critical_exit(u32_irq_state))
+    {
+        return APP_STATUS_IO_ERROR;
+    }
+    return en_status;
 }
 
 

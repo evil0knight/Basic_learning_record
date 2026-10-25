@@ -1,6 +1,6 @@
-﻿# USART Port
+# USART Port
 
-[← UART 模块](../MOC.md) | [← 主页](../../../index.md)
+[← UART 模块](../../../MOC.md) | [← 主页](../../../../../index.md)
 
 ## 文件
 

@@ -12,7 +12,7 @@ UART 外设库：platform_mcu 层 Port（`core_usart_*`），HAL + DMA + 回调�
 
 | 目录 | 作用 |
 | --- | --- |
-| [UART_Port](./UART_Port/MOC.md) | `core_usart_*` 接口 + HAL 分发 + DMA + 回调 + 静态表 |
+| [04_platform/platform_mcu/uart](./04_platform/platform_mcu/uart/MOC.md) | `core_usart_*` 接口 + HAL 分发 + DMA + 回调 + 静态表 |
 | [知识](./知识/MOC.md) | UART 协议、波特率、电平、收发写法等笔记 |
 
 ## 依赖

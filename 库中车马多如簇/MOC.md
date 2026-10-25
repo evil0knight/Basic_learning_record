@@ -22,7 +22,7 @@
 |    WiFi 模块    |                 涂鸦 WiFi 模组                 | [WiFi 模块笔记](./WiFi模块/WiFi模块.md)                 |
 |    FT辉芒微    |                     skill                     | [FT辉芒微/MOC.md](FT辉芒微/MOC.md)                      |
 |       LED       |                BSP分层驱动架构                | [BSP_LED](LED/BSP_LED/MOC.md)                           |
-|      UART      |                    UART大全                    | [UART](../库中车马多如簇/UART/MOC.md) |
+|      UART      |          循环 DMA、OSAL 前后端、环形缓冲          | [UART](../库中车马多如簇/UART/MOC.md) |
 |       CAN       |                    CAN总线                    | [CAN](./CAN总线/MOC.md)                                 |
 |  外设文件模板  |                   SKILL要用                   | [外设文件模板.md](外设文件模板.md)                      |
 |    433 模块    |                  433MHz 无线                  | [433模块笔记](./433模块/MOC.md)                         |
@@ -30,7 +30,7 @@
 |      麦轮      |            麦克纳姆轮原理与底盘解算            | [麦轮笔记](./麦轮/MOC.md)                               |
 |     超声波     |           HC-SR04 测距，输入捕获驱动           | [超声波笔记](./超声波/MOC.md)                           |
 |     编码器     |         正交编码器测速，TIM 编码器模式         | [编码器笔记](./编码器/MOC.md)                           |
-|     缓冲区     |        单缓冲,双缓冲,环形缓冲,乒乓缓冲        | [缓冲区笔记](缓冲区/MOC.md)                             |
+|     缓冲区     |        独立字节环形缓冲中间件，无 HAL / OS 依赖        | [缓冲区](缓冲区/MOC.md)                             |
 |   EasyLogger   |         嵌入式日志库，源码 + keil 移植         | [使用方法](../术中自有万钟粟/debug方法/EasyLogger.md)   |
 |      Flash      |        片内与外部 Flash 擦除、读写驱动        | [Flash](./Flash/MOC.md)                                 |
 |     Ymodem     |         文件传输协议，源码 + 协议笔记         | [Ymodem](./Ymodem/MOC.md)                               |
