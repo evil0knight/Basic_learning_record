@@ -29,5 +29,6 @@
 user_isr_callback_t pf_pin_interrupt_callback = NULL;
 user_isr_callback_t pf_dma_interrupt_callback = NULL;
 user_isr_callback_t pf_int_interrupt_callback = NULL;
+user_isr_callback_t pf_tim_interrupt_callback = NULL;
 
 

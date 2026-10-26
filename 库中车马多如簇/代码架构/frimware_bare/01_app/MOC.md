@@ -12,8 +12,10 @@
   `queue_init()` 初始化，`queue_push()` 写入 `app_event_t`，`queue_pop()` 取出事件。
 - [msg_dispatcher.h](./app_message/msg_dispatcher.h) / [msg_dispatcher.c](./app_message/msg_dispatcher.c)：(不需要添加)
   排空事件队列并调用 `app_control_event_map()`；`do_read_message()` 负责主循环事件处理。
+- [app_loop.h](./app_loop/app_loop.h) / [app_loop.c](./app_loop/app_loop.c)：(需要添加后台轮询与 ISR 处理)
+  主循环后台轮询与定时器 ISR 回调入口；`app_loop_init()` 挂载 `pf_tim_interrupt_callback`，`do_loop()` 由主循环调用，`do_loop_tick()` 由定时器 ISR 调用。
 - [user_isr_handlers.h](./app_isr_handlers/user_isr_handlers.h) / [user_isr_handlers.c](./app_isr_handlers/user_isr_handlers.c)：(需要添加中断回调函数)
-  保存 HAL 中断回调指针，由 Driver 回调产生 `EVENT_xxx` 并写入事件队列。
+  保存 HAL 中断回调指针（含 `pf_tim_interrupt_callback`），由 Driver 回调产生 `EVENT_xxx` 并写入事件队列，或由 app 层挂载后台处理函数。
 
 ## 调用顺序
 
@@ -28,4 +30,19 @@ HAL 中断回调
     -> pf_action
     -> Service
     -> Wrapper / Adapter / Handler / Driver
+```
+
+## 定时器 ISR 调用链
+
+```text
+HAL_TIM_PeriodElapsedCallback
+    -> pf_tim_interrupt_callback
+    -> do_loop_tick()           （由 app_loop_init() 挂载）
+```
+
+主循环 `while` 并列调用：
+
+```text
+do_read_message()   // 事件驱动
+do_loop()           // 后台轮询（周期关键处理由定时器 ISR 抢占）
 ```

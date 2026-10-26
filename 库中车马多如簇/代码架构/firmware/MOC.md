@@ -1,6 +1,10 @@
-﻿# firmware
+# firmware
 
 [返回代码架构](../MOC.md) | [返回主页](../../../index.md)
+
+## 入口参考
+
+- [main_frame.c](08_core/Core/Src/main_frame.c)：RTOS 入口参考。使用时手动合入 CubeMX 生成的 main.c，合并后手动删除参考文件；合并前排除编译。
 
 ## 关键目录
 

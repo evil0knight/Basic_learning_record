@@ -1,11 +1,12 @@
-﻿# 08_core
+# 08_core
 
 [返回工程根目录](../MOC.md) | [返回代码架构](../../MOC.md) | [返回主页](../../../../index.md)
 
 ## 关键文件
 
 - `Core/Inc/`：CubeMX 生成的系统、外设和中断头文件。
-- `Core/Src/main.c`：工程启动入口。
+- `Core/Src/main.c`：CubeMX 生成的正式工程入口。
+- [main_frame.c](Core/Src/main_frame.c)：框架入口参考，排除编译；使用时手动合入同目录的 `main.c`，合并后手动删除。
 - `Core/Src/stm32g4xx_it.c`：中断入口和 HAL 中断转发。
 - `Core/Src/system_stm32g4xx.c`：系统时钟和芯片启动支持。
 - `Core/Src/*_msp.c`：HAL 外设底层初始化。

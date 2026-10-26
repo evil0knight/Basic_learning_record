@@ -24,6 +24,7 @@
  *
  *****************************************************************************/
 #include "01_app/app_control/app_control.h"
+#include "01_app/app_loop/app_loop.h"
 #include "01_app/app_message/msg_dispatcher.h"
 #include "01_app/app_message/msg_queue.h"
 
@@ -35,19 +36,20 @@
  */
 int main(void)
 {
-    
+
     if ((APP_STATUS_OK != queue_init(&g_msg_queue)) ||
-        (APP_STATUS_OK != app_control_init())) {
+        (APP_STATUS_OK != app_control_init()) ||
+        (APP_STATUS_OK != app_loop_init())) {
         return 1;
     }
-    
-    while (1) {
-        
-        (void)do_read_message();
-        
-        
 
-        
+    while (1) {
+        //-------------------事件驱动：处理消息队列 begin-------------------//
+        (void)do_read_message();
+        //--------------------事件驱动：处理消息队列 end--------------------//
+        //-----------后台轮询：周期关键处理由定时器 ISR 抢占 begin-----------//
+        (void)do_loop();
+        //------------后台轮询：周期关键处理由定时器 ISR 抢占 end------------//
     }
 }
 

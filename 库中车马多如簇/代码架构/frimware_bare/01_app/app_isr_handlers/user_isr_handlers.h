@@ -31,5 +31,6 @@ typedef void (*user_isr_callback_t)(void *p_object, void *p_data);
 extern user_isr_callback_t pf_pin_interrupt_callback;
 extern user_isr_callback_t pf_dma_interrupt_callback;
 extern user_isr_callback_t pf_int_interrupt_callback;
+extern user_isr_callback_t pf_tim_interrupt_callback;
 
 #endif /* FRIMWARE_BARE_USER_ISR_HANDLERS_H */

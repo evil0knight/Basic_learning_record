@@ -23,7 +23,8 @@
    3. 写文件,搭建框架,增加索引的时候:  看[写md文件](.claude\skills\写md文件.md)
    4. 写代码.c.h的时候：				    看[写C和H代码](.claude/skills/写C和H代码.md)
    5. 视频拿不到字幕,需要转写音频的时候：  看[音频转写](.claude/skills/音频转写.md)
-   6. 用户明确要求上传 GitHub 时：直接运行
+   6. 查会话 token 用量和花费的时候：      看[用量统计](.claude/skills/用量统计.md)
+   7. 用户明确要求上传 GitHub 时：直接运行
 
 ---
 
