@@ -299,7 +299,7 @@ en_core_usart_status_t core_usart_receive(
 }
 
 /**
- * @brief 以 DMA 方式发送数据。
+ * @brief 以 DMA 方式发送数据,发送完缓冲区就回调一次
  *
  * @param[in] instance 逻辑串口实例。
  * @param[in] p_data 发送缓冲区。
@@ -328,7 +328,7 @@ en_core_usart_status_t core_usart_transmit_dma(
 }
 
 /**
- * @brief 以 DMA 方式启动一轮接收。
+ * @brief 以 DMA 方式启动一轮接收
  *
  * @param[in] instance 逻辑串口实例。
  * @param[out] p_data 接收缓冲区。
@@ -552,107 +552,142 @@ UART_HandleTypeDef *core_usart_get_handle(
 
     return g_usart_configs[instance].p_handle;
 }
-//************************* Function Definitions end *************************//
 
-//**************************** ISR Handlers begin ****************************//
 /**
- * @brief UART 接收完成回调。
+ * @brief 转发 HAL 接收完成事件到已注册的 RX 回调。
  *
- * @param[in] p_handle 触发回调的 UART HAL 句柄。
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *p_handle)
+en_core_usart_status_t core_usart_irq_rx_complete(
+    UART_HandleTypeDef *p_handle)
 {
     en_core_usart_instance_t instance;
 
     //-------------------------参数检查 begin-------------------------//
     if (NULL == p_handle)
     {
-        return;
+        return CORE_USART_ERR_ARGUMENT;
     }
     //--------------------------参数检查 end--------------------------//
 
     instance = core_usart_instance_from_handle(p_handle);
-    if (((uint32_t)instance < (uint32_t)CORE_USART_MAX) &&
-        (NULL != g_pf_usart_rx_callbacks[instance]))
+    if (CORE_USART_MAX == instance)
+    {
+        return CORE_USART_ERR_NOT_CONFIGURED;
+    }
+
+    if (NULL != g_pf_usart_rx_callbacks[instance])
     {
         /* 普通接收完成没有实际长度信息，由上层按固定长度处理。 */
         g_pf_usart_rx_callbacks[instance](NULL, 0U);
     }
+
+    return CORE_USART_OK;
 }
 
 /**
- * @brief UART 发送完成回调。
+ * @brief 转发 HAL 发送完成事件到已注册的 TX 回调。
  *
- * @param[in] p_handle 触发回调的 UART HAL 句柄。
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *p_handle)
+en_core_usart_status_t core_usart_irq_tx_complete(
+    UART_HandleTypeDef *p_handle)
 {
     en_core_usart_instance_t instance;
 
     //-------------------------参数检查 begin-------------------------//
     if (NULL == p_handle)
     {
-        return;
+        return CORE_USART_ERR_ARGUMENT;
     }
     //--------------------------参数检查 end--------------------------//
 
     instance = core_usart_instance_from_handle(p_handle);
-    if (((uint32_t)instance < (uint32_t)CORE_USART_MAX) &&
-        (NULL != g_pf_usart_tx_callbacks[instance]))
+    if (CORE_USART_MAX == instance)
+    {
+        return CORE_USART_ERR_NOT_CONFIGURED;
+    }
+
+    if (NULL != g_pf_usart_tx_callbacks[instance])
     {
         g_pf_usart_tx_callbacks[instance]();
     }
+
+    return CORE_USART_OK;
 }
 
 /**
- * @brief UART 错误回调。
+ * @brief 转发 HAL 错误事件到已注册的错误回调。
  *
- * @param[in] p_handle 触发回调的 UART HAL 句柄。
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
  */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *p_handle)
+en_core_usart_status_t core_usart_irq_error(
+    UART_HandleTypeDef *p_handle)
 {
     en_core_usart_instance_t instance;
 
     //-------------------------参数检查 begin-------------------------//
     if (NULL == p_handle)
     {
-        return;
+        return CORE_USART_ERR_ARGUMENT;
     }
     //--------------------------参数检查 end--------------------------//
 
     instance = core_usart_instance_from_handle(p_handle);
-    if (((uint32_t)instance < (uint32_t)CORE_USART_MAX) &&
-        (NULL != g_pf_usart_error_callbacks[instance]))
+    if (CORE_USART_MAX == instance)
+    {
+        return CORE_USART_ERR_NOT_CONFIGURED;
+    }
+
+    if (NULL != g_pf_usart_error_callbacks[instance])
     {
         g_pf_usart_error_callbacks[instance](p_handle->ErrorCode);
     }
+
+    return CORE_USART_OK;
 }
 
 /**
- * @brief UART 空闲线或 DMA 缓冲区接收满事件回调。
+ * @brief 转发 HAL 空闲线或 DMA 接收事件到 RX 回调。
  *
- * @param[in] p_handle 触发回调的 UART HAL 句柄。
- * @param[in] size 本次实际接收字节数。
+ * @param[in] p_handle HAL UART 句柄。
+ * @param[in] u16_size 本次实际接收字节数。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
  */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *p_handle, uint16_t size)
+en_core_usart_status_t core_usart_irq_rx_event(
+    UART_HandleTypeDef *p_handle,
+    uint16_t u16_size)
 {
     en_core_usart_instance_t instance;
 
     //-------------------------参数检查 begin-------------------------//
     if (NULL == p_handle)
     {
-        return;
+        return CORE_USART_ERR_ARGUMENT;
     }
     //--------------------------参数检查 end--------------------------//
 
     instance = core_usart_instance_from_handle(p_handle);
-    if (((uint32_t)instance < (uint32_t)CORE_USART_MAX) &&
-        (NULL != g_pf_usart_rx_callbacks[instance]))
+    if (CORE_USART_MAX == instance)
+    {
+        return CORE_USART_ERR_NOT_CONFIGURED;
+    }
+
+    if (NULL != g_pf_usart_rx_callbacks[instance])
     {
         g_pf_usart_rx_callbacks[instance](
-            g_p_usart_rx_buffer[instance], size);
+            g_p_usart_rx_buffer[instance], u16_size);
     }
+
+    return CORE_USART_OK;
 }
-//***************************** ISR Handlers end *****************************//
+//************************* Function Definitions end *************************//
 
 //******************************* End of File ********************************//

@@ -9,10 +9,13 @@
 | [usart_port.h](./inc/usart_port.h) / [usart_port.c](./src/usart_port.c) | `core_usart_*` 接口 + HAL 分发 + DMA + 回调桥 |
 | [usart_port_config.h](./inc/usart_port_config.h)                     | 槽位表（HAL 句柄 + 波特率 + 超时）              |
 
+HAL 中断回调入口位于
+[user_isr_handlers.c](../../../01_app/app_isr_handlers/user_isr_handlers.c)，
+Port 只提供 `core_usart_irq_*` 分发接口。
+
 ## port文件的使用
 
-1. 无论使用 DMA 还是阻塞/中断模式，都要先在 Port 配置表中注册 UART 句柄。
-2. 在 `inc/usart_port_config.h` 中配置逻辑实例：
+1. 在 `inc/usart_port_config.h` 中配置逻辑实例：
 
 ```c
 static const st_usart_config_t g_usart_configs[CORE_USART_MAX] = {

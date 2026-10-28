@@ -229,6 +229,48 @@ en_core_usart_status_t core_usart_register_error_callback(
  */
 UART_HandleTypeDef *core_usart_get_handle(
     en_core_usart_instance_t instance);
+
+/**
+ * @brief 转发 HAL 接收完成事件到已注册的 RX 回调。
+ *
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
+ */
+en_core_usart_status_t core_usart_irq_rx_complete(
+    UART_HandleTypeDef *p_handle);
+
+/**
+ * @brief 转发 HAL 发送完成事件到已注册的 TX 回调。
+ *
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
+ */
+en_core_usart_status_t core_usart_irq_tx_complete(
+    UART_HandleTypeDef *p_handle);
+
+/**
+ * @brief 转发 HAL 错误事件到已注册的错误回调。
+ *
+ * @param[in] p_handle HAL UART 句柄。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
+ */
+en_core_usart_status_t core_usart_irq_error(
+    UART_HandleTypeDef *p_handle);
+
+/**
+ * @brief 转发 HAL 空闲线或 DMA 接收事件到 RX 回调。
+ *
+ * @param[in] p_handle HAL UART 句柄。
+ * @param[in] u16_size 本次实际接收字节数。
+ * @return USART 操作状态。
+ * @note 仅供 App ISR Handler 调用。
+ */
+en_core_usart_status_t core_usart_irq_rx_event(
+    UART_HandleTypeDef *p_handle,
+    uint16_t u16_size);
 //************************* Function Prototypes end **************************//
 
 #endif /* USART_PORT_H */
