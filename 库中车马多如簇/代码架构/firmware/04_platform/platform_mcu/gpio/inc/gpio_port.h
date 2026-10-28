@@ -27,11 +27,14 @@
 #ifndef GPIO_PORT_H
 #define GPIO_PORT_H
 
+//******************************** Includes *********************************//
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "main.h"
+//******************************** Includes *********************************//
 
+//******************************** Typedefs *********************************//
 typedef enum
 {
     CORE_GPIO_OK = 0,
@@ -65,76 +68,69 @@ typedef struct
     en_core_gpio_pin_state_t default_state;
     bool initialize_output;
 } st_core_gpio_config_t;
+//******************************** Typedefs *********************************//
 
-/**
- * @brief Register a physical GPIO pin under a logical pin identifier.
- * @param[in] id Logical GPIO pin identifier.
- * @param[in] config Physical pin and initialization configuration.
- * @return GPIO access status.
- */
-en_core_gpio_status_t core_gpio_register(en_core_gpio_pin_t id,
-                                         const st_core_gpio_config_t *config);
+//******************************** Defines **********************************//
 
+//******************************** Defines **********************************//
+
+//******************************** APIs *************************************//
 /**
- * @brief Apply the configured default state to all registered output pins.
- * @return GPIO access status.
+ * @brief 为已配置的输出引脚应用默认电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_init(void);
 
 /**
- * @brief Write a logical GPIO pin.
- * @param[in] id Logical GPIO pin identifier.
- * @param[in] state Output state.
- * @return GPIO access status.
+ * @brief 设置逻辑 GPIO 引脚电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @param[in] state 输出电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_write_pin(en_core_gpio_pin_t id,
                                           en_core_gpio_pin_state_t state);
 
 /**
- * @brief Read a logical GPIO pin.
- * @param[in] id Logical GPIO pin identifier.
- * @param[out] state Pin state output.
- * @return GPIO access status.
+ * @brief 读取逻辑 GPIO 引脚电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @return 引脚电平；标识无效或引脚未配置时返回 CORE_GPIO_PIN_RESET。
  */
-en_core_gpio_status_t core_gpio_read_pin(en_core_gpio_pin_t id,
-                                         en_core_gpio_pin_state_t *state);
+en_core_gpio_pin_state_t core_gpio_read_pin(en_core_gpio_pin_t id);
 
 /**
- * @brief Toggle a logical GPIO output pin.
- * @param[in] id Logical GPIO pin identifier.
- * @return GPIO access status.
+ * @brief 翻转逻辑 GPIO 输出电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_toggle_pin(en_core_gpio_pin_t id);
 
 /**
- * @brief Write a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @param[in] state Output state.
- * @return GPIO access status.
+ * @brief 直接设置物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @param[in] state 输出电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_write_pin_direct(GPIO_TypeDef *port,
                                                  uint16_t pin,
                                                  GPIO_PinState state);
 
 /**
- * @brief Read a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @param[out] state Pin state output.
- * @return GPIO access status.
+ * @brief 直接读取物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @return 引脚电平；端口为空或引脚掩码为零时返回 GPIO_PIN_RESET。
  */
-en_core_gpio_status_t core_gpio_read_pin_direct(GPIO_TypeDef *port,
-                                                uint16_t pin,
-                                                GPIO_PinState *state);
+GPIO_PinState core_gpio_read_pin_direct(GPIO_TypeDef *port, uint16_t pin);
 
 /**
- * @brief Toggle a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @return GPIO access status.
+ * @brief 直接翻转物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_toggle_pin_direct(GPIO_TypeDef *port,
                                                   uint16_t pin);
+//******************************** APIs *************************************//
 
 #endif

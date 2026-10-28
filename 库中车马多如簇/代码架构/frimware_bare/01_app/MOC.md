@@ -4,6 +4,8 @@
 
 ## 关键文件
 
+- [user_init.h](./app_init/user_init.h) / [user_init.c](./app_init/user_init.c)：(需要在接入新子模块时追加 init 调用)
+  裸机 App 层统一初始化入口；`UserAppInit()` 由 `main` 在进入 `while(1)` 前调用，依次初始化事件队列、状态机、主循环 ISR 回调，后续子模块 init 顺序接入。
 - [app_control.h](./app_control/app_control.h) / [app_control.c](./app_control/app_control.c)：(需要添加事件状态转移表)
   定义应用状态、事件和状态转移表，并维护当前状态；
   `app_control_event_map()` 按事件查表并执行已接入的 `pf_action`，`app_control_init()` 初始化状态，`app_control_get_current()` 读取当前状态。
@@ -18,6 +20,12 @@
   保存 HAL 中断回调指针（含 `pf_tim_interrupt_callback`），由 Driver 回调产生 `EVENT_xxx` 并写入事件队列，或由 app 层挂载后台处理函数。
 
 ## 调用顺序
+
+```text
+main
+    -> UserAppInit()          // 队列 / 状态机 / 主循环 ISR 回调等 init
+    -> while(1) { do_read_message(); do_loop(); }
+```
 
 ```text
 HAL 中断回调

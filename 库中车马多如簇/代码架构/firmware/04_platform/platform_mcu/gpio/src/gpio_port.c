@@ -7,7 +7,8 @@
  *
  * @par dependencies
  * - gpio_port.h
- * - string.h
+ * - gpio_port_config.h
+ * - stddef.h
  *
  * @author YA
  *
@@ -25,39 +26,13 @@
 
 #include "gpio_port.h"
 
-#include <string.h>
+#include "gpio_port_config.h"
 
-typedef struct
-{
-    st_core_gpio_config_t config;
-    bool registered;
-} st_core_gpio_slot_t;
-
-static st_core_gpio_slot_t g_gpio_slots[CORE_GPIO_PIN_MAX];
+#include <stddef.h>
 
 /**
- * @brief Register a physical GPIO pin under a logical pin identifier.
- * @param[in] id Logical GPIO pin identifier.
- * @param[in] config Physical pin and initialization configuration.
- * @return GPIO access status.
- */
-en_core_gpio_status_t core_gpio_register(en_core_gpio_pin_t id,
-                                         const st_core_gpio_config_t *config)
-{
-    if ((id >= CORE_GPIO_PIN_MAX) || (config == NULL) ||
-        (config->port == NULL) || (config->pin == 0U))
-    {
-        return CORE_GPIO_ERR_ARGUMENT;
-    }
-
-    g_gpio_slots[id].config = *config;
-    g_gpio_slots[id].registered = true;
-    return CORE_GPIO_OK;
-}
-
-/**
- * @brief Apply the configured default state to all registered output pins.
- * @return GPIO access status.
+ * @brief 为已配置的输出引脚应用默认电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_init(void)
 {
@@ -65,15 +40,16 @@ en_core_gpio_status_t core_gpio_init(void)
 
     for (id = (en_core_gpio_pin_t)0; id < CORE_GPIO_PIN_MAX; id++)
     {
-        const st_core_gpio_slot_t *slot = &g_gpio_slots[id];
+        const st_core_gpio_config_t *p_config = &g_gpio_configs[id];
 
-        if (slot->registered && slot->config.initialize_output)
+        if ((NULL != p_config->port) && (0U != p_config->pin) &&
+            p_config->initialize_output)
         {
-            GPIO_PinState state = (slot->config.default_state == CORE_GPIO_PIN_SET)
+            GPIO_PinState state = (p_config->default_state == CORE_GPIO_PIN_SET)
                                       ? GPIO_PIN_SET
                                       : GPIO_PIN_RESET;
-            (void)core_gpio_write_pin_direct(slot->config.port,
-                                             slot->config.pin,
+            (void)core_gpio_write_pin_direct(p_config->port,
+                                             p_config->pin,
                                              state);
         }
     }
@@ -82,90 +58,86 @@ en_core_gpio_status_t core_gpio_init(void)
 }
 
 /**
- * @brief Write a logical GPIO pin.
- * @param[in] id Logical GPIO pin identifier.
- * @param[in] state Output state.
- * @return GPIO access status.
+ * @brief 设置逻辑 GPIO 引脚电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @param[in] state 输出电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_write_pin(en_core_gpio_pin_t id,
                                           en_core_gpio_pin_state_t state)
 {
-    if ((id >= CORE_GPIO_PIN_MAX) ||
+    if (((unsigned int)id >= (unsigned int)CORE_GPIO_PIN_MAX) ||
         ((state != CORE_GPIO_PIN_RESET) && (state != CORE_GPIO_PIN_SET)))
     {
         return CORE_GPIO_ERR_ARGUMENT;
     }
 
-    if (!g_gpio_slots[id].registered)
+    if ((NULL == g_gpio_configs[id].port) ||
+        (0U == g_gpio_configs[id].pin))
     {
         return CORE_GPIO_ERR_NOT_CONFIGURED;
     }
 
-    return core_gpio_write_pin_direct(g_gpio_slots[id].config.port,
-                                      g_gpio_slots[id].config.pin,
-                                      (state == CORE_GPIO_PIN_SET) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    return core_gpio_write_pin_direct(g_gpio_configs[id].port,
+                                      g_gpio_configs[id].pin,
+                                      (state == CORE_GPIO_PIN_SET)
+                                          ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 /**
- * @brief Read a logical GPIO pin.
- * @param[in] id Logical GPIO pin identifier.
- * @param[out] state Pin state output.
- * @return GPIO access status.
+ * @brief 读取逻辑 GPIO 引脚电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @return 引脚电平；标识无效或引脚未配置时返回 CORE_GPIO_PIN_RESET。
  */
-en_core_gpio_status_t core_gpio_read_pin(en_core_gpio_pin_t id,
-                                         en_core_gpio_pin_state_t *state)
+en_core_gpio_pin_state_t core_gpio_read_pin(en_core_gpio_pin_t id)
 {
     GPIO_PinState raw_state;
-    en_core_gpio_status_t status;
 
-    if ((id >= CORE_GPIO_PIN_MAX) || (state == NULL))
+    if ((unsigned int)id >= (unsigned int)CORE_GPIO_PIN_MAX)
     {
-        return CORE_GPIO_ERR_ARGUMENT;
+        return CORE_GPIO_PIN_RESET;
     }
 
-    if (!g_gpio_slots[id].registered)
+    if ((NULL == g_gpio_configs[id].port) ||
+        (0U == g_gpio_configs[id].pin))
     {
-        return CORE_GPIO_ERR_NOT_CONFIGURED;
+        return CORE_GPIO_PIN_RESET;
     }
 
-    status = core_gpio_read_pin_direct(g_gpio_slots[id].config.port,
-                                       g_gpio_slots[id].config.pin,
-                                       &raw_state);
-    if (status == CORE_GPIO_OK)
-    {
-        *state = (raw_state == GPIO_PIN_SET) ? CORE_GPIO_PIN_SET : CORE_GPIO_PIN_RESET;
-    }
-
-    return status;
+    raw_state = core_gpio_read_pin_direct(g_gpio_configs[id].port,
+                                          g_gpio_configs[id].pin);
+    return (GPIO_PIN_SET == raw_state)
+               ? CORE_GPIO_PIN_SET : CORE_GPIO_PIN_RESET;
 }
 
 /**
- * @brief Toggle a logical GPIO output pin.
- * @param[in] id Logical GPIO pin identifier.
- * @return GPIO access status.
+ * @brief 翻转逻辑 GPIO 输出电平。
+ * @param[in] id 逻辑 GPIO 引脚标识。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_toggle_pin(en_core_gpio_pin_t id)
 {
-    if (id >= CORE_GPIO_PIN_MAX)
+    if ((unsigned int)id >= (unsigned int)CORE_GPIO_PIN_MAX)
     {
         return CORE_GPIO_ERR_ARGUMENT;
     }
 
-    if (!g_gpio_slots[id].registered)
+    if ((NULL == g_gpio_configs[id].port) ||
+        (0U == g_gpio_configs[id].pin))
     {
         return CORE_GPIO_ERR_NOT_CONFIGURED;
     }
 
-    return core_gpio_toggle_pin_direct(g_gpio_slots[id].config.port,
-                                       g_gpio_slots[id].config.pin);
+    return core_gpio_toggle_pin_direct(g_gpio_configs[id].port,
+                                       g_gpio_configs[id].pin);
 }
 
 /**
- * @brief Write a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @param[in] state Output state.
- * @return GPIO access status.
+ * @brief 直接设置物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @param[in] state 输出电平。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_write_pin_direct(GPIO_TypeDef *port,
                                                  uint16_t pin,
@@ -181,30 +153,26 @@ en_core_gpio_status_t core_gpio_write_pin_direct(GPIO_TypeDef *port,
 }
 
 /**
- * @brief Read a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @param[out] state Pin state output.
- * @return GPIO access status.
+ * @brief 直接读取物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @return 引脚电平；端口为空或引脚掩码为零时返回 GPIO_PIN_RESET。
  */
-en_core_gpio_status_t core_gpio_read_pin_direct(GPIO_TypeDef *port,
-                                                uint16_t pin,
-                                                GPIO_PinState *state)
+GPIO_PinState core_gpio_read_pin_direct(GPIO_TypeDef *port, uint16_t pin)
 {
-    if ((port == NULL) || (pin == 0U) || (state == NULL))
+    if ((NULL == port) || (0U == pin))
     {
-        return CORE_GPIO_ERR_ARGUMENT;
+        return GPIO_PIN_RESET;
     }
 
-    *state = HAL_GPIO_ReadPin(port, pin);
-    return CORE_GPIO_OK;
+    return HAL_GPIO_ReadPin(port, pin);
 }
 
 /**
- * @brief Toggle a physical GPIO pin without logical registration.
- * @param[in] port GPIO peripheral port.
- * @param[in] pin GPIO pin mask.
- * @return GPIO access status.
+ * @brief 直接翻转物理 GPIO 电平，无需逻辑配置。
+ * @param[in] port GPIO 外设端口。
+ * @param[in] pin GPIO 引脚掩码。
+ * @return GPIO 操作状态。
  */
 en_core_gpio_status_t core_gpio_toggle_pin_direct(GPIO_TypeDef *port,
                                                   uint16_t pin)

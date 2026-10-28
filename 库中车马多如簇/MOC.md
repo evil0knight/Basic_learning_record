@@ -22,6 +22,7 @@
 |    WiFi 模块    |                 涂鸦 WiFi 模组                 | [WiFi 模块笔记](./WiFi模块/WiFi模块.md)                 |
 |    FT辉芒微    |                     skill                     | [FT辉芒微/MOC.md](FT辉芒微/MOC.md)                      |
 |       LED       |                BSP分层驱动架构                | [BSP_LED](LED/BSP_LED/MOC.md)                           |
+|       key       |         OS 按键中断入队与长按关机模板         | [key](key/MOC.md)                                      |
 |      UART      |          循环 DMA、OSAL 前后端、环形缓冲          | [UART](../库中车马多如簇/UART/MOC.md) |
 |       CAN       |                    CAN总线                    | [CAN](./CAN总线/MOC.md)                                 |
 |  外设文件模板  |                   SKILL要用                   | [外设文件模板.md](外设文件模板.md)                      |

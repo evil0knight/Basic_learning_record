@@ -9,14 +9,6 @@
 | [usart_port.h](./inc/usart_port.h) / [usart_port.c](./src/usart_port.c) | `core_usart_*` 接口 + HAL 分发 + DMA + 回调桥 |
 | [usart_port_config.h](./inc/usart_port_config.h)                     | 槽位表（HAL 句柄 + 波特率 + 超时）              |
 
-## port文件作用
-
-1. 接口封装,HAL库提供的函数向上包了一层
-2. 回调函数注册,
-   通过注册对象结构体,把huart句柄和回调函数放在一个结构体里实现高内聚
-3. 回调函数调用,
-   直接看是哪个句柄,然后调用对象结构体内对应的函数指针去执行回调函数
-
 ## port文件的使用
 
 1. 无论使用 DMA 还是阻塞/中断模式，都要先在 Port 配置表中注册 UART 句柄。
@@ -25,7 +17,7 @@
 ```c
 static const st_usart_config_t g_usart_configs[CORE_USART_MAX] = {
     [CORE_USART1] = {
-        .handle = &huart1,
+        .p_handle = &huart1,
         .baudrate = 115200U,
         .timeout = CORE_USART_DEFAULT_TIMEOUT
     },
@@ -35,6 +27,8 @@ static const st_usart_config_t g_usart_configs[CORE_USART_MAX] = {
 `huart1` 必须由 CubeMX 生成的 `MX_USART1_UART_Init()` 完成硬件初始化。
 
 3. 在 server 线程开始时注册回调并启动接收：
+
+这里就是再回调函数直接运行这个 ``server_uart_rx``回调函数,然后他就会处理了,处理了以后就发送队列通知线程或者什么逻辑就自己写了,这里都是service层的了,
 
 ```c
 static uint8_t s_server_rx_buf[128];//DMA搬运缓冲区

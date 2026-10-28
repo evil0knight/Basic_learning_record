@@ -7,8 +7,9 @@
  *
  * @par dependencies
  * - 01_app/app_control/app_control.h
+ * - 01_app/app_init/user_init.h
+ * - 01_app/app_loop/app_loop.h
  * - 01_app/app_message/msg_dispatcher.h
- * - 01_app/app_message/msg_queue.h
  *
  * @author YA
  *
@@ -16,7 +17,7 @@
  *
  * Processing flow:
  *
- * 初始化事件队列和应用控制层，主循环读取并处理应用事件。
+ * UserAppInit() 统一初始化 App 层子模块，主循环并列调用事件分发与后台轮询。
  *
  * @version V1.0
  *
@@ -24,9 +25,9 @@
  *
  *****************************************************************************/
 #include "01_app/app_control/app_control.h"
+#include "01_app/app_init/user_init.h"
 #include "01_app/app_loop/app_loop.h"
 #include "01_app/app_message/msg_dispatcher.h"
-#include "01_app/app_message/msg_queue.h"
 
 
 
@@ -36,10 +37,7 @@
  */
 int main(void)
 {
-
-    if ((APP_STATUS_OK != queue_init(&g_msg_queue)) ||
-        (APP_STATUS_OK != app_control_init()) ||
-        (APP_STATUS_OK != app_loop_init())) {
+    if (APP_STATUS_OK != UserAppInit()) {
         return 1;
     }
 

@@ -11,7 +11,7 @@
   为事件队列提供短临界区保护。接入时将实现文件加入编译，`main.h` 由目标工程提供；
   仅适用于单核 Cortex-M，NMI 和 HardFault 不得访问该队列。
 
-- `gpio/`：后续建立 GPIO 的统一接口。
+- [gpio/MOC.md](./gpio/MOC.md)：GPIO 逻辑接口、板级静态配置表和 HAL 实现。
 - `i2c/`：后续建立 I²C 的统一接口。
 - `spi/`：后续建立 SPI 的统一接口。
 - `adc/`：后续建立 ADC 的统一接口。
