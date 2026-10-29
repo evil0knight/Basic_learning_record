@@ -16,8 +16,8 @@
 
 ```text
 HAL/MCU ISR
-    -> app_isr_handlers 中的设备回调指针
-    -> 设备 Handler 提供的挂载函数
+    -> app_isr_handlers 中的 HAL 回调入口
+    -> Platform 事件处理接口，直接调用 Driver 或投递队列
     -> Driver 的具体中断处理函数或 Handler 的事件投递函数
     -> Driver 完成寄存器/协议操作
     -> Handler 更新状态、队列或上层回调
@@ -26,8 +26,8 @@ HAL/MCU ISR
 
 | 层 | 职责 | 边界 |
 | --- | --- | --- |
-| `app_isr_handlers` | 保存 ISR 回调指针，提供 HAL 回调入口 | 执行回调转发 |
-| Handler | 按设备组织初始化、事件、状态、缓存、任务和回调挂载 | 通过 Driver 使用硬件操作 |
+| `app_isr_handlers` | 提供 HAL 回调入口，直接调用 Platform | 执行回调转发 |
+| Handler | 按设备组织初始化、事件、状态、缓存、任务 | 通过 Driver 使用硬件操作 |
 | Driver | 使用接口表完成寄存器、总线、协议和硬件处理 | 提供设备硬件操作 |
 | Adapter | 组装 `pf_*` 接口、创建本设备实例、调用 Handler 初始化 | 管理平台与 BSP 的连接 |
 | Wrapper | 为上层暴露稳定的设备接口 | 通过 Adapter 访问 BSP |
@@ -45,37 +45,19 @@ typedef struct
 } bsp_xxx_handler_t;
 ```
 
-`bsp_xxx_handler_init()` 完成 Driver 绑定、Driver 初始化和必要的回调挂载；`bsp_xxx_handler_control()` 只做参数、索引和状态检查，然后调用 Driver。单设备默认只接受 `index == 0`，仅在存在多个物理实例时增加实例索引表。
+`bsp_xxx_handler_init()` 完成 Driver 绑定、Driver 初始化；`bsp_xxx_handler_control()` 只做参数、索引和状态检查，然后调用 Driver。单设备默认只接受 `index == 0`，仅在存在多个物理实例时增加实例索引表。
 
 ### 2. 中断或 DMA 设备
 
-适用于 MPU、触摸、串口 DMA、带数据就绪脚的传感器等。Handler 提供该设备自己的回调挂载函数，Driver 在初始化时把具体回调传入挂载函数：
+HAL 回调在 App 中实现，检查引脚或外设句柄后直接调用 Platform 的 core_xxx 事件处理接口。Platform 根据设备连接关系直接调用 Driver 的公开中断处理函数，或使用统一创建的队列通知任务，不再向 App 注册全局回调指针。
 
-```c
-status = bsp_xxx_driver_init(p_driver,
-                             bsp_xxx_register_int_callback,
-                             bsp_xxx_register_dma_callback);
-```
+Driver 初始化只接收设备对象：
 
-挂载函数只负责把回调赋给 `app_isr_handlers` 中对应设备的回调指针：
+~~~c
+status = bsp_xxx_driver_init(p_driver);
+~~~
 
-```c
-static bsp_xxx_status_t bsp_xxx_register_int_callback(
-    bsp_xxx_isr_callback_t pf_callback)
-{
-    if (pf_callback == NULL)
-    {
-        return BSP_XXX_ERR_ARGUMENT;
-    }
-
-    pf_xxx_int_interrupt_callback = pf_callback;
-    return BSP_XXX_OK;
-}
-```
-
-HAL 中断到来后，`app_isr_handlers` 只转发已经挂载的回调；回调指向 Driver 的具体处理函数。中断上下文中只做清中断、取必要数据或投递事件，耗时处理放到 主循环中。
-
-根据实际中断源保留对应的挂载函数。
+中断上下文只处理必要数据或投递事件，耗时操作放到任务中。
 
 ### 3. 异步队列和任务设备
 
@@ -132,8 +114,8 @@ typedef struct
 
 1. Adapter 组装 GPIO、IIC、SPI、DMA、临界区等 `pf_*` 接口表。
 2. Adapter 创建本设备 Driver/Handler 对象，并调用 `bsp_xxx_handler_init()`。
-3. Handler 调用 Driver bind/init，并把 Driver 回调挂到对应 ISR 回调指针。
-4. HAL ISR 到来时，`app_isr_handlers` 转发回调。
+3. Handler 调用 Driver bind/init 并保存设备对象。
+4. HAL ISR 到来时，`app_isr_handlers` 直接调用 Platform 事件处理接口。
 5. Handler 根据设备类型直接处理，或投递队列交给主循环处理。
 6. Wrapper 通过 Adapter 调用 Handler 的控制、读写或专用接口。
 
@@ -141,8 +123,8 @@ typedef struct
 
 - 把 `xxx` 替换为真实设备名，重新设计状态码、命令和事件类型。
 - 先确定设备是同步、异步、中断/DMA、缓存状态机还是多实例，再裁剪 Handler 成员。
-- 只声明设备实际需要的 `pf_*`、回调挂载函数、队列和任务。
-- 为每个中断源提供清晰的设备专用回调挂载函数；挂载函数按设备和中断源分别定义。
+- 只声明设备实际需要的 `pf_*`、事件处理接口、队列和任务。
+- 为每个中断源提供设备专用事件处理接口，由 Platform 区分设备并直接调用。
 - 在 Adapter 中完成底层接口组装，在 Driver 中实现硬件操作，在 Wrapper 中保持上层调用稳定。
 
 ## 文件索引

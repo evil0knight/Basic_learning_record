@@ -11,12 +11,11 @@ Bootloader 在上电后读取 App 共享标志，根据升级状态决定下载�
 
 需要注意的是,他需要复制一分ymodem和app区分出来的,用来所有app都损毁的时候兜底下载
 
-## 关键文件
-
-- [Boot_Manager.h](./Boot_Manager.h) / [Boot_Manager.c](./Boot_Manager.c)：
+ [Boot_Manager.h](./Boot_Manager.h) / [Boot_Manager.c](./Boot_Manager.c)：
   Boot_Manager_State主要负责函数,负责搬运镜像等工作
   把当前的加密文件解密到运行区app,然后重置
-  看门狗不通过就回滚
+
+- app里的看门狗不通过就回滚
   看门狗通过,app就会写APP_AreaAToAreaB把运行区备份一下
   看门狗和回滚都不通过就进入兜底ymodem下载
   上面的__weak函数是目前缺失的,直接填写就好

@@ -8,32 +8,21 @@
 
 ## 关键文件
 
-- [user_isr_handlers.h](./user_isr_handlers.h) / [user_isr_handlers.c](./user_isr_handlers.c)：声明和定义 `pf_pin_interrupt_callback`、`pf_dma_interrupt_callback`、`pf_int_interrupt_callback`，为 HAL 回调提供设备中断回调指针。
-- [bsp_adapter_port_xxx.c](../../04_platform/platform_bsp/bsp_adapter/bsp_adapter_port_xxx.c)：组装平台 `pf_*` 接口并启动具体设备 Handler 初始化，连接平台资源与 BSP 设备。
-- [bsp_xxx_handler.c](../../05_bsp/bsp_xxx/handler/bsp_xxx_handler.c)：提供中断回调注册函数，将 Driver 回调地址写入 ISR 回调指针，并完成 Handler 初始化。
-- [bsp_xxx_driver.c](../../05_bsp/bsp_xxx/driver/bsp_xxx_driver.c)：实现具体的引脚中断、DMA 完成或设备中断处理函数，完成清中断、寄存器读取和数据处理。
+- [user_isr_handlers.h](./user_isr_handlers.h) / [user_isr_handlers.c](./user_isr_handlers.c)：HAL 回调入口模板，按实际外设包含 Platform 头文件并直接调用事件处理接口，不保存全局中断回调指针。
+- [Platform Adapter](../../04_platform/platform_bsp/bsp_adapter/bsp_adapter_port_xxx.c)：组装平台接口、初始化设备，并管理平台资源与 BSP 的连接。
+- [Handler](../../05_bsp/bsp_xxx/handler/bsp_xxx_handler.c)：绑定和初始化 Driver，组织设备状态及事件处理。
+- [Driver](../../05_bsp/bsp_xxx/driver/bsp_xxx_driver.c)：提供可由 Platform 直接调用的设备中断处理接口。
 
 ## 调用顺序
 
-~~~text
-系统初始化
- └─ Platform Adapter
-     ├─ 组装 pf_* 底层接口
-     └─ bsp_xxx_handler_init()
-         ├─ Handler 绑定 Driver
-         ├─ Driver 初始化
-         ├─ Handler 提供回调注册函数
-         └─ Driver 回调地址写入 ISR 指针
-             ├─ pf_pin_interrupt_callback
-             ├─ pf_dma_interrupt_callback
-             └─ pf_int_interrupt_callback
+```text
+初始化：统一创建 OS 资源 -> Platform Adapter 组装接口 -> Handler/Driver 初始化
 
-硬件中断
- └─ MCU IRQHandler
-     └─ HAL 中断处理函数
-         └─ HAL 回调
-             ├─ 检查 GPIO 引脚或外设句柄
-             └─ 调用对应 ISR 回调指针
-                 └─ BSP Driver 中断处理函数
-                     └─ Handler 队列、状态或上层回调
-~~~
+硬件中断 -> HAL 处理 -> App 中的 HAL 回调
+    -> 检查引脚或外设句柄
+    -> 直接调用 Platform core_xxx 事件处理接口
+        -> 直接调用 Driver 的设备事件接口
+        -> 或通过队列通知任务
+```
+
+本模板未指定具体外设，因此不预设 HAL 回调实现或 core_xxx 函数名。实际接入时先初始化资源和设备，再开启中断或 DMA 接收。中断上下文只执行必要操作；OSAL 队列发送须支持中断上下文。

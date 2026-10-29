@@ -14,7 +14,7 @@
  *
  * Processing flow:
  *
- * app_loop_init() 挂载 pf_tim_interrupt_callback -> do_loop() 主循环轮询 ->
+ * app_loop_init() 初始化 -> do_loop() 主循环轮询 ->
  * do_loop_tick() 定时器 ISR 内执行。
  *
  * @version V1.0

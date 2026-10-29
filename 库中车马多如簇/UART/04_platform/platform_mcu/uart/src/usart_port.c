@@ -60,36 +60,7 @@ static volatile uint8_t g_usart_dma_rx_done[CORE_USART_MAX] =
 };
 //*************************** Static Variables end ***************************//
 
-//************************** Static Functions begin **************************//
-/**
- * @brief DMA 同步接收的内部回调，记录实际接收长度并置完成标志。
- *        synchronous:同步
- * @param[in] p_data 接收缓冲区地址。
- * @param[in] size 本次实际接收字节数。
- */
-static void core_usart_dma_sync_callback(uint8_t *p_data, uint16_t size)
-{
-    uint32_t i;
-
-    //-------------------------参数检查 begin-------------------------//
-    if (NULL == p_data)
-    {
-        return;
-    }
-    //--------------------------参数检查 end--------------------------//
-
-    for (i = 0U; i < (uint32_t)CORE_USART_MAX; i++)
-    {
-        if (g_p_usart_rx_buffer[i] == p_data)
-        {
-            g_usart_dma_rx_size[i] = size;
-            g_usart_dma_rx_done[i] = 1U;
-            break;
-        }
-    }
-}
-
-/**
+//**
  * @brief 将 STM32 HAL 返回值转换为统一 USART 状态码。
  *
  * @param[in] hal_status HAL 返回状态。
@@ -176,7 +147,7 @@ static en_core_usart_status_t core_usart_validate(
 }
 
 /**
- * @brief 根据 HAL 句柄查找对应的逻辑串口实例。
+ * @brief 根据huart句柄查找对应的逻辑串口实例。
  *
  * @param[in] p_handle HAL UART 句柄。
  * @return 逻辑串口实例；未找到时返回 CORE_USART_MAX。
@@ -207,19 +178,18 @@ static en_core_usart_instance_t core_usart_instance_from_handle(
 
 //************************ Function Definitions begin ************************//
 /**
- * @brief 初始化 USART 平台层并清空回调状态。
+ * @brief 初始化 USART 平台层并清空软件状态。
  *
  * Steps:
- *  1. 调用 CubeMX 生成的 USART 初始化函数。
+ *  1. 硬件初始化由 CubeMX 生成的启动流程负责，本函数不重复执行。
  *  2. 清空回调、接收缓冲区及 DMA 状态。
+ *  3. Service 或设备 Adapter 在本函数执行后注册回调，再启动收发。
  *
  * @return USART 操作状态。
  */
 en_core_usart_status_t core_usart_init(void)
 {
     uint32_t i;
-
-    MX_USART1_UART_Init();
 
     for (i = 0U; i < (uint32_t)CORE_USART_MAX; i++)
     {
@@ -386,6 +356,7 @@ en_core_usart_status_t core_usart_receive_to_idle_dma(
     p_handle = g_usart_configs[instance].p_handle;
     g_p_usart_rx_buffer[instance] = p_data;
 
+    //调用hal层的DMA + 空闲中断方式启动一轮接收
     hal_status = HAL_UARTEx_ReceiveToIdle_DMA(p_handle, p_data, size);
     if ((HAL_OK == hal_status) && (NULL != p_handle->hdmarx))
     {
@@ -398,7 +369,7 @@ en_core_usart_status_t core_usart_receive_to_idle_dma(
 
 /**
  * @brief 以 DMA + 空闲中断方式同步接收一帧。
- *
+ *        用 DMA 接收，但当前调用者一直等待，直到接收完成或超时才返回
  * @param[in] instance 逻辑串口实例。
  * @param[out] p_data 接收缓冲区。
  * @param[in] size 接收缓冲区大小。
@@ -431,13 +402,6 @@ en_core_usart_status_t core_usart_receive_to_idle_dma_sync(
 
     g_usart_dma_rx_done[instance] = 0U;
     g_usart_dma_rx_size[instance] = 0U;
-
-    status = core_usart_register_rx_callback(
-        instance, core_usart_dma_sync_callback);
-    if (CORE_USART_OK != status)
-    {
-        return status;
-    }
 
     status = core_usart_receive_to_idle_dma(instance, p_data, size);
     if (CORE_USART_OK != status)
@@ -679,6 +643,10 @@ en_core_usart_status_t core_usart_irq_rx_event(
     {
         return CORE_USART_ERR_NOT_CONFIGURED;
     }
+
+    /* 同步等待状态独立维护，不占用使用者注册的 RX 回调。 */
+    g_usart_dma_rx_size[instance] = u16_size;
+    g_usart_dma_rx_done[instance] = 1U;
 
     if (NULL != g_pf_usart_rx_callbacks[instance])
     {

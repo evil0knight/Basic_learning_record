@@ -7,7 +7,7 @@
  *
  * @par dependencies
  * - app_loop.h
- * - ../app_isr_handlers/user_isr_handlers.h
+ * - 无额外依赖
  *
  * @author YA
  *
@@ -15,9 +15,9 @@
  *
  * Processing flow:
  *
- * app_loop_init() 挂载 do_loop_tick 到 pf_tim_interrupt_callback；
+ * app_loop_init() 初始化主循环层；
  * do_loop() 由主循环调用执行后台轮询；
- * do_loop_tick() 由定时器 ISR 通过回调指针调用。
+ * do_loop_tick() 由 App 的定时器 HAL 回调直接调用。
  *
  * @version V1.0
  *
@@ -26,19 +26,18 @@
  *****************************************************************************/
 #include "app_loop.h"
 
-#include "../app_isr_handlers/user_isr_handlers.h"
+
 
 /**
- * @brief 初始化主循环层，挂载定时器 ISR 回调指针。
+ * @brief 初始化主循环层。
  *
  * Steps:
- *  1. 将 do_loop_tick 写入 pf_tim_interrupt_callback。
+ *  1. 保留主循环初始化入口，定时器事件采用直接调用。
  *
  * @return app_status_t : 操作状态。
  */
 app_status_t app_loop_init(void)
 {
-    pf_tim_interrupt_callback = do_loop_tick;
     return APP_STATUS_OK;
 }
 

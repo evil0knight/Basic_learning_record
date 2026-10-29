@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Copyright (C) 2026 YA.
  *
  * All Rights Reserved.
@@ -7,15 +7,14 @@
  *
  * @par dependencies
  * - user_isr_handlers.h
- * - stddef.h
  *
  * @author YA
  *
- * @brief HAL 中断回调指针定义。
+ * @brief HAL 中断回调入口，直接转发到 Platform 事件处理接口。
  *
  * Processing flow:
  *
- * Handler 在初始化时将 Driver 回调写入对应指针，HAL 回调通过指针调用 Driver。
+ * HAL 回调 -> Platform core_xxx 事件处理 -> Driver 或队列通知。
  *
  * @version V1.0
  *
@@ -24,11 +23,7 @@
  *****************************************************************************/
 #include "user_isr_handlers.h"
 
-#include <stddef.h>
-
-user_isr_callback_t pf_pin_interrupt_callback = NULL;
-user_isr_callback_t pf_dma_interrupt_callback = NULL;
-user_isr_callback_t pf_int_interrupt_callback = NULL;
-user_isr_callback_t pf_tim_interrupt_callback = NULL;
-
-
+/* 按实际外设包含 Platform 头文件，并实现 HAL 固定签名回调。
+ * 回调中检查引脚或外设句柄后，直接调用对应 core_xxx 事件处理接口。
+ * 本模板不预设具体 MCU、外设和事件处理函数。
+ */

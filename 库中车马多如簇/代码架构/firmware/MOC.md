@@ -10,8 +10,8 @@
 
 - [01_app](./01_app/app_init/MOC.md)：应用初始化、ISR 回调和用户任务。
 - [02_service](./02_service/MOC.md)：业务服务和功能流程。
-- [03_config](./03_config/MOC.md)：板级、功能、RTOS、CubeMX 和版本配置。
-- [04_platform](./04_platform/platform_bsp/MOC.md)：Platform MCU、BSP Adapter 和 Wrapper。
+- [03_config](./03_config/MOC.md)：板级、功能、RTOS、CubeMX 和版本配置
+- 04_platform：[Platform MCU](04_platform\platform_mcu\MOC.md)、[BSP Adapter和 Wrapper](./04_platform/platform_bsp/MOC.md)
 - [05_bsp](./05_bsp/MOC.md)：设备 Handler 和 Driver。
 - [06_middlewares](./06_middlewares/MOC.md)：算法、通信、文件系统、图形库和 Vendor 组件。
 - [07_os](./07_os/MOC.md)：OS 适配和系统资源。

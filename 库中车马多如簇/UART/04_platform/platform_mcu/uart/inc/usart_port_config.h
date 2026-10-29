@@ -37,12 +37,12 @@
  */
 static const st_usart_config_t g_usart_configs[CORE_USART_MAX] =
 {
-    [CORE_USART1] =
-    {
-        .p_handle = &huart1,
-        .baudrate = 115200U,
-        .timeout = CORE_USART_DEFAULT_TIMEOUT
-    }
+    // [CORE_USART1] =
+    // {
+    //     .p_handle = &huart1,
+    //     .baudrate = 115200U,
+    //     .timeout = CORE_USART_DEFAULT_TIMEOUT
+    // }
 };
 //*************************** Static Variables end ***************************//
 

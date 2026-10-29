@@ -15,7 +15,7 @@
  *
  * Processing flow:
  *
- * 绑定 Port -> Handler 传入挂载函数 -> 初始化 Driver -> 执行控制。
+ * 绑定 Port -> 初始化 Driver -> 执行控制或处理 Platform 转发的事件。
  *
  * @version V1.0
  *
@@ -36,9 +36,6 @@ typedef enum
     BSP_XXX_ERR_STATE = -3
 } bsp_xxx_status_t;
 
-typedef void (*bsp_xxx_isr_callback_t)(void *p_object, void *p_data);
-typedef bsp_xxx_status_t (*bsp_xxx_callback_register_t)(
-    bsp_xxx_isr_callback_t pf_callback);
 
 typedef struct
 {
@@ -57,6 +54,22 @@ typedef struct
 } bsp_xxx_driver_t;
 
 /**
+ * @brief 处理 Platform 转发的设备中断事件。
+ * @param[in] p_object 设备对象。
+ * @param[in] p_data 设备事件数据。
+ * @return void 无返回值。
+ */
+void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data);
+
+/**
+ * @brief 处理 Platform 转发的 DMA 完成事件。
+ * @param[in] p_object 设备对象。
+ * @param[in] p_data DMA 事件数据。
+ * @return void 无返回值。
+ */
+void bsp_xxx_dma_interrupt_callback(void *p_object, void *p_data);
+
+/**
  * @brief 将平台操作接口绑定到 XXX Driver。
  * @param[in,out] p_driver XXX Driver 对象指针。
  * @param[in] p_port_ops 平台操作接口表指针。
@@ -69,16 +82,12 @@ bsp_xxx_status_t bsp_xxx_driver_bind(
     void * const p_port_context);
 
 /**
- * @brief 初始化 XXX Driver 并挂载其中断回调。
+ * @brief 初始化 XXX Driver。
  * @param[in,out] p_driver XXX Driver 对象指针。
- * @param[in] pf_int_callback_register 外部中断回调挂载函数。
- * @param[in] pf_dma_callback_register DMA 回调挂载函数。
  * @return bsp_xxx_status_t 操作状态。
  */
 bsp_xxx_status_t bsp_xxx_driver_init(
-    bsp_xxx_driver_t * const p_driver,
-    bsp_xxx_callback_register_t pf_int_callback_register,
-    bsp_xxx_callback_register_t pf_dma_callback_register);
+    bsp_xxx_driver_t * const p_driver);
 
 /**
  * @brief 向已初始化的 XXX Driver 转发控制命令。

@@ -14,7 +14,7 @@
  *
  * Processing flow:
  *
- * 检查参数 -> Driver bind -> Driver init -> 回调挂载 -> 保存 Driver 实例。
+ * 检查参数 -> Driver bind -> Driver init -> 保存 Driver 实例。
  *
  * @version V1.0
  *
@@ -25,46 +25,8 @@
 
 #include <stddef.h>
 
-/* 由应用 ISR 文件定义，目标 HAL ISR 入口负责调用这些回调。 */
-extern void (*pf_pin_interrupt_callback)(void *, void *);
-extern void (*pf_dma_interrupt_callback)(void *, void *);
-
 /**
- * @brief 注册 XXX 外部中断回调。
- * @param[in] pf_callback 中断回调函数指针。
- * @return bsp_xxx_status_t 注册结果。
- */
-static bsp_xxx_status_t bsp_xxx_register_int_callback(
-    bsp_xxx_isr_callback_t pf_callback)
-{
-    if (pf_callback == NULL)
-    {
-        return BSP_XXX_ERR_ARGUMENT;
-    }
-
-    pf_pin_interrupt_callback = pf_callback;
-    return BSP_XXX_OK;
-}
-
-/**
- * @brief 注册 XXX DMA 中断回调。
- * @param[in] pf_callback 中断回调函数指针。
- * @return bsp_xxx_status_t 注册结果。
- */
-static bsp_xxx_status_t bsp_xxx_register_dma_callback(
-    bsp_xxx_isr_callback_t pf_callback)
-{
-    if (pf_callback == NULL)
-    {
-        return BSP_XXX_ERR_ARGUMENT;
-    }
-
-    pf_dma_interrupt_callback = pf_callback;
-    return BSP_XXX_OK;
-}
-
-/**
- * @brief 初始化 XXX Handler、Driver 和中断回调挂载。
+ * @brief 初始化 XXX Handler 和 Driver。
  * @param[in,out] p_handler XXX Handler 对象指针。
  * @param[in,out] p_driver XXX Driver 对象指针。
  * @param[in] p_port_ops 平台接口表指针。
@@ -91,9 +53,7 @@ bsp_xxx_status_t bsp_xxx_handler_init(
         return status;
     }
 
-    status = bsp_xxx_driver_init(p_driver,
-                                 bsp_xxx_register_int_callback,
-                                 bsp_xxx_register_dma_callback);
+    status = bsp_xxx_driver_init(p_driver);
     if (status != BSP_XXX_OK)
     {
         return status;

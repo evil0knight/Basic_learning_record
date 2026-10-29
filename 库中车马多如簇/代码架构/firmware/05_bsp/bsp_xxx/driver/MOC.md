@@ -15,7 +15,7 @@
 ```text
 Adapter 组装 pf_* 接口
     -> Driver bind/init
-    -> Handler 提供中断回调挂载函数
+    -> Platform 直接转发设备中断事件
     -> Driver 运行硬件操作
     -> Handler/Wrapper 调用 Driver
 ```
@@ -42,21 +42,14 @@ Adapter 负责把 GPIO、IIC、SPI、DMA、临界区等实际函数填入接口�
 
 ## 中断和 DMA 回调
 
-如果设备有中断，Driver 提供自己的具体处理函数，并在初始化时接收 Handler 的挂载函数：
+Driver 公开 bsp_xxx_int_interrupt_callback() 和 bsp_xxx_dma_interrupt_callback()，由 Platform 在识别设备后直接调用。App 的 HAL 回调只调用 Platform 接口；Driver 不依赖 App 的全局回调指针。
 
-```c
-bsp_xxx_status_t bsp_xxx_driver_init(
-    bsp_xxx_driver_t *p_driver,
-    bsp_xxx_callback_register_t pf_int_callback_register,
-    bsp_xxx_callback_register_t pf_dma_callback_register);
-```
-
-Handler 的挂载函数把 Driver 回调赋值给 `app_isr_handlers` 对应的回调指针。HAL ISR 只负责入口转发；Driver 回调负责清中断、读取必要寄存器和产生设备事件。接口表按设备实际中断源定义。
+初始化接口为 bsp_xxx_driver_init(p_driver)，不再接收回调注册函数。具体设备在事件入口检查对象和数据有效性，完成必要硬件处理；耗时业务交给任务。
 
 ## 编写规则
 
 - 所有公开函数检查对象、接口表、上下文和函数指针。
-- 初始化顺序固定为：参数检查、接口绑定、硬件复位/识别、回调挂载、设置已初始化状态。
+- 初始化顺序固定为：参数检查、接口绑定、硬件复位/识别、设置已初始化状态。
 - 控制命令和寄存器访问使用设备专用枚举、结构体和错误码，避免无意义的万能命令。
 - 临界区只保护必须的寄存器或共享状态，及时退出并返回底层错误。
 - Driver 失败时保持对象处于未初始化或错误状态，避免 Handler 误以为设备可用。

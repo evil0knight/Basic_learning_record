@@ -10,26 +10,38 @@
  *
  * @author YA
  *
- * @brief 将 XXX BSP Handler 挂载到平台 Wrapper。
+ * @brief 声明 XXX Adapter 的注册入口，供平台初始化流程调用。
  *
  * Processing flow:
  *
- * 组装 Port 接口 -> 初始化 Handler -> 注册 Wrapper 操作接口。
+ * 目标工程初始化 -> bsp_adapter_xxx_register() -> Wrapper 取得操作表。
  *
  * @version V1.0
  *
  * @note 1 tab == 4 spaces!
  *
- ******************************************************************************/
+ *****************************************************************************/
 #ifndef FIRMWARE_BSP_ADAPTER_PORT_XXX_H
 #define FIRMWARE_BSP_ADAPTER_PORT_XXX_H
 
+//****************************** Includes begin ******************************//
 #include <stdint.h>
+//******************************* Includes end *******************************//
 
+//************************ Function Prototypes begin *************************//
 /**
- * @brief 注册 XXX Adapter。
- * @return void。
+ * @brief 将 XXX Adapter 注册到 BSP Wrapper。
+ *
+ * Steps:
+ *  1. 组装 Adapter 的 init、control 和 context 三项操作表。
+ *  2. 调用 bsp_wrapper_xxx_register() 挂载操作表。
+ *
+ * @return void : 无返回值；注册结果由 Wrapper 内部记录。
+ * @note 需在 Wrapper 首次被调用前注册一次，重复注册会被 Wrapper 拒绝。
+ *
  */
 void bsp_adapter_xxx_register(void);
+//************************* Function Prototypes end **************************//
 
-#endif /* FIRMWARE_BSP_ADAPTER_PORT_XXX_H */
+#endif
+//******************************* End of File ********************************//

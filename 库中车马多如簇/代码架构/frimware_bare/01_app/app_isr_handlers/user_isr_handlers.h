@@ -6,15 +6,14 @@
  * @file user_isr_handlers.h
  *
  * @par dependencies
- * - stddef.h
  *
  * @author YA
  *
- * @brief 声明 HAL 中断回调指针。
+ * @brief HAL 中断回调入口，直接转发到 Platform 事件处理接口。
  *
  * Processing flow:
  *
- * Handler 挂载回调 -> HAL 中断入口调用回调。
+ * HAL 回调 -> Platform core_xxx 事件处理 -> Driver 或队列通知。
  *
  * @version V1.0 2026-10-24
  *
@@ -24,13 +23,7 @@
 #ifndef FRIMWARE_BARE_USER_ISR_HANDLERS_H
 #define FRIMWARE_BARE_USER_ISR_HANDLERS_H
 
-#include <stddef.h>
 
-typedef void (*user_isr_callback_t)(void *p_object, void *p_data);
 
-extern user_isr_callback_t pf_pin_interrupt_callback;
-extern user_isr_callback_t pf_dma_interrupt_callback;
-extern user_isr_callback_t pf_int_interrupt_callback;
-extern user_isr_callback_t pf_tim_interrupt_callback;
 
 #endif /* FRIMWARE_BARE_USER_ISR_HANDLERS_H */

@@ -11,7 +11,7 @@
  *
  * @author YA
  *
- * @brief XXX Handler 的初始化、回调挂载和控制转发实现。
+ * @brief XXX Handler 的初始化、控制转发实现。
  *
  * Processing flow:
  *
@@ -25,44 +25,6 @@
 #include "bsp_xxx_handler.h"
 
 #include <stddef.h>
-
-
-extern void (*pf_pin_interrupt_callback)(void *, void *);
-extern void (*pf_dma_interrupt_callback)(void *, void *);
-
-/**
- * @brief 注册 XXX 外部中断回调。
- * @param[in] pf_callback 中断回调函数指针。
- * @return bsp_xxx_status_t 注册结果。
- */
-static bsp_xxx_status_t bsp_xxx_register_int_callback(
-    bsp_xxx_isr_callback_t pf_callback)
-{
-    if (pf_callback == NULL)
-    {
-        return BSP_XXX_ERR_ARGUMENT;
-    }
-
-    pf_pin_interrupt_callback = pf_callback;
-    return BSP_XXX_OK;
-}
-
-/**
- * @brief 注册 XXX DMA 中断回调。
- * @param[in] pf_callback 中断回调函数指针。
- * @return bsp_xxx_status_t 注册结果。
- */
-static bsp_xxx_status_t bsp_xxx_register_dma_callback(
-    bsp_xxx_isr_callback_t pf_callback)
-{
-    if (pf_callback == NULL)
-    {
-        return BSP_XXX_ERR_ARGUMENT;
-    }
-
-    pf_dma_interrupt_callback = pf_callback;
-    return BSP_XXX_OK;
-}
 
 
 /**
@@ -93,9 +55,7 @@ bsp_xxx_status_t bsp_xxx_handler_init(
         return status;
     }
 
-    status = bsp_xxx_driver_init(p_driver,
-                                 bsp_xxx_register_int_callback,
-                                 bsp_xxx_register_dma_callback);
+    status = bsp_xxx_driver_init(p_driver);
     if (status != BSP_XXX_OK)
     {
         return status;

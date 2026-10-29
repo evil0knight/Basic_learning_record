@@ -34,8 +34,8 @@
 
 //**************************** ISR Handlers begin ****************************//
 /**
- * @brief 处理 UART 接收完成中断。
- *
+ * @brief 处理 UART 接收完成中断
+ *        普通cpu接收,搬运依靠cpu搬运到缓冲区,缓冲区满了就中断
  * @param[in] p_handle HAL UART 句柄。
  * @return void HAL 回调固定签名。
  */

@@ -14,7 +14,7 @@
  *
  * Processing flow:
  *
- * Handler 初始化 -> Driver 初始化和回调挂载 -> Handler 控制。
+ * Handler 初始化 -> Driver 初始化 -> Handler 控制。
  *
  * @version V1.0
  *
@@ -34,7 +34,7 @@ typedef struct
 } bsp_xxx_handler_t;
 
 /**
- * @brief 初始化 XXX Handler、Driver 和中断回调挂载。
+ * @brief 初始化 XXX Handler 和 Driver。
  * @param[in,out] p_handler XXX Handler 对象指针。
  * @param[in,out] p_driver XXX Driver 对象指针。
  * @param[in] p_port_ops 平台接口表指针。

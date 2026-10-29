@@ -6,15 +6,13 @@
 
 ## 外设索引
 
-- [critical_port.h](./critical/inc/critical_port.h) /
-  [critical_port.c](./critical/src/critical_port.c)：保存和恢复中断状态，
+- [critical_port.h](./critical/inc/critical_port.h) /[critical_port.c](./critical/src/critical_port.c)：保存和恢复中断状态，
   为事件队列提供短临界区保护。接入时将实现文件加入编译，`main.h` 由目标工程提供；
   仅适用于单核 Cortex-M，NMI 和 HardFault 不得访问该队列。
-
 - [gpio/MOC.md](./gpio/MOC.md)：GPIO 逻辑接口、板级静态配置表和 HAL 实现。
-- `i2c/`：后续建立 I²C 的统一接口。
-- `spi/`：后续建立 SPI 的统一接口。
-- `adc/`：后续建立 ADC 的统一接口。
+- [IIC/MOC.md](../../../../IIC/MOC.md)：I²C 的统一接口与 Port 实现。
+- [SPI/MOC.md](../../../../SPI/MOC.md)：SPI 的统一接口与 Port 实现。
+- [ADC/MOC.md](../../../../ADC/MOC.md)：ADC 统一接口与平台实现
 
 ## 目录规则
 

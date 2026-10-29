@@ -1,4 +1,4 @@
-﻿# 01_app
+# 01_app
 
 [返回 frimware_bare](../MOC.md) | [返回代码架构](../../MOC.md) | [返回主页](../../../../index.md)
 
@@ -15,9 +15,9 @@
 - [msg_dispatcher.h](./app_message/msg_dispatcher.h) / [msg_dispatcher.c](./app_message/msg_dispatcher.c)：(不需要添加)
   排空事件队列并调用 `app_control_event_map()`；`do_read_message()` 负责主循环事件处理。
 - [app_loop.h](./app_loop/app_loop.h) / [app_loop.c](./app_loop/app_loop.c)：(需要添加后台轮询与 ISR 处理)
-  主循环后台轮询与定时器 ISR 回调入口；`app_loop_init()` 挂载 `pf_tim_interrupt_callback`，`do_loop()` 由主循环调用，`do_loop_tick()` 由定时器 ISR 调用。
+  主循环后台轮询与定时器 ISR 回调入口；`app_loop_init()` 保留初始化入口，`do_loop()` 由主循环调用，`do_loop_tick()` 由定时器 ISR 调用。
 - [user_isr_handlers.h](./app_isr_handlers/user_isr_handlers.h) / [user_isr_handlers.c](./app_isr_handlers/user_isr_handlers.c)：(需要添加中断回调函数)
-  保存 HAL 中断回调指针（含 `pf_tim_interrupt_callback`），由 Driver 回调产生 `EVENT_xxx` 并写入事件队列，或由 app 层挂载后台处理函数。
+  实现 HAL 回调并直接调用 Platform 事件接口；定时器 HAL 回调可直接调用 `do_loop_tick()`，设备事件由 Platform/Driver 处理或投递队列。
 
 ## 调用顺序
 
@@ -29,6 +29,7 @@ main
 
 ```text
 HAL 中断回调
+    -> Platform 事件处理接口
     -> Driver 中断处理
     -> queue_push(EVENT_xxx)
     -> 主循环 do_read_message()
@@ -44,8 +45,8 @@ HAL 中断回调
 
 ```text
 HAL_TIM_PeriodElapsedCallback
-    -> pf_tim_interrupt_callback
-    -> do_loop_tick()           （由 app_loop_init() 挂载）
+    -> 检查定时器句柄
+    -> do_loop_tick()           （直接调用）
 ```
 
 主循环 `while` 并列调用：

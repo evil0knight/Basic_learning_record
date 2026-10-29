@@ -15,7 +15,7 @@
  *
  * Processing flow:
  *
- * 检查参数 -> 初始化 Port -> 交付 Driver 回调 -> 标记 Driver 已初始化。
+ * 检查参数 -> 初始化 Port -> 标记 Driver 已初始化。
  *
  * @version V1.0
  *
@@ -30,11 +30,11 @@
  *
  * @param[in] p_object : 函数调用参数。
  * @param[in] p_data : 函数调用参数。
- * @return static void : 函数执行结果。
+ * @return void : 函数执行结果。
  *
  */
 
-static void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data)
+void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data)
 {
     (void)p_object;
     (void)p_data;
@@ -44,11 +44,11 @@ static void bsp_xxx_int_interrupt_callback(void *p_object, void *p_data)
  *
  * @param[in] p_object : 函数调用参数。
  * @param[in] p_data : 函数调用参数。
- * @return static void : 函数执行结果。
+ * @return void : 函数执行结果。
  *
  */
 
-static void bsp_xxx_dma_interrupt_callback(void *p_object, void *p_data)
+void bsp_xxx_dma_interrupt_callback(void *p_object, void *p_data)
 {
     (void)p_object;
     (void)p_data;
@@ -85,22 +85,16 @@ bsp_xxx_status_t bsp_xxx_driver_bind(
 }
 
 /**
- * @brief 初始化 XXX Driver 并挂载其中断回调。
+ * @brief 初始化 XXX Driver。
  * @param[in,out] p_driver XXX Driver 对象指针。
- * @param[in] pf_int_callback_register 外部中断回调挂载函数。
- * @param[in] pf_dma_callback_register DMA 回调挂载函数。
  * @return bsp_xxx_status_t 操作状态。
  */
 bsp_xxx_status_t bsp_xxx_driver_init(
-    bsp_xxx_driver_t * const p_driver,
-    bsp_xxx_callback_register_t pf_int_callback_register,
-    bsp_xxx_callback_register_t pf_dma_callback_register)
+    bsp_xxx_driver_t * const p_driver)
 {
     bsp_xxx_status_t status;
 
-    if ((p_driver == NULL) || (p_driver->p_port_ops == NULL) ||
-        (pf_int_callback_register == NULL) ||
-        (pf_dma_callback_register == NULL))
+    if ((p_driver == NULL) || (p_driver->p_port_ops == NULL))
     {
         return BSP_XXX_ERR_ARGUMENT;
     }
@@ -110,18 +104,6 @@ bsp_xxx_status_t bsp_xxx_driver_init(
     }
 
     status = p_driver->p_port_ops->pf_init(p_driver->p_port_context);
-    if (status != BSP_XXX_OK)
-    {
-        return status;
-    }
-
-    status = pf_int_callback_register(bsp_xxx_int_interrupt_callback);
-    if (status != BSP_XXX_OK)
-    {
-        return status;
-    }
-
-    status = pf_dma_callback_register(bsp_xxx_dma_interrupt_callback);
     if (status != BSP_XXX_OK)
     {
         return status;
