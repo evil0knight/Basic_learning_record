@@ -10,13 +10,13 @@
 | ---------------------------------------------------------------------- | ------------------------------------------ |
 | [i2c_port.h](./inc/i2c_port.h) / [i2c_port.c](./src/i2c_port.c)              | 统一状态、静态总线表、HAL分发和阻塞事务API |
 | [i2c_port_config.h](./inc/i2c_port_config.h)                              | 硬件/软件I2C槽位和板级资源配置             |
-| [soft_i2c.h](./src/soft_i2c.h) / [soft_i2c.c](./src/soft_i2c.c)              | 软件I2C内部接口和START、STOP、ACK/NACK时序 |
+| [soft_i2c.h](./inc/soft_i2c.h) / [soft_i2c.c](./src/soft_i2c.c)              | 软件I2C内部接口和START、STOP、ACK/NACK时序 |
 | [GPIO Port](../../代码架构/firmware/04_platform/platform_mcu/gpio/MOC.md) | 软件I2C所需的直接GPIO接口                  |
 
 ## 移植文件
 
-1. 复制 `IIC_Port/inc/i2c_port.h`和 `IIC_Port/src`内全部文件。
-2. 添加 `IIC_Port/inc`、`IIC_Port/src`和GPIO Port头文件路径。
+1. 复制 `IIC_Port/inc`和 `IIC_Port/src`内全部文件。
+2. 添加 `IIC_Port/inc`和GPIO Port头文件路径。
 3. 将 `i2c_port.c`、`soft_i2c.c`和 `gpio_port.c`加入工程编译。
 4. 确认工程已有CubeMX生成的 `main.h`；硬件I2C还需要 `i2c.h`、`i2c.c`和HAL I2C Driver。
 
