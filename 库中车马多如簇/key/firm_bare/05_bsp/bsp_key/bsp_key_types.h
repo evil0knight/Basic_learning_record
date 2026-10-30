@@ -34,6 +34,6 @@ typedef enum
     BSP_KEY_EVENT_MAX
 } en_key_event_t;
 
-typedef en_key_status_t (*pf_key_irq_callback_t)(void *p_object);
+typedef en_key_status_t (*bsp_key_irq_callback_t)(uint32_t u32_key_id);
 
 #endif /* BSP_KEY_TYPES_H */

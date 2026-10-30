@@ -11,11 +11,11 @@
  *
  * @author YA
  *
- * @brief 保存 Adapter 注册的操作表，并把上层 init/control 转发给 Adapter。
+ * @brief 多槽位保存 XXX 器件描述，按"当前槽位"转发 init 和 control。
  *
  * Processing flow:
  *
- * 检查是否注册 -> 参数检查 -> 调用操作表函数 -> 返回统一状态。
+ * register 写槽位并切当前 -> init 用当前槽位 -> control 用当前槽位。
  *
  * @version V1.0 2026-10-24
  *
@@ -30,46 +30,66 @@
 //******************************* Includes end *******************************//
 
 //************************** Static Variables begin **************************//
-/* Adapter 注册进来的操作表副本。 */
-static bsp_wrapper_xxx_ops_t g_bsp_wrapper_xxx_ops;
+/* 多槽位器件描述副本，一个 Adapter 占一个槽位。 */
+static bsp_wrapper_xxx_dev_t g_a_bsp_wrapper_xxx_dev[BSP_WRAPPER_XXX_DRV_MAX_NUM];
 
-/* 注册标志，保证同一时刻只有一个 Adapter 生效。 */
-static bool g_bsp_wrapper_xxx_registered;
+/* 每个槽位是否已注册。 */
+static bool g_a_bsp_wrapper_xxx_registered[BSP_WRAPPER_XXX_DRV_MAX_NUM];
+
+/* 当前活跃槽位索引，register 时切换。 */
+static uint32_t g_u32_bsp_wrapper_xxx_current = 0U;
 //*************************** Static Variables end ***************************//
+
+//************************** Static Functions begin **************************//
+/**
+ * @brief 取当前活跃槽位的器件描述，调用前须保证已注册。
+ */
+static const bsp_wrapper_xxx_dev_t *bsp_wrapper_xxx_get_current(void)
+{
+    return &g_a_bsp_wrapper_xxx_dev[g_u32_bsp_wrapper_xxx_current];
+}
+//*************************** Static Functions end ***************************//
 
 //************************ Function Definitions begin ************************//
 /**
- * @brief 注册 BSP Wrapper 的操作接口。
+ * @brief 把 XXX 器件描述注册到指定槽位，并把当前槽位切到它。
  *
  * Steps:
- *  1. 检查操作表指针及 init、control 两项是否为空。
- *  2. 检查是否已注册过，未注册时整体保存操作表并置位标志。
+ *  1. 检查槽位和 dev 指针及 init、control 两项是否有效。
+ *  2. 检查该槽位是否已被占用，未占用时整体保存并置位标志。
+ *  3. 把当前活跃槽位切到本次注册的槽位。
  *
- * @param[in] ops : 操作函数表及其上下文指针。
- * @return bool : 注册成功返回 true，参数无效或重复注册返回 false。
+ * @param[in] index : 槽位索引。
+ * @param[in] dev : 器件描述。
+ * @return bool : 注册成功返回 true，参数无效或槽位被占返回 false。
  *
  */
-bool bsp_wrapper_xxx_register(const bsp_wrapper_xxx_ops_t *ops)
+bool bsp_wrapper_xxx_register(uint32_t index, const bsp_wrapper_xxx_dev_t *dev)
 {
     //-------------------------参数检查 begin-------------------------//
-    if ((NULL == ops) || (NULL == ops->init) || (NULL == ops->control) ||
-        g_bsp_wrapper_xxx_registered)
+    if ((BSP_WRAPPER_XXX_DRV_MAX_NUM <= index) ||
+        (NULL == dev) || (NULL == dev->init) || (NULL == dev->control))
+    {
+        return false;
+    }
+    if (g_a_bsp_wrapper_xxx_registered[index])
     {
         return false;
     }
     //--------------------------参数检查 end--------------------------//
 
-    g_bsp_wrapper_xxx_ops = *ops;
-    g_bsp_wrapper_xxx_registered = true;
+    g_a_bsp_wrapper_xxx_dev[index]        = *dev;
+    g_a_bsp_wrapper_xxx_registered[index] = true;
+    g_u32_bsp_wrapper_xxx_current         = index;
     return true;
 }
 
 /**
- * @brief 初始化已注册的 BSP Wrapper。
+ * @brief 初始化当前活跃槽位的 XXX 器件。
  *
  * Steps:
- *  1. 检查是否已有 Adapter 注册。
- *  2. 调用注册表中的 init，把上下文原样回传给 Adapter。
+ *  1. 检查当前槽位是否已注册。
+ *  2. 调用当前器件的 init，把 context 原样回传给 Adapter。
  *
  * @return bsp_wrapper_xxx_status_t : 底层初始化状态；未注册返回
  *         BSP_WRAPPER_XXX_ERR_STATE。
@@ -77,24 +97,27 @@ bool bsp_wrapper_xxx_register(const bsp_wrapper_xxx_ops_t *ops)
  */
 bsp_wrapper_xxx_status_t bsp_wrapper_xxx_init(void)
 {
+    const bsp_wrapper_xxx_dev_t *dev;
+
     //-------------------------参数检查 begin-------------------------//
-    if (false == g_bsp_wrapper_xxx_registered)
+    if (!g_a_bsp_wrapper_xxx_registered[g_u32_bsp_wrapper_xxx_current])
     {
         return BSP_WRAPPER_XXX_ERR_STATE;
     }
     //--------------------------参数检查 end--------------------------//
 
-    return g_bsp_wrapper_xxx_ops.init(g_bsp_wrapper_xxx_ops.context);
+    dev = bsp_wrapper_xxx_get_current();
+    return dev->init(dev->context);
 }
 
 /**
- * @brief 向已注册的 BSP Wrapper 转发控制命令。
+ * @brief 向当前活跃槽位转发控制命令。
  *
  * Steps:
- *  1. 检查是否已有 Adapter 注册。
- *  2. 调用注册表中的 control，透传索引、命令和参数。
+ *  1. 检查当前槽位是否已注册。
+ *  2. 调用当前器件的 control，透传子索引、命令和参数。
  *
- * @param[in] index : 设备或通道索引。
+ * @param[in] index : 器件内部子索引。
  * @param[in] command : 控制命令编码。
  * @param[in] argument : 控制命令参数指针，可为 NULL。
  * @return bsp_wrapper_xxx_status_t : 控制操作状态；未注册返回
@@ -105,17 +128,17 @@ bsp_wrapper_xxx_status_t bsp_wrapper_xxx_control(uint32_t index,
                                                  uint32_t command,
                                                  void *argument)
 {
+    const bsp_wrapper_xxx_dev_t *dev;
+
     //-------------------------参数检查 begin-------------------------//
-    if (false == g_bsp_wrapper_xxx_registered)
+    if (!g_a_bsp_wrapper_xxx_registered[g_u32_bsp_wrapper_xxx_current])
     {
         return BSP_WRAPPER_XXX_ERR_STATE;
     }
     //--------------------------参数检查 end--------------------------//
 
-    return g_bsp_wrapper_xxx_ops.control(g_bsp_wrapper_xxx_ops.context,
-                                         index,
-                                         command,
-                                         argument);
+    dev = bsp_wrapper_xxx_get_current();
+    return dev->control(dev->context, index, command, argument);
 }
 //************************* Function Definitions end *************************//
 

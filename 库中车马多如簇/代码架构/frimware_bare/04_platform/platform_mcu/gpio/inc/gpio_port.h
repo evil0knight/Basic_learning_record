@@ -56,7 +56,7 @@ typedef enum
     CORE_GPIO_DISPLAY_BACKLIGHT,
     CORE_GPIO_FLASH_WP,
     CORE_GPIO_LED_EN,
-    CORE_GPIO_KEY1,
+    CORE_GPIO_KEY0,
     CORE_GPIO_SENSOR_INT,
     CORE_GPIO_PIN_MAX
 } en_core_gpio_pin_t;
@@ -131,6 +131,18 @@ GPIO_PinState core_gpio_read_pin_direct(GPIO_TypeDef *port, uint16_t pin);
  */
 en_core_gpio_status_t core_gpio_toggle_pin_direct(GPIO_TypeDef *port,
                                                   uint16_t pin);
+
+/**
+ * @brief 由 HAL 的 port + pin 掩码反向查找配置表中的逻辑 ID。
+ *        供 EXTI 回调把 HAL 给的 GPIO_Pin 翻译成已登记的逻辑 ID。
+ * @param[in] port GPIO 外设端口；传 NULL 时忽略端口比对，只按 pin 匹配。
+ * @param[in] pin  GPIO 引脚掩码。
+ * @param[out] p_id 命中时写入对应逻辑 ID。
+ * @return GPIO 操作状态；未命中返回 CORE_GPIO_ERR_NOT_CONFIGURED。
+ */
+en_core_gpio_status_t core_gpio_find_by_hal_pin(GPIO_TypeDef *port,
+                                                uint16_t pin,
+                                                en_core_gpio_pin_t *p_id);
 //******************************** APIs *************************************//
 
 #endif

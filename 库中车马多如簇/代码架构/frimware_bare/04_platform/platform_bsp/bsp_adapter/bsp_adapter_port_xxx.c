@@ -18,7 +18,7 @@
  *
  * Processing flow:
  *
- * 平台接口实现 -> Driver bind -> Handler init -> Wrapper register。
+ * 平台接口实现 -> Driver inst -> Handler inst -> Wrapper register。
  *
  * @version V1.0
  *
@@ -81,14 +81,14 @@ static const bsp_xxx_port_ops_t g_bsp_adapter_xxx_port_ops =
  */
 void bsp_adapter_xxx_register(void)
 {
-    static const bsp_wrapper_xxx_ops_t ops =
+    static const bsp_wrapper_xxx_dev_t dev =
     {
         .init = bsp_adapter_xxx_init,
         .control = bsp_adapter_xxx_control,
         .context = NULL
     };
 
-    (void)bsp_wrapper_xxx_register(&ops);
+    (void)bsp_wrapper_xxx_register(0U, &dev);
 }
 //************************* Function Definitions end *************************//
 
@@ -207,31 +207,23 @@ static bsp_wrapper_xxx_status_t bsp_adapter_xxx_status_convert(
  * @brief 初始化 XXX Driver。
  *
  * Steps:
- *  1. 把平台资源的 Port 接口表绑定到 Driver 实例。
- *  2. 调用 Driver 初始化，由 Driver 回调 pf_init 完成硬件初始化。
+ *  1. 把Adapter 组装的 Port 接口表传给 Driver inst。
+ *  2. 调用 Driver inst，由 inst 保存资源、挂载函数并完成初始化。
  *
  * @param[in] p_context : Wrapper 透传的上下文，本模板不使用。
  * @return bsp_wrapper_xxx_status_t : Driver 初始化结果。
  * @note 无 Handler 的器件由 Adapter 持有 Driver 实例；
- *       有 Handler 时把本函数换成 bsp_xxx_handler_init() 即可。
+ *       有 Handler 时把本函数换成 bsp_xxx_handler_inst() 即可。
  *
  */
 static bsp_wrapper_xxx_status_t bsp_adapter_xxx_init(void *p_context)
 {
-    bsp_xxx_status_t status;
-
     (void)p_context;
 
-    status = bsp_xxx_driver_bind(&g_bsp_adapter_xxx_driver,
-                                 &g_bsp_adapter_xxx_port_ops,
-                                 &g_bsp_adapter_xxx_driver);
-    if (BSP_XXX_OK != status)
-    {
-        return bsp_adapter_xxx_status_convert(status);
-    }
-
     return bsp_adapter_xxx_status_convert(
-        bsp_xxx_driver_init(&g_bsp_adapter_xxx_driver));
+        bsp_xxx_driver_inst(&g_bsp_adapter_xxx_driver,
+                            &g_bsp_adapter_xxx_port_ops,
+                            &g_bsp_adapter_xxx_driver));
 }
 
 /**
@@ -254,13 +246,20 @@ static bsp_wrapper_xxx_status_t bsp_adapter_xxx_control(
     uint32_t command,
     void *p_argument)
 {
+    //-------------------------参数检查 begin-------------------------//
+    if ((false == g_bsp_adapter_xxx_driver.initialized) ||
+        (NULL == g_bsp_adapter_xxx_driver.pf_control))
+    {
+        return BSP_WRAPPER_XXX_ERR_STATE;
+    }
+    //--------------------------参数检查 end--------------------------//
+
     (void)p_context;
     (void)index;
 
     return bsp_adapter_xxx_status_convert(
-        bsp_xxx_driver_control(&g_bsp_adapter_xxx_driver,
-                               command,
-                               p_argument));
+        g_bsp_adapter_xxx_driver.pf_control(
+            &g_bsp_adapter_xxx_driver, command, p_argument));
 }
 //*************************** Static Functions end ***************************//
 

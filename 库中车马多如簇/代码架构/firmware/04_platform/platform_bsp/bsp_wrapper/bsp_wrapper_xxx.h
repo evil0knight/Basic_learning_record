@@ -11,17 +11,17 @@
  *
  * @author YA
  *
- * @brief 声明 XXX BSP Wrapper 的状态码、操作表和对外接口。
+ * @brief 声明 XXX BSP Wrapper 的状态码、设备描述和对外接口。
  *
  * Processing flow:
  *
- * Adapter 注册操作表 -> Wrapper 保存表 -> 上层 init/control 转发到 Adapter。
+ * Adapter register(槽位, dev) -> 切当前 -> init / control 转发到当前槽位。
  *
- * @version V1.0
+ * @version V1.0 2026-10-24
  *
  * @note 1 tab == 4 spaces!
  *
- ******************************************************************************/
+ *****************************************************************************/
 #ifndef FIRMWARE_BSP_WRAPPER_XXX_H
 #define FIRMWARE_BSP_WRAPPER_XXX_H
 
@@ -29,6 +29,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 //******************************* Includes end *******************************//
+
+//******************************* Defines begin ******************************//
+/* 允许同时存在的 XXX 器件数量；register 时的槽位上限。 */
+#define BSP_WRAPPER_XXX_DRV_MAX_NUM   2U
+//******************************** Defines end *******************************//
 
 //******************************* Enums begin ********************************//
 /* Wrapper 对外统一状态码，0 表示成功，负数表示失败。 */
@@ -42,36 +47,38 @@ typedef enum
 //******************************** Enums end *********************************//
 
 //****************************** Typedefs begin ******************************//
-/* Adapter 向 Wrapper 注册的操作表，context 由 Adapter 自行维护。 */
+/* XXX 器件描述：一个 Adapter 填一份注册进来，context 由 Adapter 自行维护。 */
 typedef struct
 {
     bsp_wrapper_xxx_status_t (*init)(void *context);
     bsp_wrapper_xxx_status_t (*control)(void *context, uint32_t index,
                                         uint32_t command, void *argument);
     void *context;
-} bsp_wrapper_xxx_ops_t;
+} bsp_wrapper_xxx_dev_t;
 //******************************* Typedefs end *******************************//
 
 //************************ Function Prototypes begin *************************//
 /**
- * @brief 注册 BSP Wrapper 的操作接口。
+ * @brief 把一个 XXX 器件描述注册到指定槽位，并切换当前活跃槽位。
  *
  * Steps:
- *  1. 检查操作表指针及 init、control 两项是否为空。
- *  2. 检查是否已注册过，未注册时整体保存操作表。
+ *  1. 检查槽位和 dev 指针及 init、control 两项是否有效。
+ *  2. 检查该槽位是否已被占用，未占用时保存器件描述并置位标志。
+ *  3. 把当前活跃槽位切到本次注册的槽位。
  *
- * @param[in] ops : 操作函数表及其上下文指针。
- * @return bool : 注册成功返回 true，参数无效或重复注册返回 false。
+ * @param[in] index : 槽位索引，范围 0 ~ BSP_WRAPPER_XXX_DRV_MAX_NUM-1。
+ * @param[in] dev : 器件描述 {init, control, context}。
+ * @return bool : 注册成功返回 true，参数无效或槽位被占返回 false。
  *
  */
-bool bsp_wrapper_xxx_register(const bsp_wrapper_xxx_ops_t *ops);
+bool bsp_wrapper_xxx_register(uint32_t index, const bsp_wrapper_xxx_dev_t *dev);
 
 /**
- * @brief 初始化已注册的 BSP Wrapper。
+ * @brief 初始化当前活跃槽位的 XXX 器件。
  *
  * Steps:
- *  1. 检查是否已有 Adapter 注册。
- *  2. 调用注册表中的 init，把上下文原样回传给 Adapter。
+ *  1. 检查当前槽位是否已注册。
+ *  2. 调用当前器件的 init，把 context 原样回传给 Adapter。
  *
  * @return bsp_wrapper_xxx_status_t : 底层初始化状态；未注册返回
  *         BSP_WRAPPER_XXX_ERR_STATE。
@@ -80,13 +87,13 @@ bool bsp_wrapper_xxx_register(const bsp_wrapper_xxx_ops_t *ops);
 bsp_wrapper_xxx_status_t bsp_wrapper_xxx_init(void);
 
 /**
- * @brief 向已注册的 BSP Wrapper 转发控制命令。
+ * @brief 向当前活跃槽位转发控制命令。
  *
  * Steps:
- *  1. 检查是否已有 Adapter 注册。
- *  2. 调用注册表中的 control，透传索引、命令和参数。
+ *  1. 检查当前槽位是否已注册。
+ *  2. 调用当前器件的 control，透传子索引、命令和参数。
  *
- * @param[in] index : 设备或通道索引。
+ * @param[in] index : 器件内部子索引（如子通道、按键 ID）。
  * @param[in] command : 控制命令编码。
  * @param[in] argument : 控制命令参数指针，可为 NULL。
  * @return bsp_wrapper_xxx_status_t : 控制操作状态；未注册返回

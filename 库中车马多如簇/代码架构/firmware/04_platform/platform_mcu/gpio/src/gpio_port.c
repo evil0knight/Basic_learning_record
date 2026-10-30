@@ -185,3 +185,36 @@ en_core_gpio_status_t core_gpio_toggle_pin_direct(GPIO_TypeDef *port,
     HAL_GPIO_TogglePin(port, pin);
     return CORE_GPIO_OK;
 }
+
+/**
+ * @brief 由 HAL 的 port + pin 掩码反向查找逻辑 ID。
+ */
+en_core_gpio_status_t core_gpio_find_by_hal_pin(GPIO_TypeDef *port,
+                                                uint16_t pin,
+                                                en_core_gpio_pin_t *p_id)
+{
+    en_core_gpio_pin_t id;
+
+    //-------------------------参数检查 begin-------------------------//
+    if ((0U == pin) || (NULL == p_id))
+    {
+        return CORE_GPIO_ERR_ARGUMENT;
+    }
+    //--------------------------参数检查 end--------------------------//
+
+    for (id = (en_core_gpio_pin_t)0; id < CORE_GPIO_PIN_MAX; id++)
+    {
+        const st_core_gpio_config_t *p_config = &g_gpio_configs[id];
+        if ((NULL == p_config->port) || (0U == p_config->pin))
+        {
+            continue;
+        }
+        if ((p_config->pin == pin) &&
+            ((NULL == port) || (p_config->port == port)))
+        {
+            *p_id = id;
+            return CORE_GPIO_OK;
+        }
+    }
+    return CORE_GPIO_ERR_NOT_CONFIGURED;
+}

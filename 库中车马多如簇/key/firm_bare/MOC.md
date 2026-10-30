@@ -9,8 +9,8 @@
 | [bsp_key_types.h](05_bsp/bsp_key/bsp_key_types.h) | 状态码、动作和中断回调类型 |
 | [bsp_key_driver.h](05_bsp/bsp_key/driver/bsp_key_driver.h) / [bsp_key_driver.c](05_bsp/bsp_key/driver/bsp_key_driver.c) | 读取 GPIO，转换有效电平 |
 | [bsp_key_handler.h](05_bsp/bsp_key/handler/bsp_key_handler.h) / [bsp_key_handler.c](05_bsp/bsp_key/handler/bsp_key_handler.c) | 持有 Driver 和 Handler 静态对象，处理消抖、短按和长按 |
-| [bsp_adapter_port_key.h](04_platform/platform_bsp/bsp_adapter/bsp_adapter_port_key.h) / [bsp_adapter_port_key.c](04_platform/platform_bsp/bsp_adapter/bsp_adapter_port_key.c) | 按键配置表、平台接口和对象挂载 |
-| [bsp_wrapper_key.h](04_platform/platform_bsp/bsp_wrapper/bsp_wrapper_key.h) / [bsp_wrapper_key.c](04_platform/platform_bsp/bsp_wrapper/bsp_wrapper_key.c) | 挂载、扫描、读取事件、中断通知和解除 |
+| [bsp_adapter_port_key.h](04_platform/platform_bsp/key/bsp_adapter/bsp_adapter_port_key.h) / [bsp_adapter_port_key.c](04_platform/platform_bsp/key/bsp_adapter/bsp_adapter_port_key.c) | 按键配置表、平台接口和对象挂载 |
+| [bsp_wrapper_key.h](04_platform/platform_bsp/key/bsp_wrapper/bsp_wrapper_key.h) / [bsp_wrapper_key.c](04_platform/platform_bsp/key/bsp_wrapper/bsp_wrapper_key.c) | 挂载、扫描、读取事件、中断通知和解除 |
 | [user_init.h](01_app/app_init/user_init.h) / [user_init.c](01_app/app_init/user_init.c) | 初始化 App 子模块，挂载按键 |
 | [app_control.h](01_app/app_control/app_control.h) / [app_control.c](01_app/app_control/app_control.c) | App 事件枚举和应用状态转移表 |
 | [user_isr_handlers.h](01_app/app_isr_handlers/user_isr_handlers.h) / [user_isr_handlers.c](01_app/app_isr_handlers/user_isr_handlers.c) | HAL EXTI 回调和框架回调指针 |

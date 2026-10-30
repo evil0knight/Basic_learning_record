@@ -30,12 +30,18 @@
 /*
  * 未使用的逻辑引脚保持零初始化，访问时返回未配置错误。
  * 在下表中按逻辑 ID 添加配置；物理宏由目标工程的 main.h 提供。
- * 例如（目标板定义了 LCD_DC_GPIO_Port 和 LCD_DC_Pin 后启用）：
+ * 按键这类输入引脚只填 port / pin，default_state 和 initialize_output
+ * 可保持零（它们只影响输出）。
+ * 例如：
  * [CORE_GPIO_DISPLAY_DC] = {
  *     .port = LCD_DC_GPIO_Port,
  *     .pin = LCD_DC_Pin,
  *     .default_state = CORE_GPIO_PIN_RESET,
  *     .initialize_output = true
+ * },
+ * [CORE_GPIO_KEY0] = {
+ *     .port = KEY0_GPIO_Port,
+ *     .pin  = KEY0_Pin
  * }
  */
 static const st_core_gpio_config_t g_gpio_configs[CORE_GPIO_PIN_MAX] = {0};

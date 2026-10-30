@@ -4,11 +4,11 @@
 
 ---
 
-| 文件                            | 作用                                       |
-| ------------------------------- | ------------------------------------------ |
-| [gpio_port.h](./inc/gpio_port.h) | 逻辑 GPIO ID、配置类型、逻辑接口和底层直接接口 |
-| [gpio_port_config.h](./inc/gpio_port_config.h) | 板级引脚映射和默认电平静态配置表 |
-| [gpio_port.c](./src/gpio_port.c) | 读取配置表，实现初始化和 HAL GPIO 操作 |
+| 文件                                          | 作用                                           |
+| --------------------------------------------- | ---------------------------------------------- |
+| [gpio_port.h](./inc/gpio_port.h)               | 逻辑 GPIO ID、配置类型、逻辑接口和底层直接接口 |
+| [gpio_port_config.h](./inc/gpio_port_config.h) | 板级引脚映射和默认电平静态配置表               |
+| [gpio_port.c](./src/gpio_port.c)               | 读取配置表，实现初始化和 HAL GPIO 操作         |
 
 ## 接入
 
@@ -50,14 +50,3 @@ GPIO_PinState raw_state = core_gpio_read_pin_direct(LCD_DC_GPIO_Port,
 物理读取返回 `GPIO_PIN_RESET` 或 `GPIO_PIN_SET`。
 逻辑标识无效、引脚未配置、物理端口为空或引脚掩码为零时，
 对应读取接口返回低电平，无法通过返回值区分这些情况与正常低电平。
-
-## 接口边界
-
-| 接口                                  | 使用位置                                 |
-| ------------------------------------- | ---------------------------------------- |
-| `core_gpio_write/read/toggle_pin()` | 设备 Adapter 中的 GPIO 操作 |
-| `core_gpio_*_pin_direct()`          | Platform底层动态引脚、SPI Port和硬件调试 |
-| `HAL_GPIO_*()`                      | 仅GPIO Port实现                          |
-
-LED、按键、DC、RST 等长期使用的信号应在配置表中绑定逻辑 ID。
-`direct` 用于动态底层配置，不代替设备 Adapter 中的逻辑引脚接口。

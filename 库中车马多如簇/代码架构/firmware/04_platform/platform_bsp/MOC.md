@@ -1,4 +1,4 @@
-﻿# platform_bsp
+# platform_bsp
 
 [返回 firmware](../../MOC.md) | [返回代码架构](../../../../MOC.md) | [返回主页](../../../../../index.md)
 
