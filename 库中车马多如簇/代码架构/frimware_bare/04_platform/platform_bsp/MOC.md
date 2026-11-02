@@ -26,7 +26,7 @@
   2. 有task:用argument:下层人员思维:mcu资源注入
 
      下层是需要资源的,所以通过一个argument把资源通过task的形参传递到底层的handler或者driver实例去
-  3. 没有task:直接在实例的init里调用底层的inst,去挂载资源,再加上注册回调函数例如
+  3. 没有task:直接在adapter定义handler和driver实例,然后直接调用底层的inst,去挂载资源,再加上注册回调函数例如
 
      ```
      static bsp_st7789_driver_t g_st7789DriverInstance;

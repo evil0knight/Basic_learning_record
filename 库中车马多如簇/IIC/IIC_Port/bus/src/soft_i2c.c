@@ -14,7 +14,7 @@
  * @brief 通过 GPIO 生成软件 I2C 时序。
  *
  * 处理流程：
- * 配置槽位后，通过 Port 接口完成参数检查、加锁、传输及解锁。
+ * 由 Bus 在持锁上下文中调用，按位翻转生成 START、STOP、ACK/NACK 时序。
  *
  * @version V1.0
  *
@@ -23,23 +23,23 @@
  *****************************************************************************/
 
 //**************************** Includes begin ********************************//
-#include "soft_i2c.h"
+#include "../inc/soft_i2c.h"
 
-#include "gpio_port.h"
+#include "../../../gpio/inc/gpio_port.h"
 //****************************** Includes end ********************************//
 
 //******************** Static Functions begin ********************************//
 /**
  * @brief 调用微秒延时回调等待一个软件 I2C 半周期。
- *
+ *        周期的一半是采样和发送的好时机
  * 步骤：
  *  1. 调用微秒延时回调等待一个软件 I2C 半周期。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  *
  * @return void : 无返回值。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static void soft_i2c_delay(
     const st_core_software_i2c_config_t *config)
@@ -59,7 +59,7 @@ static void soft_i2c_delay(
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_set(
     GPIO_TypeDef  *port,
@@ -83,16 +83,22 @@ static en_core_i2c_status_t soft_i2c_set(
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_get(
     GPIO_TypeDef  *port,
     uint16_t       pin,
     GPIO_PinState *state)
 {
-    return (core_gpio_read_pin_direct(port, pin, state) == CORE_GPIO_OK)
-               ? CORE_I2C_OK
-               : CORE_I2C_ERROR;
+    //-------------------------参数检查 begin-------------------------//
+    if ((NULL == port) || (0U == pin) || (NULL == state))
+    {
+        return CORE_I2C_ERR_ARGUMENT;
+    }
+    //--------------------------参数检查 end--------------------------//
+
+    *state = core_gpio_read_pin_direct(port, pin);
+    return CORE_I2C_OK;
 }
 
 /**
@@ -101,11 +107,11 @@ static en_core_i2c_status_t soft_i2c_get(
  * 步骤：
  *  1. 释放 SDA 和 SCL 后拉低 SDA，再拉低 SCL，产生起始条件。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_start(
     const st_core_software_i2c_config_t *config)
@@ -130,11 +136,11 @@ static en_core_i2c_status_t soft_i2c_start(
  * 步骤：
  *  1. 拉低 SDA 后释放 SCL，再释放 SDA，产生停止条件。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_stop(
     const st_core_software_i2c_config_t *config)
@@ -160,12 +166,12 @@ static en_core_i2c_status_t soft_i2c_stop(
  * 步骤：
  *  1. 尝试发送停止条件，停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  status               : 停止前的事务状态。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_finish(
     const st_core_software_i2c_config_t *config,
@@ -182,12 +188,12 @@ static en_core_i2c_status_t soft_i2c_finish(
  * 步骤：
  *  1. 从最高位发送一个字节并读取从机应答。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  data                 : 待发送的一个字节。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_send_byte(
     const st_core_software_i2c_config_t *config,
@@ -240,13 +246,13 @@ static en_core_i2c_status_t soft_i2c_send_byte(
  * 步骤：
  *  1. 逐位读取一个字节，并根据参数发送 ACK 或 NACK。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[out] data                 : 接收缓冲区，不得为空。
  * @param[in]  acknowledge          : 非零发送 ACK，零发送 NACK。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_receive_byte(
     const st_core_software_i2c_config_t *config,
@@ -304,13 +310,13 @@ static en_core_i2c_status_t soft_i2c_receive_byte(
  * 步骤：
  *  1. 发送内部地址，十六位地址先发送高字节。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  memory_address       : 设备内部寄存器或存储地址。
  * @param[in]  address_size         : 内部地址宽度，八位或十六位。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 static en_core_i2c_status_t soft_i2c_send_memory_address(
     const st_core_software_i2c_config_t *config,
@@ -341,14 +347,14 @@ static en_core_i2c_status_t soft_i2c_send_memory_address(
  *  1. 产生起始条件，发送地址并执行数据传输或探测。
  *  2. 事务结束时尝试 STOP；停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  device_address_7bit  : 未左移的七位设备地址，范围为 0x00～0x7F。
  * @param[in]  data                 : 发送缓冲区，不得为空。
  * @param[in]  size                 : 传输字节数，必须大于零。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 en_core_i2c_status_t soft_i2c_write(
     const st_core_software_i2c_config_t *config,
@@ -375,14 +381,14 @@ en_core_i2c_status_t soft_i2c_write(
  *  1. 产生起始条件，发送地址并执行数据传输或探测。
  *  2. 事务结束时尝试 STOP；停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  device_address_7bit  : 未左移的七位设备地址，范围为 0x00～0x7F。
  * @param[out] data                 : 接收缓冲区，不得为空。
  * @param[in]  size                 : 传输字节数，必须大于零。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 en_core_i2c_status_t soft_i2c_read(
     const st_core_software_i2c_config_t *config,
@@ -409,7 +415,7 @@ en_core_i2c_status_t soft_i2c_read(
  *  1. 产生起始条件，发送地址并执行数据传输或探测。
  *  2. 事务结束时尝试 STOP；停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  device_address_7bit  : 未左移的七位设备地址，范围为 0x00～0x7F。
  * @param[in]  memory_address       : 设备内部寄存器或存储地址。
  * @param[in]  address_size         : 内部地址宽度，八位或十六位。
@@ -418,7 +424,7 @@ en_core_i2c_status_t soft_i2c_read(
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 en_core_i2c_status_t soft_i2c_mem_write(
     const st_core_software_i2c_config_t *config,
@@ -450,7 +456,7 @@ en_core_i2c_status_t soft_i2c_mem_write(
  *  1. 产生起始条件，发送地址并执行数据传输或探测。
  *  2. 事务结束时尝试 STOP；停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  device_address_7bit  : 未左移的七位设备地址，范围为 0x00～0x7F。
  * @param[in]  memory_address       : 设备内部寄存器或存储地址。
  * @param[in]  address_size         : 内部地址宽度，八位或十六位。
@@ -459,7 +465,7 @@ en_core_i2c_status_t soft_i2c_mem_write(
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 en_core_i2c_status_t soft_i2c_mem_read(
     const st_core_software_i2c_config_t *config,
@@ -496,13 +502,13 @@ en_core_i2c_status_t soft_i2c_mem_read(
  *  1. 产生起始条件，发送地址并执行数据传输或探测。
  *  2. 事务结束时尝试 STOP；停止失败时优先返回停止错误。
  *
- * @param[in]  config               : 已由 Port 层验证的软件总线配置，不得为空。
+ * @param[in]  config               : 已由 Bus 层验证的软件总线配置，不得为空。
  * @param[in]  device_address_7bit  : 未左移的七位设备地址，范围为 0x00～0x7F。
  * @param[in]  trials               : 最大探测次数，必须大于零。
  *
  * @return en_core_i2c_status_t : 成功为 CORE_I2C_OK，否则为具体错误。
  *
- * @note 内部接口由 Port 层负责参数检查及完整事务的加锁。
+ * @note 内部接口由 Bus 层负责参数检查及完整事务的加锁。
  */
 en_core_i2c_status_t soft_i2c_is_ready(
     const st_core_software_i2c_config_t *config,

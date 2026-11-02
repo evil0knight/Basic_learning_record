@@ -94,35 +94,38 @@ __WEAK void adc_sample_task(void *argument);
 
 user_task_config_t g_user_tasks[USER_TASK_IDX_MAX] =
 {
-    {false, "Thread_5ms_Task", thread_5ms_task, CFG_TASK_XXX_STACK_SIZE,
-     CFG_TASK_XXX_PRIORITY, NULL, NULL}
+    [USER_TASK_IDX_THREAD_5MS] =
+    {
+        false, "Thread_5ms_Task", thread_5ms_task, CFG_TASK_XXX_STACK_SIZE,
+        CFG_TASK_XXX_PRIORITY, NULL, NULL
+    }
 };
 
 user_queue_config_t g_user_queues[USER_QUEUE_IDX_MAX] =
 {
-    {false, 2U, sizeof(uint32_t), NULL},
-    {false, 2U, sizeof(uint32_t), NULL},
-    {false, 2U, sizeof(void *), NULL}
+    [USER_QUEUE_IDX_SENSOR_DATA]  = {false, 2U, sizeof(uint32_t), NULL},
+    [USER_QUEUE_IDX_UI_EVENT]     = {false, 2U, sizeof(uint32_t), NULL},
+    [USER_QUEUE_IDX_OTA_APP_DATA] = {false, 2U, sizeof(void *),   NULL}
 };
 
 user_mutex_config_t g_user_mutexes[USER_MUTEX_IDX_MAX] =
 {
-    {false, NULL},
-    {false, NULL},
-    {false, NULL},
-    {false, NULL}
+    [USER_MUTEX_IDX_SENSOR]        = {false, NULL},
+    [USER_MUTEX_IDX_UI]            = {false, NULL},
+    [USER_MUTEX_IDX_ADC]           = {false, NULL},
+    [USER_MUTEX_IDX_OTA_EXT_FLASH] = {false, NULL}
 };
 
 user_sema_config_t g_user_semaphores[USER_SEMA_IDX_MAX] =
 {
-    {false, true, 1U, 0U, NULL},
-    {false, true, 1U, 0U, NULL},
-    {false, true, 1U, 0U, NULL}
+    [USER_SEMA_IDX_SHUTDOWN]  = {false, true, 1U, 0U, NULL},
+    [USER_SEMA_IDX_WAKEUP]    = {false, true, 1U, 0U, NULL},
+    [USER_SEMA_IDX_EXT_FLASH] = {false, true, 1U, 0U, NULL}
 };
 
 user_event_config_t g_user_events[USER_EVENT_IDX_MAX] =
 {
-    {false, NULL}
+    [USER_EVENT_IDX_APP] = {false, NULL}
 };
 
 /**

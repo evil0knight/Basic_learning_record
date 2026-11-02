@@ -26,13 +26,16 @@
 
 st_user_task_config_t g_st_user_tasks[USER_TASK_IDX_MAX] =
 {
-    {true, "Thread_5ms_Task", thread_5ms_task,
-     CFG_TASK_5MS_STACK_SIZE, CFG_TASK_5MS_PRIORITY, NULL, NULL}
+    [USER_TASK_IDX_THREAD_5MS] =
+    {
+        true, "Thread_5ms_Task", thread_5ms_task,
+        CFG_TASK_5MS_STACK_SIZE, CFG_TASK_5MS_PRIORITY, NULL, NULL
+    }
 };
 
 st_user_queue_config_t g_st_user_queues[USER_QUEUE_IDX_MAX] =
 {
-    {1U, sizeof(uint8_t), NULL}
+    [USER_QUEUE_IDX_SHUTDOWN_KEY] = {1U, sizeof(uint8_t), NULL}
 };
 
 /**

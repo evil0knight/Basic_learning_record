@@ -10,6 +10,11 @@
   有了资源就,adapter层要一层薄封装,然后就可以挂载到wrapper了
 
   引入 Handler 的一个重要原因，是同一个设备的多个 Driver 可能共用队列、时间基准、延时函数、任务句柄、缓存或事件分发器。这些资源属于设备的协调和业务层，只需要由 Handler 保存和管理，不需要重复挂载到每个 Driver 中。
+
+  handler和driver的实例一般放在adapter去集中,但是如果在handler开了线程,就放到线程里高内聚
+
+  handler开线程,关键在这个采样是异步,是低频(需要的时候再开),两个都不是就不用开
+
 - [bsp_xxx_driver.h](./bsp_xxx/driver/bsp_xxx_driver.h) / [bsp_xxx_driver.c](./bsp_xxx/driver/bsp_xxx_driver.c)：
 
   最底层的思路是先写一个结构体，这个结构体对应一个器件，然后在结构体里写函数指针，需要什么操作就写什么操作。操作函数依赖上层提供的资源指针实现，上层资源会在上层完成注册，再挂载到 Driver 的资源指针上。
