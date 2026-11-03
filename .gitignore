@@ -24,6 +24,7 @@
 # 私有笔记仓库的本地克隆（如果放在本项目目录下）
 private-notes/
 
-# DSH agent temp files (pasted images / vision artifacts)
+# DSH agent 本地状态与项目级 skill（bili-note / feishu-docx 等），不入库
+.dsh/
 .dsh-vision-toolkit/
 .compile_check/
