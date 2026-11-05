@@ -37,7 +37,7 @@ HRTIM1
 定时器是可以,打开,并且定时器中断不开的,根据定时器的时间,外设会自动运行的,所以不需要开定时器中断,
 如果开了,还要再定义一个HTRIM定时器中断入口,独立于HTRIM主中断入口的
 
-图中只开启了主定时器中断,其他的定时器中断没有开启
+各定时器中断可以分别使能，只开实际用到的那几个即可。
 
 ## DMA Settings — DMA 配置
 
@@ -76,39 +76,39 @@ HRTIM1
 
 | 分类      | 选项                                 | 意思                                                                                                                                                                                           |
 | --------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 通用      | Timer Idx                            | 当前配置的子定时器，图里是 Timer A。                                                                                                                                                           |
-| 通用      | Basic/Advanced Configuration         | 基础模式用图形界面，高级模式用 HAL 波形 API。                                                                                                                                                  |
-| 时基      | Prescaler Ratio                      | 计数时钟的分频，影响精度和周期范围。                                                                                                                                                           |
-| 时基      | fHRCK Equivalent Frequency           | 分频后的计数时钟，图里 680 MHz。                                                                                                                                                               |
-| 时基      | Period                               | 一个 PWM 周期的计数值，图里 34000。                                                                                                                                                            |
-| 时基      | Resulting PWM Frequency              | 算出的 PWM 频率，图里 10 kHz。                                                                                                                                                                 |
-| 时基      | Repetition Counter                   | 每几个周期产生一次重复事件，0 是每个周期。                                                                                                                                                     |
+| 通用      | Timer Idx                            | 当前配置的是哪个子定时器；Timer A～F 各有一份同样的配置项                                                                                                                                      |
+| 通用      | Basic/Advanced Configuration         | 基础模式用图形界面配波形；高级模式改用 HAL 波形 API                                                                                                                                            |
+| 时基      | Prescaler Ratio                      | 计数时钟的分频档，可选不分频 / ÷2 / ÷4 等（档位随芯片而定）；分得越大周期范围越长、精度越粗                                                                                                  |
+| 时基      | fHRCK Equivalent Frequency           | 分频后实际的计数时钟频率，只读，用来换算周期长度和分辨率                                                                                                                                       |
+| 时基      | Period                               | 一个 PWM 周期的计数值，0x0001～0xFFFF；和计数频率一起决定输出频率                                                                                                                              |
+| 时基      | Resulting PWM Frequency              | 由计数频率和 Period 算出的实际频率，只读                                                                                                                                                       |
+| 时基      | Repetition Counter                   | 重复计数 N，每 N+1 个周期产生一次重复事件；填 0 表示每个周期都有                                                                                                                               |
 | 时基      | Up Down Mode                         | 向上：0 数到 Period。<br />向下：Period 数到 0<br /><br />上下：0→Period→0，即中心对齐, 同一个比较值上升、下降各命中一次，比较事件关于周期中点对称；波形还要看输出置位/复位配置。           |
 | 时基      | Roll-Over Event ×5                  | 计数器走到头回卷（roll-over）的时刻。<br />向上数到 Period 回 0；上下计数时 0 和 Period 两个端点都算。<br />勾选后把这个时刻给故障/事件计数、Burst、ADC 触发、输出置位复位、更新/中断/DMA 用。 |
 | 时序单元  | Interleaved Mode                     | 交错模式，把比较点按周期等分。<br />Half：CMP1=1/2 周期。<br />Triple：CMP1=1/3、CMP2=2/3。<br />Quad：CMP1=1/4、CMP2=2/4、CMP3=3/4。<br />用来做多相错相,每个CMP可以触发一个事件              |
 | 时序单元  | Start On Sync                        | 收到同步信号才开始计数。<br /><br />信号到来， **启动计数** ；已在运行则继续，不清零<br /><br />同步的意思是其他的定时器也收到了这个信号                                                 |
 | 时序单元  | Reset On Sync                        | 信号到来，**计数器清零** ；运行中也会清零，重新对齐时序。<br /><br />全部清零停止                                                                                                        |
-| 时序单元  | Dac Synchro                          | 更新时给 DAC 发同步触发                                                                                                                                                                        |
-| 时序单元  | Preload Enable                       | 先写预装载，更新事件时才生效。                                                                                                                                                                 |
-| 时序单元  | Update Gating                        | 更新是否等 DMA burst 搬完再生效。                                                                                                                                                              |
-| 时序单元  | Repetition Update                    | 重复事件时是否执行更新。<br /><br />重复计数值==3,则每4个定时器周期就产生一次重复事件                                                                                                          |
-| 时序单元  | Burst Mode                           | Burst 期间计数器继续跑，还是停住清零。<br /><br />brust:**一段时间连续工作**                                                                                                             |
-| 时序单元  | Push Pull                            | 推挽模式开关。                                                                                                                                                                                 |
-| 时序单元  | Number of Faults to enable           | 启用几路故障输入                                                                                                                                                                               |
-| 时序单元  | Fault Lock                           | 故障使能位只读还是可写。                                                                                                                                                                       |
-| 时序单元  | Dead Time Insertion                  | 输出 1、2 之间插死区，防直通                                                                                                                                                                   |
-| 时序单元  | Delayed Protection Mode              | 故障后延迟把指定输出切到空闲                                                                                                                                                                   |
-| 时序单元  | Update Trigger Sources               | 选几个更新触发源                                                                                                                                                                               |
-| 时序单元  | Reset Update                         | 复位或溢出时是否执行更新。                                                                                                                                                                     |
-| 时序单元  | Resynchronized Update                | 外部更新立刻生效，还是等下次复位/溢出。                                                                                                                                                        |
-| 时序单元  | Reset Trigger Sources                | 选几个复位触发源，图里 1 个，来源是 Master 周期。                                                                                                                                              |
-| 时序单元  | Interrupt Requests Sources           | 选几个事件产生中断                                                                                                                                                                             |
-| 时序单元  | Timer A Internal DMA Request Sources | 选几个事件产生 DMA 请求                                                                                                                                                                        |
-| 比较单元  | Compare Unit 1~4                     | 四个比较单元，每个设比较值、方式和自动延迟                                                                                                                                                     |
-| 捕获单元  | Capture Unit 1~2                     | 捕获外部事件到来时的计数值。                                                                                                                                                                   |
-| 外部事件  | External Event 1~10 Filtering        | 10 路外部事件输入的数字滤波。                                                                                                                                                                  |
-| 外部事件  | Event Counter A                      | 数外部事件来了多少次。                                                                                                                                                                         |
-| Burst DMA | Burst DMA Controller                 | Burst DMA 控制器，用来成组更新寄存器                                                                                                                                                           |
+| 时序单元  | Dac Synchro                          | 每次更新事件是否给 DAC 发同步触发：开 / 关                                                                                                                                                     |
+| 时序单元  | Preload Enable                       | 参数先写进预装载寄存器，等更新事件才生效：开 / 关                                                                                                                                              |
+| 时序单元  | Update Gating                        | 更新是否要等 DMA 成组传输（Burst DMA）搬完才生效：开 / 关                                                                                                                                      |
+| 时序单元  | Repetition Update                    | 重复事件时是否把预装载值刷到活动寄存器：开 / 关                                                                                                                                                |
+| 时序单元  | Burst Mode                           | 突发模式空闲窗口期间，该定时器计数器继续跑还是停住清零；总开关在 Burst Mode Configuration 里                                                                                                   |
+| 时序单元  | Push Pull                            | 推挽模式开关：开 / 关                                                                                                                                                                          |
+| 时序单元  | Number of Faults to enable           | 该定时器启用几路故障输入：0～6                                                                                                                                                                 |
+| 时序单元  | Fault Lock                           | 故障使能位是只读还是可写：只读 / 可写                                                                                                                                                          |
+| 时序单元  | Dead Time Insertion                  | 输出 1、2 之间插死区，防止上下管直通：开 / 关                                                                                                                                                  |
+| 时序单元  | Delayed Protection Mode              | 故障后延迟一段时间再把指定输出切到空闲：开 / 关                                                                                                                                                |
+| 时序单元  | Update Trigger Sources               | 选几个更新触发源（数量）+ 每个源是什么：Master 周期/比较、其他 Timer、外部事件等                                                                                                               |
+| 时序单元  | Reset Update                         | 复位或回卷时是否执行更新：开 / 关                                                                                                                                                              |
+| 时序单元  | Resynchronized Update                | 外部更新立刻生效，还是等下次复位/回卷：立即 / 下次                                                                                                                                             |
+| 时序单元  | Reset Trigger Sources                | 选几个复位触发源（数量）+ 每个源是什么：Master 周期/比较、其他 Timer、外部事件等                                                                                                               |
+| 时序单元  | Interrupt Requests Sources           | 选几个事件产生中断请求：周期、比较、重复、捕获、故障等                                                                                                                                         |
+| 时序单元  | Timer A Internal DMA Request Sources | 选几个事件产生 DMA 请求：周期、比较、重复、捕获等                                                                                                                                              |
+| 比较单元  | Compare Unit 1~4                     | 四个比较单元，每个可设比较值、比较方式和自动延迟                                                                                                                                               |
+| 捕获单元  | Capture Unit 1~2                     | 捕获外部事件到来时的计数值                                                                                                                                                                     |
+| 外部事件  | External Event 1~10 Filtering        | 10 路外部事件输入各自的数字滤波档位（关 / 若干个采样点）                                                                                                                                       |
+| 外部事件  | Event Counter A                      | 外部事件计数器，统计事件来了多少次                                                                                                                                                             |
+| Burst DMA | Burst DMA Controller                 | HRTIM 成组寄存器 DMA 传输的开关：开 / 关                                                                                                                                                       |
 | 输出      | Output 1 Configuration               | 输出 1 的置位/复位源、极性、空闲电平                                                                                                                                                           |
 
 ## Fault Lines Configuration — 故障输入配置
@@ -152,31 +152,17 @@ HRTIM 侧配置触发源，ADC 侧选择对应的外部触发信号及边沿；�
 
 | 配置项                               | 说明                                                                                                        |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| Burst Mode（Burst Mode Enabling）    | 突发模式总开关。启用后，HRTIM 按活动窗口和空闲窗口间歇运行；禁用后按普通连续模式运行。                      |
-| Mode                                 | 突发运行方式。常见有连续模式和单次触发模式（Single Shot）；单次模式由触发启动一段突发序列，完成后进入空闲。 |
-| Clock Source                         | 突发计数器的时钟来源。图中使用 Master Timer 的计数器复位/回卷事件作为突发时钟                               |
-| Prescaler                            | 突发计数时钟分频。分频越大，空闲时长和周期可设置得更长，但计时粒度变粗。                                    |
-| Preload Enable                       | 是否使用预装载寄存器。启用后，新写入的突发参数在更新事件到来时统一生效；禁用后直接写入活动寄存器            |
-| Number of Burst Mode Trigger Sources | 突发模式触发源数量。用于统计或选择参与启动突发序列的触发事件；为 0 时表示不配置触发源                       |
-| Burst Mode Idle Duration             | 空闲窗口持续时间，即两段活动窗口之间暂停输出的时长。图中为 `0x0000`                                       |
-| Burst Mode Period                    | 突发模式的总周期或活动窗口基准长度，用于确定突发序列的时间间隔。图中为 `0x0001`。                         |
-| Timer Burst Mode                     | 各 Timer 是否参与突发模式,参与的定时器在空闲窗口按其 Idle 状态保持输出；未参与的定时器继续按普通配置运行    |
+| Burst Mode（Burst Mode Enabling）    | 总开关。启用后按活动窗口/空闲窗口间歇运行；禁用后按普通连续模式运行                                         |
+| Mode                                 | 运行方式：连续模式 / 单次触发（Single Shot，由触发启动一段突发序列后进入空闲）                              |
+| Clock Source                         | 突发计数器的时钟来源：Master 的周期或回卷事件 / 各 Timer 的周期或回卷事件 / 外部事件等                      |
+| Prescaler                            | 突发计数时钟分频档；分得越大空闲时长和周期能设得越长，计时粒度越粗                                          |
+| Preload Enable                       | 是否用预装载寄存器：启用后新参数在更新事件统一生效，禁用则直接写活动寄存器                                  |
+| Number of Burst Mode Trigger Sources | 要配几个触发源：0～32，填 0 表示不配触发源                                                                  |
+| Burst Mode Idle Duration             | 空闲窗口长度：0x0000～0xFFFF，单位是突发计数时钟                                                            |
+| Burst Mode Period                    | 突发模式总周期：0x0001～0xFFFF，单位是突发计数时钟                                                          |
+| Timer Burst Mode                     | 各 Timer 是否参与突发模式：参与的在空闲窗口把输出保持在各自 Idle 电平（0 或 1），未参与的继续按普通配置输出 |
 
-其中，`Burst Mode Period` 与 `Burst Mode Idle Duration` 共同决定活动/空闲窗口的节奏；具体输出电平仍由各 Timer 的空闲电平、空闲模式和故障配置决定。
-
-## Burst DMA — 成组寄存器传输
-
-HRTIM 的 Burst DMA 用于一次 DMA 请求连续搬运多个相关寄存器，例如在周期事件到来时批量更新周期值、比较值或输出配置。它通过 DMA 的突发传输和 FIFO 减少总线访问次数，提高批量更新效率；传输期间可能连续占用总线，具体行为取决于 DMA 的 Stream、Burst、FIFO 及优先级配置。
-
-| 功能                    | 说明                                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------- |
-| Burst DMA Controller    | HRTIM 内部的成组 DMA 控制器，负责按预先配置的寄存器顺序搬运数据                                   |
-| Burst Length            | 一次请求连续传输的 beat 数量，决定本次批量更新包含多少个数据项                                    |
-| Burst Base Address      | 成组传输的寄存器起始地址，确定从哪一个 HRTIM 寄存器开始更新                                       |
-| DMA Request Source      | 触发成组搬运的 HRTIM 事件，如周期、重复事件、比较事件或更新事件。                                 |
-| Preload / Update Gating | 配合预装载和更新门控，让一批新值在指定更新时刻统一生效，避免同一 PWM 周期内只更新了一部分寄存器。 |
-
-这里的 Burst DMA 是“成组搬运寄存器”的 DMA 传输功能，与上一节按活动窗口/空闲窗口间歇输出的 Burst Mode 不是同一功能。
+`Burst Mode Period` 与 `Burst Mode Idle Duration` 一起决定活动/空闲窗口的节奏；空闲窗口里输出到底是高还是低，仍由各 Timer 的空闲电平、空闲模式和故障配置决定。
 
 ## Master Timer — 主定时器配置
 
@@ -184,30 +170,30 @@ Master 通常用于确定整组波形的周期、子定时器复位时刻或相�
 
 ![1793783029374](image/HRTIM高分辨定时器/1793783029374.png)
 
-| 分类     | 选项                                                | 意思及图中配置                                                                                                                         |
-| -------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 通用     | Timer Idx                                           | 当前配置的定时器，图中为 Master Timer。                                                                                                |
-| 时基     | Prescaler Ratio                                     | 计数时钟倍率/分频。图中为 HRTIM 时钟 ×4，决定计数的时间刻度。                                                                         |
-| 时基     | fHRCK Equivalent Frequency                          | 等效计数频率。图中为 `6.8E8 Hz`，即 680 MHz；这是定时刻度的等效频率。                                                                |
-| 时基     | Period                                              | 周期计数值。图中为 34000，对应周期 `34000 ÷ 680 MHz = 50 μs`。                                                                     |
-| 时基     | Resulting PWM Frequency                             | 根据计数频率和周期算出的频率。图中为 20 kHz；Master 本身没有 PWM 输出引脚。                                                            |
-| 时基     | Repetition Counter                                  | 重复计数值 N，每 N+1 个周期产生一次重复事件。图中为 0，即每个周期一次。                                                                |
-| 时基     | Mode                                                | 连续运行还是单次运行。图中为连续运行，到周期末回卷并继续计数。                                                                         |
-| 时序单元 | Interleaved Mode                                    | 自动将比较点按周期等分，用于交错时序；Half、Triple、Quad 分别对应二、三、四等分。图中关闭。                                            |
-| 时序单元 | Start On Sync                                       | 是否由同步输入事件启动计数。图中关闭，同步输入不会启动 Master。                                                                        |
-| 时序单元 | Reset On Sync                                       | 是否由同步输入事件清零计数器。图中关闭，同步输入不会复位 Master。                                                                      |
-| 时序单元 | Dac Synchro                                         | 是否生成供 DAC 使用的同步事件。图中不生成。                                                                                            |
-| 时序单元 | Preload Enable                                      | 写入周期、比较值等参数时先放入预装载寄存器，等更新事件再生效。图中启用。                                                               |
-| 时序单元 | Update Gating                                       | 是否让寄存器更新等待 DMA 成组传输完成。图中不等待，更新独立于 DMA burst 完成事件。                                                     |
-| 时序单元 | Repetition Update                                   | 是否在重复事件时把预装载值更新到活动寄存器。图中启用，配合重复计数值 0，可每周期更新一次。                                             |
-| 时序单元 | Burst Mode                                          | Master 在突发模式空闲窗口中的计数行为。图中保持计数时钟，Master 继续正常运行；突发模式总开关在前面的 Burst Mode Configuration 中设置。 |
-| 事件请求 | Interrupt Requests Sources Selection                | 选择产生 Master 中断请求的事件，如周期、比较、重复事件。图中数量为 0，未选择中断源；需要中断时还要配置 NVIC。                          |
-| 事件请求 | Number of Master Timer Internal DMA Request Sources | 选择产生 DMA 请求的 Master 事件。图中数量为 0，未选择 DMA 请求源。                                                                     |
-| 比较单元 | Compare Unit 1～4 Configuration                     | 分别启用或关闭四个比较单元。图中只启用 Compare Unit 1，其余关闭。                                                                      |
-| 比较单元 | Compare Value                                       | 计数器到达该值时产生比较事件。图中 CMP1=17000，即周期起点后 25 μs；事件是否改变子定时器输出，取决于子定时器的事件配置。               |
-| 成组传输 | Burst DMA Controller / Burst DMA Configuration      | 配置 HRTIM 成组寄存器 DMA 传输，用于批量更新参数。图中关闭；与上面的间歇工作 Burst Mode 分开配置。                                     |
+| 分类     | 选项                                                | 意思及可选值                                                                        |
+| -------- | --------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 通用     | Timer Idx                                           | 当前配置的是哪个定时器；Master 和 Timer A～F 各有一份                               |
+| 时基     | Prescaler Ratio                                     | 计数时钟的分频/倍率档位，决定计数的时间刻度                                         |
+| 时基     | fHRCK Equivalent Frequency                          | 分频后的等效计数频率，只读                                                          |
+| 时基     | Period                                              | 周期计数值 0x0001～0xFFFF，和计数频率一起决定周期时长                               |
+| 时基     | Resulting PWM Frequency                             | 由计数频率和周期算出的频率，只读；Master 不直接接输出引脚                           |
+| 时基     | Repetition Counter                                  | 重复计数 N，每 N+1 个周期产生一次重复事件；填 0 表示每个周期一次                    |
+| 时基     | Mode                                                | 连续运行 / 单次运行；连续模式到周期末自动回卷继续计数                               |
+| 时序单元 | Interleaved Mode                                    | 自动把比较点按周期等分：Half 二分之一、Triple 三分之一、Quad 四分之一，用于交错时序 |
+| 时序单元 | Start On Sync                                       | 同步输入到来时是否启动计数：开 / 关                                                 |
+| 时序单元 | Reset On Sync                                       | 同步输入到来时是否清零计数器：开 / 关                                               |
+| 时序单元 | Dac Synchro                                         | 是否产生给 DAC 用的同步事件：开 / 关                                                |
+| 时序单元 | Preload Enable                                      | 新参数先放预装载寄存器，等更新事件再生效：开 / 关                                   |
+| 时序单元 | Update Gating                                       | 寄存器更新是否要等 DMA 成组传输完成：开 / 关                                        |
+| 时序单元 | Repetition Update                                   | 重复事件时是否把预装载值刷到活动寄存器：开 / 关                                     |
+| 时序单元 | Burst Mode                                          | 突发模式空闲窗口期间，该定时器的计数行为：继续计数 / 停住清零                       |
+| 事件请求 | Interrupt Requests Sources Selection                | 选几个 Master 事件产生中断请求：周期、比较、重复等                                  |
+| 事件请求 | Number of Master Timer Internal DMA Request Sources | 选几个 Master 事件产生 DMA 请求：周期、比较、重复等                                 |
+| 比较单元 | Compare Unit 1～4 Configuration                     | 分别启用或关闭四个比较单元                                                          |
+| 比较单元 | Compare Value                                       | 计数器到该值时产生比较事件；是否改变子定时器输出，取决于子定时器的事件配置          |
+| 成组传输 | Burst DMA Controller / Burst DMA Configuration      | HRTIM 成组寄存器 DMA 传输的开关和细节；与上面间歇工作的 Burst Mode 是两回事         |
 
-图中 Master 每 50 μs 产生一次周期事件，CMP1 在周期中间的 25 μs 处产生比较事件。要用它控制子定时器的周期或相位，还需在子定时器中选用相应的 Master 周期/比较事件。
+Master 的周期事件可以当整组波形的节拍，比较事件常用来复位子定时器或触发采样。要用它控制子定时器的周期或相位，还需在子定时器中选用对应的 Master 周期/比较事件。
 
 ## HRTIM Interrupt Configuration — 外设中断源配置
 
@@ -217,15 +203,27 @@ Master 通常用于确定整组波形的周期、子定时器复位时刻或相�
 
 ## Sync Configuration — 同步配置
 
-配置同步输入、同步输出及相关信号源，使 HRTIM 与其他定时器或外部设备对齐时间基准。常见内容包括同步输入源、有效边沿、同步输出源及极性。
+配置同步输入、同步输出及相关信号源，使 HRTIM 与其他定时器或外部设备对齐时间基准。
+
+常见内容包括同步输入源、有效边沿、同步输出源及极性。
 
 用于多控制器、多电源模块或多组波形协同。同步信号建立后，还要配置相关计数器对同步事件的响应，才能实现同步启动或复位。
 
+![1793805992010](image/HRTIM高分辨定时器/1793805992010.png)
+
+| 选项                 | 说明（可选值）                                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Sync Options         | 这个 HRTIM 在同步里扮演什么角色：<br />不使用同步（独立运行）/ 只当主（产生 SYNCOUT）/ 只当从（吃 SYNCIN）/ 既当主又当从               |
+| Sync Output Source   | 主模式下 SYNCOUT 何时发一个脉冲（宽度 16 个 fHRTIM 周期）：<br />Master 启动事件 / Master 比较 1 / Timer A 启动或复位 / Timer A 比较 1 |
+| Sync Output Polarity | 这个同步脉冲的极性：关闭（不发脉冲）/ 正脉冲 / 负脉冲                                                                                  |
+
+选成“从”或“主+从”时，才会多出 `Sync Input Source`（不配 / 片上定时器 / SYNCIN 引脚正脉冲）和有效边沿相关的项。
+
 ## High Resolution — 高分辨率配置
 
-配置高分辨率时序所需的 DLL 校准及相关选项，例如校准方式、周期性校准设置。DLL 用于建立细分延时，使部分事件边沿能够获得细于普通计数时钟周期的时间分辨率。
-
 使用高分辨率功能前，需要完成相应校准并确认就绪。实际分辨率取决于芯片、HRTIM 时钟及工作条件；高分辨率描述的是边沿定位能力，不代表 CPU 中断也具有同样的响应精度。
+
+![1793840049321](image/HRTIM高分辨定时器/1793840049321.png)
 
 ## External Event Configuration — 外部事件配置
 
