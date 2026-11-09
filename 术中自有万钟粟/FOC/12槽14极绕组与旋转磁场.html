@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12槽14极绕组与旋转磁场</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1220;--card:#151f30;--line:#304057;--text:#edf3fb;--muted:#a5b6ce;--a:#ff9a78;--b:#70c9ff;--c:#c5a0ff;--seven:#6ae4c0;--five:#e3b96a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.7 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1380px;margin:auto;padding:28px}h1{font-size:clamp(25px,3vw,38px);margin:12px 0}h2{font-size:19px;margin:0 0 12px}p{margin:10px 0}a{color:var(--b)}nav{font-size:13px;color:var(--muted)}.lead{max-width:950px;color:var(--muted)}.pill{font-size:12px;color:var(--seven);letter-spacing:2px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}.full{grid-column:1/-1}.controls{position:sticky;top:0;z-index:3;background:#151f30f5;backdrop-filter:blur(12px);display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-top:22px}button,select{font:inherit;color:var(--text);border:1px solid #4a617f;background:#24354e;border-radius:8px;padding:7px 13px;cursor:pointer}button:hover{background:#354e6e}button.primary{background:#176f62;border-color:#289a87}input[type=range]{accent-color:var(--seven);cursor:pointer;max-width:100%}.slider{display:flex;align-items:center;gap:12px;flex:1;min-width:230px}.slider input{flex:1;min-width:80px}output{font-variant-numeric:tabular-nums;min-width:54px}.stats{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:12px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:24px;font-variant-numeric:tabular-nums}.stat strong em{font-size:13px;font-style:normal;color:var(--muted)}canvas{display:block;width:100%;height:auto}#motor{aspect-ratio:1}#wave{aspect-ratio:2}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}.note{color:var(--muted);font-size:13px}.highlight{border-left:3px solid var(--seven);padding:9px 14px;background:#6ae4c009}.phasebars{display:flex;gap:12px;margin:14px 0}.phasebar{flex:1}.phasebar b{font-size:14px}.track{position:relative;height:10px;background:#0b1220;border-radius:6px;margin:8px 0}.track:before{content:"";position:absolute;left:50%;height:100%;border-left:1px solid #b2c3da}.fill{position:absolute;height:100%;border-radius:6px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;text-align:center;white-space:nowrap}td,th{padding:9px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}.winding{font-size:15px;font-weight:bold}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.steps b{color:var(--seven)}code{color:#b5e8d8;font-family:Consolas,monospace}.equation{padding:12px;background:#0c1525;border-radius:10px;overflow-x:auto;font-family:Consolas,monospace}.toggles{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}.toggles input{accent-color:var(--seven)}.selection{min-height:55px;padding:10px 12px;border-radius:10px;background:#0c1525;color:var(--muted)}details{margin-top:16px}summary{cursor:pointer;color:var(--b)}hr{border:0;border-top:1px solid var(--line);margin:20px 0}@media(max-width:850px){main{padding:15px}.grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.card{padding:16px}.controls{position:static}.stats{gap:18px}#wave{aspect-ratio:1.65}}
+.lesson{margin-top:24px;border-color:#538c80}.lesson-controls{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.lesson-controls button.active{background:#176f62;border-color:#6ae4c0}.lesson-layout{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.4fr);gap:22px;align-items:start}.lesson-copy{min-height:85px}.equation-box{padding:14px;background:#0c1525;border-radius:10px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.lesson-chart{width:100%}.small-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.probe{display:flex;align-items:center;gap:12px;margin:16px 0}.probe input{flex:1;min-width:60px}.warning{color:#f1d29c}.lesson h3{margin:10px 0;font-size:16px}#lessonRing{max-width:470px;margin:auto}.lesson-stage{font-size:23px;color:var(--seven)}@media(max-width:850px){.lesson-layout{grid-template-columns:1fr}.lesson-stage{font-size:20px}}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="MOC.md">← FOC MOC</a> · <a href="../../index.md">← 主页</a> · <a href="电机学基础.md">← 电机学基础</a></nav>
+<hr>
+<div class="pill">12 SLOTS / 14 POLES / 7 POLE PAIRS</div>
+<h1>12 个线圈，怎样配合 7 对磁极？</h1>
+<p class="lead">先暂停电流变化，一组一组看。12 个齿并没有变成 14 个独立磁极。“含有 7 对极成分”，也不等于“总磁场只有 7 对极”。</p>
+<section class="card lesson">
+<h2>从这里开始：逐组放入线圈，再看相加</h2>
+<div class="lesson-controls" id="lessonStages"></div>
+<div class="small-controls"><button id="lessonPrev">← 上一步</button><button class="primary" id="lessonNext">下一步 →</button><button id="lessonTime">电流前进 60°</button><button id="lessonZero">电流回到起点</button><span id="lessonPhi" class="note"></span></div>
+<h3 id="lessonTitle" class="lesson-stage"></h3><p id="lessonCopy" class="lesson-copy"></p>
+<div class="lesson-layout">
+<div><canvas id="lessonRing" width="560" height="560" aria-label="逐组高亮齿线圈"></canvas><p class="note">暗色齿暂不加入计算；亮色齿是这一步选中的线圈。这里只画定子，先拿掉转子，避免把转子磁极误认为定子磁极。</p><div class="small-controls"><label>右侧看什么？ <select id="lessonMode"><option value="raw">线圈的完整简化分布</option><option value="seven">各线圈中的 7 对极成分</option></select></label></div><p id="modeCopy" class="note"></p></div>
+<div style="min-width:0"><h3>横轴都表示圆周上的同一位置，最后一行逐点相加</h3><div style="overflow-x:auto"><canvas id="lessonPlot" class="lesson-chart" style="min-width:640px" width="1100" height="760" aria-label="各组贡献和逐点相加结果"></canvas></div><label class="probe">移动观察线 <input id="lessonProbe" type="range" min="0" max="359" value="0"><output id="probeOut">0°</output></label><div id="lessonSum" class="equation-box"></div></div>
+</div>
+<p class="highlight"><b>“叠加”：</b>像几个人在同一地点推同一个物体，方向相同就加强，相反就抵消。这里是在圆周每一个位置，把各线圈的磁动势贡献相加；在线性、均匀气隙近似下，磁场也按同样原则相加。</p>
+<p class="warning"><b>“叠加”和“分解”是两回事：</b>先把 12 个线圈的贡献相加，得到完整分布；再把完整分布拆成不同重复次数的波形，才会看到其中的 7 对极成分。绿色七个峰不是凭空新增的七块磁铁。</p>
+<details><summary>为什么一个形状不规则的波，也可以含有“7 次起伏”？</summary><p>像一个声音同时含有低音和高音，耳朵听到的是它们相加后的声音。这里的“高低”换成了“沿圆周起伏的次数”。完整波形可能看不出 7 个峰，但其中仍有一个 7 次起伏的分量。切到第 8 步，再把下拉框切回完整分布，观察它们并不是同一条曲线。</p><p>单齿的完整分布采用“本齿距内为正台阶、其余圆周为小的负背景”的理想磁动势模型，圆周均值为零，表示回磁路的约束。每相正反线圈数量相等，所以整相相加时背景抵消，回到下方原图使用的阶梯波。图中数值是教学模型，不是逐齿实测磁密。</p></details>
+</section>
+<details><summary style="margin-top:24px">展开原来的整体动画、绕组表和数学说明</summary>
+<div class="controls">
+<button id="play" class="primary">▶ 播放</button><button id="step">前进 60° 电角度</button><button id="reset">复位</button>
+<label class="slider">电角度 <input id="angle" type="range" min="0" max="2520" step="1" value="0"><output id="angleOut">0°</output></label>
+<label>速度 <select id="speed"><option value="30">慢</option><option value="70" selected>中</option><option value="150">快</option></select></label>
+</div>
+<div class="grid">
+<section class="card">
+<h2>① 沿圆周看：齿固定，磁场在转</h2>
+<div class="legend"><span><i class="dot" style="background:var(--a)"></i>A 相</span><span><i class="dot" style="background:var(--b)"></i>B 相</span><span><i class="dot" style="background:var(--c)"></i>C 相</span><span>红 N / 蓝 S</span></div>
+<canvas id="motor" width="720" height="720" aria-label="12齿绕组、定子7对极磁场成分和14极转子示意图">浏览器需要支持 Canvas。</canvas>
+<div class="selection" id="selected">点击外圈任一齿，查看它属于哪一相、绕向和当前安匝值。</div>
+<p class="note">外圈：12 个齿，各绕一个线圈，相邻齿之间为槽。细环：单独显示的定子 7 对极成分。内环：14 极转子示意。相同磁极每隔约 51.43° 重复。</p>
+<p class="note">转子按同步转动、固定 60° 电角度负载角演示；不是动力学仿真。红蓝细环是筛选后的成分，不是实际总磁场的逐点分布。</p>
+</section>
+<section class="card">
+<h2>② 把圆周展开：7 对极藏在合成波形里</h2>
+<div class="stats"><div class="stat"><small>电角度累计变化</small><strong id="electric">0 <em>°</em></strong></div><div class="stat"><small>同步机械角度变化</small><strong id="mechanical">0.00 <em>°</em></strong></div></div>
+<div class="toggles"><label><input type="checkbox" id="showTotal" checked> 齿线圈合成磁动势</label><label style="color:var(--seven)"><input type="checkbox" id="show7" checked> 7 对极成分</label><label style="color:var(--five)"><input type="checkbox" id="show5"> 5 对极成分</label></div>
+<canvas id="wave" width="900" height="450" aria-label="圆周磁动势与5、7对极空间谐波"></canvas>
+<p class="highlight">看绿色曲线：沿机械圆周 0° → 360°，恰好出现 <b>7 个正峰、7 个负峰</b>。它们的峰值位置可以落在齿间，不需要与 12 个齿一一对齐。</p>
+<div class="phasebars" id="phasebars"></div>
+<p class="note">三相电流：iA = cos φ，iB = cos(φ − 240°)，iC = cos(φ − 120°)。这是本图采用的相序；交换 B、C 相会改变旋转方向。</p>
+<p class="note">灰色阶梯采用等匝齿线圈、每齿距内磁动势恒定的理想模型。绿色和金色曲线由灰色波形做空间傅里叶分解得到；并非先画一条绿色曲线再假装绕组生成了它。</p>
+</section>
+<section class="card full">
+<h2>③ 具体绕法：每相 4 个齿线圈</h2>
+<p>同一字母的线圈归到同一相，按正负绕向连接。<b>“＋ / −”表示线圈方向，不是固定的 N / S 极。</b>下表的正负安匝值会随电流变化。</p>
+<div class="tablewrap"><table id="windingTable"><thead><tr><th>齿号</th></tr></thead><tbody></tbody></table></div>
+<p class="note">可按 A：1+、2−、7−、8+；B：3−、4+、9+、10−；C：5+、6−、11−、12+ 连接。同相等匝串联作为本图示例，首尾由绕线视向确定；这里只展示电磁关系，不是接线施工图。</p>
+</section>
+<section class="card full">
+<h2>④ 为什么选这些相和绕向？</h2>
+<div class="steps"><div><b>1 / 机械位置乘以 7</b><p>相邻齿差 30° 机械角。对于目标 7 对极成分，相邻齿对应 <strong>210° 电角度</strong>。</p><code>θe = 7 × θm</code></div><div><b>2 / 选接近的绕组相位</b><p>A+、B−、C+、A−、B+、C− 提供 0°、60°、120°、180°、240°、300° 六个方向。目标相位与所选方向相差交替为 0° 和 30°，所以能协同加强 7 对极成分。</p></div><div><b>3 / 电流推动波形移动</b><p>电角度增加 360°，绿色波形移动 <strong>360° ÷ 7 ≈ 51.43°</strong> 机械角。电流经过 7 个周期，转子同步转一整圈。</p></div></div>
+<p class="highlight">同一套 12 槽绕组也有较强的 <b>5 对极成分</b>，它在本相序下反向旋转。12 槽本身不能唯一决定转子用 10 极还是 14 极；本图选择 14 极转子，让它与 7 对极成分同步配合。</p>
+<details><summary>展开：图中的数学模型与边界</summary>
+<p>齿中心 θk = k·30°。每个齿线圈的正向磁动势在本齿距内取 sₖ·i相，其余齿距取 0；12 个线圈叠加成灰色阶梯 F(θ)。本绕组各相正负匝数平衡，因此圆周平均磁动势为 0。</p>
+<div class="equation">aₙ = (2/12) sinc(nπ/12) Σₖ Fₖ cos(nθₖ)<br>bₙ = (2/12) sinc(nπ/12) Σₖ Fₖ sin(nθₖ)<br>Fₙ(θ) = aₙ cos(nθ) + bₙ sin(nθ),　sinc(x) = sin(x)/x</div>
+<p>本图的分解得到 F₇ ∝ cos(7θ − φ − 15°)，F₅ ∝ cos(5θ + φ + 15°)，幅值均恒定。在本图模型中，7 对极与 5 对极的幅值之比为 5/7。7 对极不必是幅值最大的成分，仍可与 14 极转子同步产生平均转矩。</p>
+<p>若假设光滑、均匀气隙，径向磁密近似正比于磁动势；实际磁密还受气隙磁导、槽口、磁钢、饱和等影响。本图没有计算漏磁、齿槽转矩、端部和有限元磁场。</p>
+</details>
+</section>
+</div>
+</details>
+</main>
+<script>
+'use strict';
+const TAU=2*Math.PI, rad=Math.PI/180;
+const winding=[['A',1],['A',-1],['B',-1],['B',1],['C',1],['C',-1],['A',-1],['A',1],['B',1],['B',-1],['C',-1],['C',1]];
+const colors={A:'#ff9a78',B:'#70c9ff',C:'#c5a0ff'};
+const $=id=>document.getElementById(id);
+const motor=$('motor'),wave=$('wave'),m=motor.getContext('2d'),w=wave.getContext('2d');
+let phi=0,playing=false,last=0,selected=-1;
+const current=p=>({A:Math.cos(p),B:Math.cos(p-240*rad),C:Math.cos(p-120*rad)});
+function values(p){const c=current(p);return winding.map(([phase,sign])=>sign*c[phase]);}
+function harmonic(v,n){const factor=2/12*Math.sin(n*Math.PI/12)/(n*Math.PI/12);let a=0,b=0;v.forEach((f,k)=>{a+=f*Math.cos(n*k*TAU/12);b+=f*Math.sin(n*k*TAU/12);});return{a:a*factor,b:b*factor};}
+function evaluate(h,n,t){return h.a*Math.cos(n*t)+h.b*Math.sin(n*t);}
+function point(r,t){return[360+r*Math.sin(t),360-r*Math.cos(t)];}
+function line(ctx,x1,y1,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
+function label(ctx,text,x,y,color='#edf3fb',size=14){ctx.fillStyle=color;ctx.font=`${size}px system-ui, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x,y);}
+function sector(ctx,r1,r2,t1,t2,fill){ctx.beginPath();ctx.arc(360,360,r2,t1-Math.PI/2,t2-Math.PI/2);ctx.arc(360,360,r1,t2-Math.PI/2,t1-Math.PI/2,true);ctx.closePath();ctx.fillStyle=fill;ctx.fill();}
+function renderMotor(v,h7){m.clearRect(0,0,720,720);
+sector(m,274,294,0,TAU,'#28384e');
+for(let k=0;k<12;k++){
+const t=k*TAU/12,[phase,sign]=winding[k],color=colors[phase];
+sector(m,227,287,t-.115,t+.115,selected===k?'#647996':'#3c4d65');
+sector(m,250,279,t-.16,t+.16,color);
+const pos=point(266,t);label(m,phase+(sign>0?'+':'−'),...pos,'#101725',17);
+const num=point(318,t);label(m,String(k+1),...num,selected===k?'#ffffff':'#a5b6ce',16);
+const tip=point(231,t),tail=point(231+Math.abs(v[k])*24,t);
+line(m,...tip,...tail,v[k]>=0?'#ff777b':'#6eb0ff',4);
+}
+const amplitude=Math.hypot(h7.a,h7.b);
+for(let j=0;j<560;j++){
+const t=j*TAU/560,f=evaluate(h7,7,t)/amplitude;
+sector(m,192,211,t,t+TAU/560+.001,`rgba(${f>=0?'255,107,118':'85,159,255'},${.2+.8*Math.abs(f)})`);
+}
+const peak=-Math.atan2(-h7.b,h7.a)/7;
+for(let k=0;k<14;k++){const t=peak+k*Math.PI/7;label(m,k%2===0?'N':'S',...point(202,t),'#ffffff',12);}
+const rotation=(phi*rad+15*rad-60*rad)/7;
+for(let k=0;k<14;k++){
+const center=rotation+k*Math.PI/7;
+sector(m,124,171,center-Math.PI/14+.009,center+Math.PI/14-.009,k%2===0?'#337ac3':'#c54b60');
+label(m,k%2===0?'S':'N',...point(148,center),'#fff',15);
+}
+sector(m,0,117,0,TAU,'#101929');label(m,'14 极转子',360,344,'#edf3fb',23);label(m,'7 对 N / S',360,378,'#a5b6ce',17);
+const marker=point(108,rotation);m.beginPath();m.arc(...marker,6,0,TAU);m.fillStyle='#fff';m.fill();
+label(m,'齿编号从顶部起，顺时针增加',360,691,'#a5b6ce',14);
+}
+function renderWave(v,h7,h5){w.clearRect(0,0,900,450);const left=60,right=875,top=35,bottom=380,mid=(top+bottom)/2,scale=123;
+for(let d=0;d<=360;d+=30){const x=left+(right-left)*d/360;line(w,x,top,x,bottom,'#2a3b53');label(w,String(d)+'°',x,bottom+22,'#a5b6ce',12);}
+[-1,0,1].forEach(f=>{line(w,left,mid-f*scale,right,mid-f*scale,f===0?'#71829a':'#2a3b53');label(w,String(f),left-24,mid-f*scale,'#a5b6ce',12);});
+label(w,'归一化磁动势',128,15,'#a5b6ce',12);label(w,'机械圆周角 θ →',775,435,'#a5b6ce',13);
+function plot(fn,color,width){w.beginPath();for(let j=0;j<=2400;j++){const t=j/2400*TAU,x=left+(right-left)*j/2400,y=mid-fn(t)*scale;if(j===0)w.moveTo(x,y);else w.lineTo(x,y);}w.strokeStyle=color;w.lineWidth=width;w.stroke();}
+if($('showTotal').checked)plot(t=>v[Math.floor((t+Math.PI/12)/TAU*12)%12],'#a8b7cb',2);
+if($('show5').checked)plot(t=>evaluate(h5,5,t),'#e3b96a',2.5);
+if($('show7').checked)plot(t=>evaluate(h7,7,t),'#6ae4c0',3);
+for(let k=0;k<12;k++)if($('showTotal').checked){const x=left+(right-left)*k/12,y=mid-v[k]*scale;w.beginPath();w.arc(x,y,3,0,TAU);w.fillStyle=colors[winding[k][0]];w.fill();}
+}
+function initTable(){const header=$('windingTable').querySelector('thead tr');for(let k=0;k<12;k++){const cell=document.createElement('th');cell.textContent=k+1;header.appendChild(cell);}
+const rows=[['绕组',k=>winding[k][0]+(winding[k][1]>0?'+':'−')],['机械角',k=>(k*30)+'°'],['目标电角度',k=>(k*210%360)+'°'],['绕组相位',k=>({A:0,B:240,C:120}[winding[k][0]]+(winding[k][1]<0?180:0))%360+'°'],['当前安匝值',()=> '']];
+for(const [name,fn]of rows){const row=document.createElement('tr'),title=document.createElement('th');title.textContent=name;row.appendChild(title);for(let k=0;k<12;k++){const td=document.createElement('td');td.textContent=fn(k);if(name==='绕组'){td.style.color=colors[winding[k][0]];td.className='winding';}if(name==='当前安匝值')td.id='value'+k;row.appendChild(td);}$('windingTable').querySelector('tbody').appendChild(row);}
+for(const p of ['A','B','C']){const div=document.createElement('div');div.className='phasebar';div.innerHTML=`<b style="color:${colors[p]}">i${p} = <span id="i${p}"></span></b><div class="track"><div class="fill" id="bar${p}" style="background:${colors[p]}"></div></div>`;$('phasebars').appendChild(div);}}
+function render(){const v=values(phi*rad),h7=harmonic(v,7),h5=harmonic(v,5),c=current(phi*rad);$('angle').value=phi;$('angleOut').textContent=phi.toFixed(0)+'°';$('electric').innerHTML=phi.toFixed(0)+' <em>°</em>';$('mechanical').innerHTML=(phi/7).toFixed(2)+' <em>°</em>';
+for(let k=0;k<12;k++)$('value'+k).textContent=(v[k]>=0?'+':'')+v[k].toFixed(2);
+for(const p of ['A','B','C']){$('i'+p).textContent=c[p].toFixed(2);$('bar'+p).style.left=(c[p]<0?50+c[p]*50:50)+'%';$('bar'+p).style.width=(Math.abs(c[p])*50)+'%';}
+if(selected>=0){const[p,s]=winding[selected];$('selected').textContent=`${selected+1} 号齿：${p} 相，${s>0?'正':'反'}向绕制；${selected*30}° 机械角 → ${selected*210%360}° 目标电角度；当前安匝值 ${v[selected].toFixed(3)}（以匝数 × 电流峰值归一化）。`;}
+renderMotor(v,h7);renderWave(v,h7,h5);renderLesson();}
+function setPlaying(state){playing=state;$('play').textContent=playing?'Ⅱ 暂停':'▶ 播放';last=0;}
+$('play').addEventListener('click',()=>setPlaying(!playing));
+$('step').addEventListener('click',()=>{setPlaying(false);phi=Math.min(2520,phi+60);render();});
+$('reset').addEventListener('click',()=>{setPlaying(false);phi=0;render();});
+$('angle').addEventListener('input',e=>{setPlaying(false);phi=Number(e.target.value);render();});
+['showTotal','show7','show5'].forEach(id=>$(id).addEventListener('change',render));
+motor.addEventListener('click',e=>{const rect=motor.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width*720-360,y=(e.clientY-rect.top)/rect.height*720-360,r=Math.hypot(x,y);if(r<220||r>340)return;let t=Math.atan2(x,-y);if(t<0)t+=TAU;selected=Math.round(t/TAU*12)%12;render();});
+function animate(time){if(playing){if(last){phi=Math.min(2520,phi+Math.min((time-last)/1000,.1)*Number($('speed').value));if(phi>=2520)setPlaying(false);render();}last=time;}requestAnimationFrame(animate);}
+const groups={A:[0,1,6,7],B:[2,3,8,9],C:[4,5,10,11]};
+const lessons=[
+{title:'1 / 只看 1 号齿：一个线圈',copy:'A 相电流从 +1 开始。先看橙色线圈自己产生的分布：完整分布是一个台阶及其回路背景，并不是一条沿圆周均匀起伏 7 次的正弦波。',rows:[{name:'1 号 A+',ids:[0],color:colors.A}]},
+{title:'2 / 加上 2 号齿：两个相邻线圈',copy:'1 号是 A+，2 号是 A−。同一股 A 相电流通过它们，但绕向相反。看两行各自的贡献，再看最下面的和；正负背景相互抵消，本齿处的台阶保留下来。',rows:[{name:'1 号 A+',ids:[0],color:colors.A},{name:'2 号 A−',ids:[1],color:'#ffc3aa'}]},
+{title:'3 / A 相四个线圈：1、2、7、8 号',copy:'这四个线圈属于同一相，电流相同，绕向按 +、−、−、+ 分配。下面四条曲线逐点相加，才得到 A 相自己的完整分布。它还不是三相合成磁场。',rows:groups.A.map((id,i)=>({name:(id+1)+' 号 A'+(winding[id][1]>0?'+':'−'),ids:[id],color:['#ff9a78','#ffc3aa','#df795d','#ffe0cf'][i]}))},
+{title:'4 / 单独看 B 相：3、4、9、10 号',copy:'这一步先拿掉 A 相，单看 B 相四个线圈。起点时 iB = −0.5，所以同样标着“+”的绕组，当前贡献也可能为负。绕向和瞬时电流需要相乘。',rows:groups.B.map(id=>({name:(id+1)+' 号 B'+(winding[id][1]>0?'+':'−'),ids:[id],color:colors.B}))},
+{title:'5 / 单独看 C 相：5、6、11、12 号',copy:'C 相放在另外四个齿上。起点时 iC = −0.5。每组只有四个线圈，三相合起来才是完整的十二个齿线圈。',rows:groups.C.map(id=>({name:(id+1)+' 号 C'+(winding[id][1]>0?'+':'−'),ids:[id],color:colors.C}))},
+{title:'6 / A 相 + B 相：先加两组',copy:'现在每一行代表整相，不再代表单个齿。观察线所指的位置，A 相和 B 相各贡献多少，就直接相加多少。最后一行是这八个线圈的合成结果。',rows:[{name:'A 相四线圈',ids:groups.A,color:colors.A},{name:'B 相四线圈',ids:groups.B,color:colors.B}]},
+{title:'7 / A + B + C：十二个线圈完整相加',copy:'这就是三相十二个线圈的完整简化分布。请注意：它是阶梯波，不是突然出现了 14 个交替的独立磁极。前面的解释若让你产生这个印象，需要在这里纠正。',rows:['A','B','C'].map(p=>({name:p+' 相四线圈',ids:groups[p],color:colors[p]}))},
+{title:'8 / 换一种看法：只看其中的“7 次起伏”',copy:'线圈与电流都没有改。这一步只是把每一相完整分布里的 7 对极部分单独取出来，再相加。最后的绿色曲线才是能与 14 极转子同步配合的成分。它不是完整磁场；切回“完整简化分布”就能比较。',rows:['A','B','C'].map(p=>({name:p+' 相的 7 对极部分',ids:groups[p],color:colors[p]}))}
+];
+let lessonIndex=0;
+const lr=$('lessonRing').getContext('2d'),lp=$('lessonPlot').getContext('2d');
+function lessonVector(ids){const v=values(phi*rad);return v.map((x,k)=>ids.includes(k)?x:0);}
+function rawAt(v,t){const index=((Math.floor((t+Math.PI/12)/TAU*12)%12)+12)%12;return v[index]-v.reduce((a,b)=>a+b,0)/12;}
+function lessonFunction(v,mode){if(mode==='seven'){const h=harmonic(v,7);return t=>evaluate(h,7,t);}return t=>rawAt(v,t);}
+function renderLesson(){
+const lesson=lessons[lessonIndex],mode=$('lessonMode').value,probe=Number($('lessonProbe').value)*rad;
+$('lessonTitle').textContent=lesson.title;$('lessonCopy').textContent=lesson.copy;
+$('lessonPhi').textContent='当前电角度 '+phi.toFixed(0)+'°';$('probeOut').textContent=(probe/rad).toFixed(0)+'°';
+$('modeCopy').textContent=mode==='seven'?'当前每一条曲线都只显示该组的 7 对极成分。单个线圈也能分解出这类成分，但不表示单个线圈的完整磁场就是 7 对极。':'当前显示各组完整的简化磁动势，不筛选极对数。先理解逐点相加，再看第 8 步的 7 对极成分。';
+$('lessonPrev').disabled=lessonIndex===0;$('lessonNext').disabled=lessonIndex===lessons.length-1;
+Array.from($('lessonStages').children).forEach((b,i)=>{b.classList.toggle('active',i===lessonIndex);b.setAttribute('aria-pressed',String(i===lessonIndex));});
+const ids=lesson.rows.flatMap(r=>r.ids),v=values(phi*rad);
+lr.clearRect(0,0,560,560);lr.save();lr.translate(-80,-80);
+sector(lr,198,223,0,TAU,'#26364c');
+for(let k=0;k<12;k++){const t=k*TAU/12,active=ids.includes(k),[p,s]=winding[k];sector(lr,161,217,t-.14,t+.14,active?colors[p]:'#29364a');label(lr,p+(s>0?'+':'−'),...point(191,t),active?'#101725':'#6b7c94',18);label(lr,String(k+1),...point(244,t),active?'#edf3fb':'#6b7c94',16);if(active)label(lr,(v[k]>=0?'+':'')+v[k].toFixed(2),...point(139,t),v[k]>=0?'#ff9a9e':'#8cc8ff',13);}
+label(lr,ids.length+' 个齿线圈',360,347,'#edf3fb',24);label(lr,'只看亮色这一组',360,381,'#a5b6ce',16);
+line(lr,...point(94,probe),...point(252,probe),'#ffffff',2);lr.restore();
+const functions=lesson.rows.map(r=>lessonFunction(lessonVector(r.ids),mode));
+const sum=t=>functions.reduce((s,fn)=>s+fn(t),0);
+const lines=[...lesson.rows.map((r,i)=>({name:r.name,fn:functions[i],color:r.color})),{name:'相加结果',fn:sum,color:'#6ae4c0'}];
+lp.clearRect(0,0,1100,760);const left=158,right=1060,top=24,bottom=702,rowH=(bottom-top)/lines.length,scale=Math.min(95,rowH*.37);
+for(let d=0;d<=360;d+=30){const x=left+(right-left)*d/360;line(lp,x,top,x,bottom,'#293b52');label(lp,d+'°',x,730,'#a5b6ce',15);}
+for(let i=0;i<lines.length;i++){
+const item=lines[i],y=top+rowH*(i+.5);line(lp,left,y,right,y,'#4a5a70');label(lp,item.name,77,y-12,item.color,17);label(lp,(item.fn(probe)>=0?'+':'')+item.fn(probe).toFixed(3),77,y+14,item.color,17);
+lp.beginPath();for(let j=0;j<=1800;j++){const t=j/1800*TAU,x=left+(right-left)*j/1800,yy=y-item.fn(t)*scale;if(j===0)lp.moveTo(x,yy);else lp.lineTo(x,yy);}lp.strokeStyle=item.color;lp.lineWidth=i===lines.length-1?4:2.5;lp.stroke();
+const x=left+(right-left)*probe/TAU;lp.beginPath();lp.arc(x,y-item.fn(probe)*scale,5,0,TAU);lp.fillStyle='#ffffff';lp.fill();
+}
+const px=left+(right-left)*probe/TAU;line(lp,px,top,px,bottom,'#ffffff',1.5);
+const formatted=functions.map(fn=>'('+((fn(probe)>=0?'+':'')+fn(probe).toFixed(3))+')');
+$('lessonSum').textContent='在 '+(probe/rad).toFixed(0)+'° 这个位置：'+formatted.join(' + ')+' = '+sum(probe).toFixed(3)+'。'+(mode==='seven'?'这些数是各组“7 对极部分”的贡献。':'这些数是各组完整简化分布的贡献。');
+}
+function setLesson(i){setPlaying(false);lessonIndex=i;$('lessonMode').value=i===7?'seven':'raw';render();}
+['1 单齿','2 两齿','3 A相','4 B相','5 C相','6 A+B','7 三相合成','8 找7对极'].forEach((name,i)=>{const b=document.createElement('button');b.textContent=name;b.addEventListener('click',()=>setLesson(i));$('lessonStages').appendChild(b);});
+$('lessonPrev').addEventListener('click',()=>setLesson(Math.max(0,lessonIndex-1)));
+$('lessonNext').addEventListener('click',()=>setLesson(Math.min(7,lessonIndex+1)));
+$('lessonTime').addEventListener('click',()=>{setPlaying(false);phi=phi>=2520?0:Math.min(2520,phi+60);render();});
+$('lessonZero').addEventListener('click',()=>{setPlaying(false);phi=0;render();});
+$('lessonProbe').addEventListener('input',renderLesson);$('lessonMode').addEventListener('change',renderLesson);
+initTable();render();requestAnimationFrame(animate);
+</script>
+</body>
+</html>
