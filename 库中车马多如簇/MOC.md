@@ -33,6 +33,7 @@
 |     编码器     |       AS5600 分层驱动、资源挂载与 DMA 采样       | [编码器笔记](./编码器/MOC.md)                           |
 |     缓冲区     |        环形缓冲区、定长块内存池、AB 双缓冲        | [缓冲区](缓冲区/MOC.md)                             |
 |   EasyLogger   |         嵌入式日志库，源码 + keil 移植         | [使用方法](../术中自有万钟粟/debug方法/EasyLogger.md)   |
+|    DWT 测量    |   单通道区间计时，enter/exit 直接打印周期与微秒   | [DWT 测量](./DWT测量/MOC.md)                            |
 |      Flash      |        片内与外部 Flash 擦除、读写驱动        | [Flash](./Flash/MOC.md)                                 |
 |     Ymodem     |         文件传输协议，源码 + 协议笔记         | [Ymodem](./Ymodem/MOC.md)                               |
 |       AES       | 对称加密，128/192/256 bit CBC，源码 + OTA 使用 | [AES](./AES/MOC.md)                                     |
