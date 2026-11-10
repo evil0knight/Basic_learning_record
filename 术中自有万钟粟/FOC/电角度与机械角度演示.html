@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>电角度与机械角度演示</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1220;--card:#151f30;--line:#304057;--text:#edf3fb;--muted:#a5b6ce;--green:#6ae4c0;--gold:#f4cb78;--blue:#70c9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.7 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1320px;margin:auto;padding:28px}nav{font-size:13px}a{color:var(--blue)}hr{border:0;border-top:1px solid var(--line);margin:20px 0}h1{font-size:clamp(25px,3vw,38px);margin:8px 0}h2{font-size:19px;margin:0 0 12px}p{margin:10px 0}.muted{color:var(--muted)}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--green)}.controls{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin:20px 0}button,select{font:inherit;color:var(--text);background:#24354e;border:1px solid #4a617f;border-radius:8px;padding:8px 13px;cursor:pointer}button:hover{background:#354e6e}button.primary{background:#176f62;border-color:#289a87}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:4px}.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}.full{grid-column:1/-1}canvas{width:100%;height:auto;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px}.legend i{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:50%}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{padding:14px;background:var(--bg);border-radius:12px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:clamp(24px,3vw,35px);font-variant-numeric:tabular-nums}.mechanical{color:var(--gold)}.electric{color:var(--green)}.formula{font-size:23px;padding:15px;background:#0c1525;border-radius:12px;font-variant-numeric:tabular-nums}.highlight{border-left:3px solid var(--green);padding:10px 14px;background:#6ae4c009}.slider{display:flex;align-items:center;gap:12px;margin:18px 0}.slider input{flex:1;min-width:30px;accent-color:var(--gold)}output{min-width:78px;font-variant-numeric:tabular-nums}.cycles{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:15px 0}.cycle{border:1px solid var(--line);border-radius:8px;padding:9px 2px;text-align:center;font-size:12px;background:linear-gradient(90deg,#176f62 var(--fill),#0c1525 var(--fill))}.cycle b{display:block;font-size:18px}.notes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.notes b{color:var(--green)}.caption{font-size:13px;color:var(--muted)}#status{min-height:58px}.speed{margin-left:auto}@media(max-width:850px){main{padding:15px}.grid,.notes{grid-template-columns:1fr}.card{padding:16px}.speed{margin-left:0}.cycles{gap:3px}.cycle{font-size:10px}.cycle b{font-size:16px}}
+</style>
+<style>
+.torque-demo{margin:22px 0;border-color:#538c80}.torque-layout{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(0,1.3fr);gap:22px}.torque-demo .controls{margin:12px 0}.torque-demo button.active{border-color:var(--green);background:#176f62}.torque-readout{display:flex;gap:24px;flex-wrap:wrap}.torque-readout strong{font-size:25px;font-variant-numeric:tabular-nums}.torque-readout small{display:block;color:var(--muted)}@media(max-width:850px){.torque-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>电角度与机械角度演示</h1>
+<nav><a href="MOC.md">← FOC MOC</a> · <a href="../../index.md">← 主页</a> · <a href="12槽14极绕组与旋转磁场.html">← 原绕组演示</a></nav>
+<hr>
+<section class="card torque-demo" id="torque-demo">
+<div class="eyebrow">先看这里 · 为什么 90° 电角度的转矩最大？</div>
+<h2>把磁场的吸引想成一个“能量山坡”</h2>
+<p>转子会向磁能更低的位置转动。<b>正对齐像待在谷底；错开四分之一周期，正好来到坡最陡的位置。</b>坡越陡，推动转子的转矩越大。</p>
+<div class="controls" id="torque-presets">
+<button data-delta="0">0° · 谷底</button><button data-delta="45">45° · 上坡</button><button data-delta="90">90° · 最陡</button><button data-delta="135">135° · 接近山顶</button><button data-delta="180">180° · 山顶</button><button id="torque-play" class="primary">▶ 慢慢扫过 0° → 180°</button>
+</div>
+<label class="slider">两套磁场错位 <input id="delta" type="range" min="-180" max="180" step="1" value="90"><output id="delta-out">90° 电</output></label>
+<div class="torque-readout"><div><small>电角度夹角 δe</small><strong class="electric" id="delta-electric"></strong></div><div><small>圆周实际错位 δm = δe ÷ 7</small><strong class="mechanical" id="delta-mechanical"></strong></div><div><small>转矩 / 最大转矩</small><strong id="torque-value"></strong></div></div>
+<div class="torque-layout">
+<div><canvas id="torque-ring" width="660" height="660" aria-label="12槽14极电机中转子磁极和定子7对极磁场的错位"></canvas><p class="caption">内环：转子磁极，暂时固定。外侧红蓝细环：定子磁场的 7 对极成分，拖动滑块改变其位置。外侧 S 对准内侧 N 时为零错位；两侧磁极指各自朝向气隙的极性。细环不是 14 块定子磁铁，也不是完整磁场。</p></div>
+<div><canvas id="torque-slope" width="1000" height="650" aria-label="将一个磁极周期展开，显示磁场对齐位置、磁能山坡和转矩大小"></canvas><p class="highlight" id="torque-copy"></p><p class="caption">金点表示转子的当前位置，绿点是与定子磁场对齐的低能位置。金点处的斜线表示局部坡度；箭头表示转矩方向和大小。横轴向右对应电机顺时针，整段 360° 电角度只占 51.43° 机械角度。</p></div>
+</div>
+<p class="caption">此图比较固定幅值的理想正弦磁场，忽略磁阻转矩。相互作用磁能 U = −C cos(δe)，转矩 T = −∂U/∂θm = 7C sin(δe)。右图画的是转子尝试移动时的能量 U(x) = −C cos(x − δe)，用来观察当前位置的坡度；不是磁力线或实测磁场。180° 是不稳定平衡，恰好停在山顶时转矩为零。</p>
+<p><a href="#angle-demo">继续看：为什么 360° 电角度只转了 51.43° 机械角度 ↓</a></p>
+</section>
+<div id="angle-demo"></div>
+<div class="eyebrow">12 SLOTS / 14 POLES / 7 POLE PAIRS</div>
+<p class="muted">盯住带金色圆点的 N₁ 磁铁：它没有绕轴一整圈，但顶部固定观察点已经看到一次 N → S → N。这就是一个电周期。</p>
+<div class="controls">
+<button id="one" class="primary">▶ 演示一个电周期</button>
+<button id="whole">▶ 演示机械一整圈</button>
+<button id="pause">▶ 继续</button>
+<button id="step">前进 90° 电角度</button>
+<button id="reset">复位</button>
+<label class="speed">速度 <select id="speed"><option value="45">慢</option><option value="90" selected>中</option><option value="180">快</option></select></label>
+</div>
+<div class="grid">
+<section class="card">
+<h2>① 看实体：同一块磁铁只走了一小段</h2>
+<div class="legend"><span><i style="background:#c54b60"></i>N 极</span><span><i style="background:#337ac3"></i>S 极</span><span><i style="background:var(--gold)"></i>跟踪 N₁ 的实体位置</span></div>
+<canvas id="motor" width="760" height="760" aria-label="固定的12槽定子和带有金色跟踪标记的14极旋转转子">需要支持 Canvas 的浏览器。</canvas>
+<p class="caption">外圈 12 个齿及齿间槽固定不动；内圈有 14 块交替磁极。虚线是 N₁ 的初始方向，金色弧线是轴实际转过的机械角度。顺时针为本图正方向。</p>
+</section>
+<section class="card">
+<h2>② 看周期：磁极重复一次，电角度走一圈</h2>
+<div class="stats"><div class="stat"><small>轴实际转过 · 累计机械角度</small><strong id="mechanical" class="mechanical">0.00°</strong></div><div class="stat"><small>磁极相位走过 · 累计电角度</small><strong id="electric" class="electric">0°</strong></div></div>
+<canvas id="dial" width="680" height="300" aria-label="机械角度表和电角度表对比"></canvas>
+<div id="formula" class="formula">0° = 7 × 0.00°</div>
+<p id="status" class="highlight" aria-live="polite"></p>
+<p class="caption">两个表盘都是顶部为零、顺时针增加。指针每满 360° 回到顶部；上方数字保留累计角度。绿色表盘显示磁极相位，并非另一根实际转动的轴。</p>
+<label class="slider">拖动转子 <input id="angle" type="range" min="0" max="2520" step="0.1" value="0" aria-label="累计电角度"><output id="angleOut">0.00° 机械</output></label>
+<div class="cycles" id="cycles"></div>
+<p class="caption">每格是一个电周期：360° 电角度 = 51.43° 机械角度。填满 7 格，轴才转完 360°。</p>
+</section>
+<section class="card full">
+<h2>③ 站在顶部不动，观察经过的磁极</h2>
+<canvas id="wave" width="1200" height="260" aria-label="一个电周期内固定观察点的磁极变化及当前位置"></canvas>
+<p class="highlight" id="probe"></p>
+<div class="notes">
+<div><b>起点：N₁ 对着你</b><p>机械角度 0°，电角度 0°。跟踪的 N₁ 磁铁在顶部。</p></div>
+<div><b>半个电周期：S 对着你</b><p>机械转过 25.71°，电角度走过 180°。相邻 S 极来到顶部。</p></div>
+<div><b>一个电周期：下一块 N 对着你</b><p>机械转过 51.43°，电角度走过 360°。顶部再次是 N，但已经换了一块磁铁！</p></div>
+</div>
+<p class="caption">这里用理想正弦分布表示转子磁场在固定位置的周期变化，示意值 B/B峰值 = cos(θe)。只观察转子磁极，不绘制定子通电产生的磁场。12 槽决定绕组布局；角度倍率由 7 对转子磁极决定。零点选在 N₁ 对准顶部时，忽略零点偏移。</p>
+<p class="caption">回到 SVPWM：本页绿色表盘是转子电角度 θe；SVPWM 使用的电压矢量方向还取决于 Ud、Uq，不能直接认为两者总是相等。</p>
+</section>
+</div>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),R=Math.PI/180,TAU=Math.PI*2;
+const gold='#f4cb78',green='#6ae4c0',muted='#a5b6ce',white='#edf3fb';
+const winding=[['A',1],['A',-1],['B',-1],['B',1],['C',1],['C',-1],['A',-1],['A',1],['B',1],['B',-1],['C',-1],['C',1]];
+const colors={A:'#ff9a78',B:'#70c9ff',C:'#c5a0ff'};
+let electric=0,playing=false,target=360,last=null,lastStatus='';
+const motor=$('motor').getContext('2d'),dial=$('dial').getContext('2d'),wave=$('wave').getContext('2d');
+function point(cx,cy,r,degrees){return[cx+r*Math.sin(degrees*R),cy-r*Math.cos(degrees*R)];}
+function line(c,x1,y1,x2,y2,color,width=1,dash=[]){c.beginPath();c.setLineDash(dash);c.moveTo(x1,y1);c.lineTo(x2,y2);c.strokeStyle=color;c.lineWidth=width;c.stroke();c.setLineDash([]);}
+function text(c,s,x,y,color=white,size=15){c.fillStyle=color;c.font=`${size}px system-ui,sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(s,x,y);}
+function ring(c,cx,cy,r1,r2,a,b,color){c.beginPath();c.arc(cx,cy,r2,(a-90)*R,(b-90)*R);c.arc(cx,cy,r1,(b-90)*R,(a-90)*R,true);c.closePath();c.fillStyle=color;c.fill();}
+function dot(c,x,y,r,color){c.beginPath();c.arc(x,y,r,0,TAU);c.fillStyle=color;c.fill();}
+function drawMotor(){
+const c=motor,m=electric/7;c.clearRect(0,0,760,760);
+ring(c,380,380,273,297,0,360,'#28384e');
+for(let k=0;k<12;k++){
+const a=k*30,[p,s]=winding[k];ring(c,380,380,230,290,a-6.5,a+6.5,'#40526b');ring(c,380,380,250,280,a-9,a+9,colors[p]);
+text(c,p+(s>0?'+':'−'),...point(380,380,265,a),'#101725',17);text(c,String(k+1),...point(380,380,319,a),muted,15);
+}
+line(c,380,380,380,170,'#8293ab',2,[6,6]);
+// Identity labels stay attached to their physical magnets, including after a full electrical cycle.
+for(let k=0;k<14;k++){
+const a=m+k*180/7;ring(c,380,380,134,206,a-90/7+.45,a+90/7-.45,k%2===0?'#c54b60':'#337ac3');
+text(c,(k%2===0?'N':'S')+(Math.floor(k/2)+1),...point(380,380,174,a),'#fff',17);
+}
+ring(c,380,380,0,126,0,360,'#101929');
+text(c,'14 极转子',380,360,white,25);text(c,'7 对 N / S',380,397,muted,18);
+line(c,380,380,...point(380,380,141,m),gold,3);dot(c,...point(380,380,142,m),7,gold);
+if(m>0){c.beginPath();c.arc(380,380,111,-Math.PI/2,(m-90)*R);c.strokeStyle=gold;c.lineWidth=5;c.stroke();}
+dot(c,...point(380,380,217,m),7,gold);text(c,'N₁ 实体标记',380,691,gold,17);
+text(c,`轴实际转过 ${m.toFixed(2)}°`,380,722,gold,21);
+// The observer belongs to the stator, never to the rotating magnet array.
+line(c,380,60,380,155,green,3);dot(c,380,155,6,green);
+text(c,'固定观察点：我一直站在这里',380,27,green,18);
+text(c,'起始方向',438,227,muted,13);
+}
+function drawDial(){
+const c=dial;c.clearRect(0,0,680,300);
+function clock(cx,angle,color,title){
+ring(c,cx,139,87,91,0,360,'#304057');
+for(let k=0;k<12;k++)line(c,...point(cx,139,79,k*30),...point(cx,139,89,k*30),'#667991',2);
+text(c,'0°',cx,32,muted,14);text(c,'180°',cx,249,muted,13);
+line(c,cx,139,...point(cx,139,70,angle),color,5);dot(c,cx,139,7,color);
+text(c,`${(angle%360).toFixed(1)}°`,cx,180,color,18);text(c,title,cx,280,color,19);
+}
+clock(170,electric/7,gold,'机械：看同一块磁铁的位置');clock(510,electric,green,'电：看磁极变化的相位');
+}
+function cyclePhase(){if(electric>0&&Math.abs(electric%360)<1e-7)return 360;return electric%360;}
+function drawWave(){
+const c=wave;c.clearRect(0,0,1200,260);const left=70,right=1130,mid=120,scale=72;
+line(c,left,mid,right,mid,'#53657e');
+for(let d=0;d<=360;d+=90){const x=left+(right-left)*d/360;line(c,x,32,x,211,'#304057');text(c,d+'° 电',x,229,muted,14);}
+for(let i=0;i<360;i++){const a=i*R,b=(i+1)*R,x=left+(right-left)*i/360,xx=left+(right-left)*(i+1)/360;line(c,x,mid-scale*Math.cos(a),xx,mid-scale*Math.cos(b),Math.cos((a+b)/2)>=0?'#ff929c':'#70b9ff',3);}
+text(c,'N₁',left,22,'#ff929c',17);text(c,'相邻 S',600,211,'#70b9ff',17);text(c,'另一块 N',right,22,'#ff929c',17);
+const phase=cyclePhase(),x=left+(right-left)*phase/360,y=mid-scale*Math.cos(phase*R);
+line(c,x,32,x,211,green,2);dot(c,x,y,7,green);
+}
+function render(){
+const m=electric/7,phase=cyclePhase(),complete=Math.floor((electric+1e-7)/360);
+$('mechanical').textContent=m.toFixed(2)+'°';$('electric').textContent=electric.toFixed(0)+'°';
+$('formula').textContent=`${electric.toFixed(0)}° 电 = 7 × ${m.toFixed(2)}° 机械`;
+$('angle').value=electric;$('angleOut').textContent=m.toFixed(2)+'° 机械';
+let status;
+if(electric<1e-7)status='起点：顶部是带标记的 N₁。先点击“演示一个电周期”，盯着金色标记。';
+else if(Math.abs(phase-360)<1e-7)status=electric===2520?'7 个电周期完成：同一个 N₁ 终于回到顶部，轴转满 360°。':`完成 ${complete} 个电周期：顶部又是 N，但不是最初的 N₁！轴累计只转了 ${m.toFixed(2)}°。`;
+else status=`轴正在转动；这是第 ${Math.min(7,complete+1)} 个电周期。比较金色实体标记与绿色相位指针，绿色走得快 7 倍。`;
+if(status!==lastStatus){$('status').textContent=status;lastStatus=status;}
+const b=Math.cos(electric*R),pole=Math.abs(b)<.025?'N / S 交界':b>0?'N 极一侧':'S 极一侧';
+$('probe').textContent=`顶部观察点现在看到：${pole}。本周期相位 ${phase.toFixed(1)}°；归一化磁场 ${b.toFixed(2)}。N → S → N 是一次重复，不要求同一块 N 磁铁回来。`;
+Array.from($('cycles').children).forEach((el,k)=>el.style.setProperty('--fill',Math.max(0,Math.min(100,(electric-k*360)/360*100))+'%'));
+drawMotor();drawDial();drawWave();
+}
+function play(state){playing=state;last=null;$('pause').textContent=state?'Ⅱ 暂停':'▶ 继续';}
+function startOne(){if(electric>=2520)electric=0;target=Math.min(2520,(Math.floor((electric+1e-7)/360)+1)*360);play(true);render();}
+$('one').addEventListener('click',startOne);
+$('whole').addEventListener('click',()=>{electric=0;target=2520;play(true);render();});
+$('pause').addEventListener('click',()=>{if(playing)play(false);else if(electric>=target)startOne();else play(true);});
+$('step').addEventListener('click',()=>{play(false);electric=Math.min(2520,electric+90);render();});
+$('reset').addEventListener('click',()=>{play(false);electric=0;target=360;render();});
+$('angle').addEventListener('input',e=>{play(false);electric=Number(e.target.value);target=2520;render();});
+for(let k=0;k<7;k++){const el=document.createElement('div');el.className='cycle';el.innerHTML=`<b>${k+1}</b>电周期`;$('cycles').appendChild(el);}
+function animate(time){if(playing){if(last!==null){electric=Math.min(target,electric+Math.min((time-last)/1000,.1)*Number($('speed').value));if(electric>=target)play(false);render();}if(playing)last=time;}requestAnimationFrame(animate);}
+let delta=90,torquePlaying=false,torqueLast=null;
+const tr=$('torque-ring').getContext('2d'),ts=$('torque-slope').getContext('2d');
+function arrow(c,x,y,length,color){if(Math.abs(length)<1)return;const end=x+length,sign=Math.sign(length);line(c,x,y,end,y,color,5);line(c,end,y,end-sign*12,y-8,color,4);line(c,end,y,end-sign*12,y+8,color,4);}
+function drawTorqueRing(){
+const c=tr;c.clearRect(0,0,660,660);const cx=330,cy=320;
+ring(c,cx,cy,254,272,0,360,'#28384e');
+for(let k=0;k<12;k++){const a=k*30,[p,s]=winding[k];ring(c,cx,cy,226,267,a-7,a+7,'#40526b');ring(c,cx,cy,240,258,a-9,a+9,colors[p]);text(c,p+(s>0?'+':'−'),...point(cx,cy,249,a),'#101725',13);}
+for(let k=0;k<14;k++){
+const a=k*180/7,b=a+delta/7;
+ring(c,cx,cy,123,171,a-90/7+.6,a+90/7-.6,k%2===0?'#c54b60':'#337ac3');text(c,k%2===0?'N':'S',...point(cx,cy,147,a),white,15);
+ring(c,cx,cy,185,211,b-90/7+.6,b+90/7-.6,k%2===0?'#337ac3':'#c54b60');text(c,k%2===0?'S':'N',...point(cx,cy,199,b),white,14);
+}
+line(c,cx,cy,...point(cx,cy,177,0),gold,3);line(c,cx,cy,...point(cx,cy,218,delta/7),green,3);
+if(Math.abs(delta)>.001){c.beginPath();c.arc(cx,cy,102,-Math.PI/2,(-90+delta/7)*R,delta<0);c.strokeStyle=green;c.lineWidth=5;c.stroke();}
+dot(c,...point(cx,cy,174,0),5,gold);dot(c,...point(cx,cy,216,delta/7),5,green);
+text(c,'内：转子 N',cx,cy+24,gold,18);text(c,'外：吸引它的 S',cx,cy+53,green,18);
+text(c,`实际错开 ${(delta/7).toFixed(2)}° 机械角度`,330,613,gold,20);
+text(c,'两套图案的夹角，不是轴累计转过的角度',330,643,muted,14);
+}
+function drawTorqueSlope(){
+const c=ts;c.clearRect(0,0,1000,650);const left=75,right=925,x=d=>left+(d+180)/360*(right-left),y=a=>335+104*Math.cos((a-delta)*R);
+text(c,'取一组 N / S 周期，沿圆周展开',500,24,white,21);
+text(c,'转子',35,75,gold,14);text(c,'定子',35,120,green,14);
+for(let i=0;i<360;i++){const a=i-180,xx=x(a),width=(right-left)/360+.5;const rotorN=Math.cos(a*R)>=0,statorS=Math.cos((a-delta)*R)>=0;c.fillStyle=rotorN?'#c54b60':'#337ac3';c.fillRect(xx,57,width,30);c.fillStyle=statorS?'#337ac3':'#c54b60';c.fillRect(xx,102,width,30);}
+text(c,'N',x(0),72,white,17);text(c,'S',x(delta),117,white,17);
+line(c,x(0),143,x(0),460,gold,2,[5,5]);line(c,x(delta),143,x(delta),460,green,2,[5,5]);
+text(c,'转子当前位置',x(0),166,gold,16);
+text(c,'能量高',40,232,muted,14);text(c,'能量低',40,440,muted,14);
+for(let d=-180;d<=180;d+=90){line(c,x(d),205,x(d),460,'#304057');text(c,d+'°',x(d),478,muted,15);}
+c.beginPath();for(let d=-180;d<=180;d++){if(d===-180)c.moveTo(x(d),y(d));else c.lineTo(x(d),y(d));}c.strokeStyle='#9aaecb';c.lineWidth=3;c.stroke();
+const slope=104*Math.sin(delta*R)*R;
+line(c,x(-26),y(0)-26*slope,x(26),y(0)+26*slope,gold,4);
+dot(c,x(delta),y(delta),7,green);dot(c,x(0),y(0),9,gold);
+arrow(c,x(0),y(0)-34,Math.sin(delta*R)*130,green);
+text(c,'假设转子沿圆周移动 →（电角度坐标）',500,513,muted,16);
+// A common scale makes the zero, maximum and return to zero directly comparable.
+const start=230,end=810,base=589,value=Math.sin(delta*R);
+text(c,'净转矩',100,base,white,18);line(c,start,base,end,base,'#40526b',10);
+line(c,520,base,520+value*290,base,value>=0?green:'#ff929c',12);
+line(c,520,base-16,520,base+16,white,2);text(c,'−最大',start,624,muted,15);text(c,'0',520,624,muted,15);text(c,'+最大',end,624,muted,15);
+}
+function renderTorque(){
+const t=Math.sin(delta*R);$('delta').value=delta;$('delta-out').textContent=delta.toFixed(0)+'° 电';$('delta-electric').textContent=delta.toFixed(0)+'°';$('delta-mechanical').textContent=(delta/7).toFixed(2)+'°';$('torque-value').textContent=(Math.abs(t)<1e-9?'0.00':(t>0?'+':'')+t.toFixed(2));
+let copy;
+if(Math.abs(delta)<.01)copy='0°：N 与吸引它的 S 正对齐，金点在谷底。向左和向右都没有优先趋势，净转矩为零。';
+else if(Math.abs(Math.abs(delta)-90)<.01)copy=`${delta.toFixed(0)}°：金点处坡最陡，${delta>0?'向右':'向左'}推动最强。相当于错开四分之一磁极周期；实体圆周只错开 ${(delta/7).toFixed(2)}°。`;
+else if(Math.abs(Math.abs(delta)-180)<.01)copy='180°：N 与 N 正对，金点位于山顶。正好对准时向左、向右没有优先方向，净转矩为零；稍受扰动就会离开山顶。';
+else copy=`${delta.toFixed(0)}°：沿${delta>0?'右':'左'}侧下坡，转子会朝低能的对齐位置转动。比较金点处的坡度：越接近 ±90° 越陡，越接近 0° 或 ±180° 越平。`;
+$('torque-copy').textContent=copy;
+Array.from($('torque-presets').children).forEach(b=>b.classList.toggle('active',b.dataset.delta!==undefined&&Number(b.dataset.delta)===delta));
+drawTorqueRing();drawTorqueSlope();
+}
+function stopTorque(){torquePlaying=false;torqueLast=null;$('torque-play').textContent='▶ 慢慢扫过 0° → 180°';}
+$('torque-presets').addEventListener('click',e=>{if(e.target.dataset.delta===undefined)return;stopTorque();delta=Number(e.target.dataset.delta);renderTorque();});
+$('delta').addEventListener('input',e=>{stopTorque();delta=Number(e.target.value);renderTorque();});
+$('torque-play').addEventListener('click',()=>{if(torquePlaying){stopTorque();return;}play(false);delta=0;torquePlaying=true;torqueLast=null;$('torque-play').textContent='Ⅱ 暂停错位演示';renderTorque();});
+function torqueAnimate(time){if(torquePlaying){if(torqueLast!==null){delta=Math.min(180,delta+Math.min((time-torqueLast)/1000,.1)*15);if(delta>=180)stopTorque();renderTorque();}if(torquePlaying)torqueLast=time;}requestAnimationFrame(torqueAnimate);}
+render();renderTorque();requestAnimationFrame(animate);requestAnimationFrame(torqueAnimate);
+</script>
+</body>
+</html>

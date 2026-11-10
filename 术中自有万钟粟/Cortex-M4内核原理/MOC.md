@@ -23,6 +23,7 @@
 | PC/LR/SP 作用、硬件压栈与软件压栈流程                | [cpu通用寄存器组.md](cpu通用寄存器组.md) |
 | XPSR/PRIMASK/FAULTMASK/BASEPRI/CONTROL，MRS/MSR 访问 | [特殊寄存器.md](特殊寄存器.md)           |
 | FPU 寄存器、双栈指针与状态寄存器索引                 | [剩余寄存器.md](剩余寄存器.md)           |
+| 浮点运算原理、寄存器组、惰性压栈与中断嵌套、单精度配置 | [FPU浮点运算单元](FPU浮点运算单元.md) |
 | DWT寄存器(调试和计时)                                | [DWT](DWT.md)                            |
 | ITM寄存器(跟踪输出)                                  | [ITM](ITM.md)                            |
 | FPB寄存器(硬件断点)                                  | [FPB](FPB.md)                            |
