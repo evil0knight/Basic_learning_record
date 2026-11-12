@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Park与逆Park交互演示</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,'Microsoft YaHei',sans-serif;background:#0c1424;color:#e7edf9}*{box-sizing:border-box}body{max-width:1200px;margin:auto;padding:28px}a{color:#8dc8ff}h1{font-size:clamp(25px,4vw,38px);margin:14px 0}h2{font-size:20px}p{line-height:1.8;color:#bfcce0}.lead{font-size:18px}.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}.card{background:#131f34;border:1px solid #2b3b55;border-radius:18px;padding:22px;margin:18px 0}button{background:#253650;color:#eef4ff;border:1px solid #526887;border-radius:8px;padding:10px 14px;cursor:pointer;margin:4px}button.active{background:#155e75;border-color:#64dfef}button:focus-visible,input:focus-visible{outline:3px solid #f9ca74}label{display:block;margin:20px 0 6px}input[type=range]{width:100%;accent-color:#63d8e8}svg{width:100%;display:block;background:#101b2e;border-radius:12px}text{font:14px system-ui;fill:#cbd8ec}.values{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.value{background:#0c1628;border-radius:10px;padding:12px;font-size:20px;font-variant-numeric:tabular-nums}.d{color:#66dfba}.q{color:#c5a2ff}.v{color:#ffc777}.values .value{color:#fff}pre{white-space:pre-wrap;line-height:1.9;font-size:15px;background:#0c1628;padding:16px;border-radius:12px}.note{border-left:3px solid #68d8e7;padding-left:16px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.steps p{margin-bottom:0}small{color:#a4b6d1}hr{border:0;border-top:1px solid #2b3b55} @media(max-width:780px){body{padding:14px}.grid,.steps{grid-template-columns:1fr}.card{margin:10px 0;padding:16px}}
+/* Keep all text white while retaining diagram line colors. */
+body,body *{color:#fff!important}svg text{fill:#fff!important}
+</style></head>
+<body>
+<h1>Park与逆Park交互演示</h1>
+<nav><a href="MOC.md">← FOC MOC</a> · <a href="../../index.md">← 主页</a> · <a href="Park变换.md">Park笔记</a> · <a href="逆Park变换.md">逆Park笔记</a></nav><hr>
+<p class="lead">想象一根箭头，旁边放着一把会旋转的直角尺。<br><b>Park：读出箭头在旋转尺上的两个分量。逆 Park：用两个分量把箭头拼回来。</b></p>
+<div class="steps"><section class="card"><b>① 先固定箭头，只转尺子</b><p>选择 Park，拖动 θ。金色箭头不动，但它在 d、q 上的投影会变。</p></section><section class="card"><b>② 再让箭头跟尺子一起转</b><p>点击“同步旋转”，再播放。α、β 在变，d、q 却保持不变。</p></section><section class="card"><b>③ 最后反过来拼箭头</b><p>选择逆 Park，设定 d、q，再拖动 θ。旋转尺子上的分量不变，地面上的箭头跟着转。</p></section></div>
+<div><button id="park" class="active" aria-pressed="true">Park · αβ → dq</button><button id="inverse" aria-pressed="false">逆 Park · dq → αβ</button><button id="sync">示例：同步旋转</button><button id="reset">重置</button></div>
+<div class="grid"><section class="card"><h2 id="viewTitle">地面视角：固定的 αβ 与旋转的 dq</h2>
+<svg id="plot" viewBox="0 0 540 500" role="img" aria-label="静止坐标轴、旋转坐标轴、矢量与分量投影"></svg>
+<p><span class="v">━ 原矢量</span>　<span class="d">━ d 分量</span>　<span class="q">━ q 分量</span><br>虚线把两个分量补成平行四边形；两条分量矢量相加，回到金色箭头尖。</p><p id="insight" class="note"></p>
+</section><section class="card"><h2 id="controlTitle">输入：地面坐标中的分量</h2>
+<label for="theta">尺子的电角度 θ：<output id="thetaValue"></output></label><input id="theta" type="range" min="0" max="360" step="0.1" value="30">
+<button id="play">▶ 播放角度</button><button id="zero">θ = 0°</button><button id="ninety">θ = 90°</button>
+<label for="first" id="firstLabel"></label><input id="first" type="range" min="-1" max="1" step="0.01" value="0.8">
+<label for="second" id="secondLabel"></label><input id="second" type="range" min="-1" max="1" step="0.01" value="0.4">
+<p><small>所有分量用归一化值表示。θ 从 α 正轴逆时针量到 d 正轴；q 比 d 逆时针超前 90°。本图是电角度空间，不是电机机械剖面。</small></p>
+<div class="values"><div class="value" id="va"></div><div class="value" id="vb"></div><div class="value d" id="vd"></div><div class="value q" id="vq"></div></div>
+<pre id="formula"></pre><small id="check"></small>
+</section></div>
+<section class="card"><h2>为什么公式里有正号和负号？</h2><p>d 轴的单位方向是 <b class="d">(cos θ, sin θ)</b>；q 轴的单位方向是 <b class="q">(−sin θ, cos θ)</b>。Park 就是把箭头与这两个方向分别做点积，得到有正负的投影长度。负数表示沿该轴的反方向。</p><pre>d = α cos θ + β sin θ
+q = −α sin θ + β cos θ
+
+(α, β) = d × (cos θ, sin θ) + q × (−sin θ, cos θ)
+α = d cos θ − q sin θ
+β = d sin θ + q cos θ</pre><p>例如 θ = 90°，地面向右的箭头 (α, β) = (1, 0)，在旋转尺子上读作 (d, q) = (0, −1)。因为这时 d 朝上、q 朝左，向右就是负 q。</p></section>
+<section class="card"><h2>放回 FOC：为什么两边都要用？</h2><pre>相电流 → Clarke → Iα、Iβ → Park → Id、Iq
+                                         ↓ 与目标比较，电流 PI 调节
+SVPWM ← Vα、Vβ ← 逆 Park ← Vd、Vq</pre><p>Park 帮控制器看清“沿转子磁场”和“垂直转子磁场”的电流。PI 算出需要的电压后，逆 Park 再把电压转换成定子坐标，交给调制器执行。<b>实际控制链中间有 PI，因此不是把刚测到的电流原样变回去。</b></p><p>只有当矢量相对 dq 的方向与长度都固定时，d、q 才是常数；Park 并不会把任意交流信号自动变成直流。这里采用永磁同步电机中 d 轴对齐转子永磁磁链的常见约定。</p></section>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), rad=Math.PI/180;
+let mode='park',running=false,last=0;
+const fmt=x=>(Math.abs(x)<0.0005?0:x).toFixed(3);
+function forward(a,b,t){return [a*Math.cos(t)+b*Math.sin(t),-a*Math.sin(t)+b*Math.cos(t)]}
+function backward(d,q,t){return [d*Math.cos(t)-q*Math.sin(t),d*Math.sin(t)+q*Math.cos(t)]}
+function render(){
+ const angle=+$('theta').value,t=angle*rad,c=Math.cos(t),s=Math.sin(t),x=+$('first').value,y=+$('second').value;
+ let a,b,d,q;if(mode==='park'){a=x;b=y;[d,q]=forward(a,b,t)}else{d=x;q=y;[a,b]=backward(d,q,t)}
+ $('thetaValue').textContent=angle.toFixed(1)+'°';
+ $('firstLabel').textContent=(mode==='park'?'α':'d')+' = '+fmt(x);$('secondLabel').textContent=(mode==='park'?'β':'q')+' = '+fmt(y);
+ $('controlTitle').textContent=mode==='park'?'输入：地面坐标中的分量':'输入：旋转坐标中的分量';
+ for(const [id,name,v] of [['va','α',a],['vb','β',b],['vd','d',d],['vq','q',q]])$(id).textContent=name+' = '+fmt(v);
+ $('formula').textContent=mode==='park'?`d = α cos θ + β sin θ = ${fmt(d)}\nq = −α sin θ + β cos θ = ${fmt(q)}\ncos θ = ${fmt(c)}，sin θ = ${fmt(s)}`:`α = d cos θ − q sin θ = ${fmt(a)}\nβ = d sin θ + q cos θ = ${fmt(b)}\ncos θ = ${fmt(c)}，sin θ = ${fmt(s)}`;
+ const [aa,bb]=backward(...forward(a,b,t),t);
+ $('check').textContent=`长度守恒：|αβ| = ${fmt(Math.hypot(a,b))}，|dq| = ${fmt(Math.hypot(d,q))}；往返误差 ${Math.hypot(aa-a,bb-b).toExponential(1)}`;
+ $('insight').textContent=mode==='park'?'现在固定的是 α、β。转动 θ 只是在换尺子：箭头本身不动，d、q 的读数改变。':'现在固定的是 d、q。转动 θ 时，箭头随尺子同步转动：α、β 改变，d、q 保持不变。';
+ const scale=135,X=v=>270+v*scale,Y=v=>250-v*scale;
+ function line(x1,y1,x2,y2,color,width=2,dash=false,arrow=false){return `<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" stroke="${color}" stroke-width="${width}" ${dash?'stroke-dasharray="6 5"':''} ${arrow?'marker-end="url(#tip)"':''}/>`}
+ function label(x,y,text,color){return `<text x="${X(x)}" y="${Y(y)}" style="fill:${color}">${text}</text>`}
+ let svg='<defs><marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke"/></marker></defs>';
+ svg+=`<circle cx="270" cy="250" r="135" fill="none" stroke="#273952" stroke-dasharray="3 5"/>`;
+ svg+=line(-1.65,0,1.65,0,'#73839c',1,false,true)+line(0,-1.65,0,1.65,'#73839c',1,false,true)+label(1.7,-.12,'α','#a8b7cf')+label(.08,1.7,'β','#a8b7cf');
+ svg+=line(-1.5*c,-1.5*s,1.5*c,1.5*s,'#66dfba',1,false,true)+line(1.5*s,-1.5*c,-1.5*s,1.5*c,'#c5a2ff',1,false,true);
+ svg+=label(1.6*c,1.6*s,'d','#66dfba')+label(-1.6*s,1.6*c,'q','#c5a2ff');
+ svg+=line(d*c,d*s,a,b,'#c5a2ff',2,true)+line(-q*s,q*c,a,b,'#66dfba',2,true);
+ svg+=line(0,0,d*c,d*s,'#66dfba',5,false,true)+line(0,0,-q*s,q*c,'#c5a2ff',5,false,true)+line(0,0,a,b,'#ffc777',3,false,true);
+ svg+=`<circle cx="${X(a)}" cy="${Y(b)}" r="5" fill="#ffc777"/>`+label(a+.06,b+.08,'矢量','#ffc777')+label(.05,-.15,'O','#a8b7cf');
+ $('plot').innerHTML=svg;
+}
+function select(next){mode=next;for(const id of ['park','inverse']){$(id).classList.toggle('active',mode===id);$(id).setAttribute('aria-pressed',String(mode===id))}render()}
+function stop(){running=false;$('play').textContent='▶ 播放角度'}
+$('park').onclick=()=>{stop();select('park')};$('inverse').onclick=()=>{stop();select('inverse')};
+$('sync').onclick=()=>{stop();$('first').value=0;$('second').value=.8;select('inverse')};
+$('reset').onclick=()=>{stop();$('theta').value=30;$('first').value=.8;$('second').value=.4;select('park')};
+$('zero').onclick=()=>{stop();$('theta').value=0;render()};$('ninety').onclick=()=>{stop();$('theta').value=90;render()};
+for(const id of ['theta','first','second'])$(id).oninput=()=>{if(id==='theta')stop();render()};
+$('play').onclick=()=>{running=!running;last=performance.now();$('play').textContent=running?'Ⅱ 暂停':'▶ 播放角度'};
+function tick(now){if(running){$('theta').value=(+$('theta').value+Math.min(now-last,100)*.025)%360;render()}last=now;requestAnimationFrame(tick)}render();requestAnimationFrame(tick);
+</script></body></html>
