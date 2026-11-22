@@ -30,7 +30,7 @@
 |   硬件原器件   |                 实际用过的元件                 | [硬件原器件笔记](./硬件原器件/MOC.md)                   |
 |      麦轮      |            麦克纳姆轮原理与底盘解算            | [麦轮笔记](./麦轮/MOC.md)                               |
 |     超声波     |           HC-SR04 测距，输入捕获驱动           | [超声波笔记](./超声波/MOC.md)                           |
-|     编码器     |       AS5600 分层驱动、资源挂载与 DMA 采样       | [编码器笔记](./编码器/MOC.md)                           |
+| 编码器 | AS5600 通用分层版、FOC 高实时版 | [编码器](./编码器/MOC.md) |
 |     缓冲区     |        环形缓冲区、定长块内存池、AB 双缓冲        | [缓冲区](缓冲区/MOC.md)                             |
 |   EasyLogger   |         嵌入式日志库，源码 + keil 移植         | [使用方法](../术中自有万钟粟/debug方法/EasyLogger.md)   |
 |    DWT 测量    |   单通道区间计时，enter/exit 直接打印周期与微秒   | [DWT 测量](./DWT测量/MOC.md)                            |
@@ -38,14 +38,15 @@
 |     Ymodem     |         文件传输协议，源码 + 协议笔记         | [Ymodem](./Ymodem/MOC.md)                               |
 |       AES       | 对称加密，128/192/256 bit CBC，源码 + OTA 使用 | [AES](./AES/MOC.md)                                     |
 |       MD5       |          散列摘要，OTA 固件完整性校验           | [MD5](./MD5/MOC.md)                                     |
-|       FOC       |       磁场定向控制笔记与相关代码       | [FOC MOC](./FOC/MOC.md)                  |
+| FOC | FOC 算法代码与 FOCV2.5.4 工程代码索引 | [FOC](./FOC/MOC.md) |
 |       PID       |       通用 PID、功能位组合与饱和反馈       | [PID](./PID/MOC.md)                                     |
 |       OTA       |       APP后台下载与BootLoader安装       | [OTA](./OTA/MOC.md)                                     |
 |      看门狗      |       IWDG/WWDG统一Wrapper与Backend       | [看门狗](./看门狗/MOC.md)                                |
 |       SPI       |          硬件SPI、软件SPI与统一Port          | [SPI](./SPI/MOC.md)                                     |
-|       IIC       |       硬件I2C、软件I2C与统一总线Port        | [IIC](./IIC/MOC.md)                                     |
+| IIC | 通用 Bus/Port 与 FOC 简化直连版 | [IIC](./IIC/MOC.md) |
 |     EEPROM      |             掉电保存与AT24C02驱动             | [EEPROM](./EEPROM/MOC.md)                               |
-|       ADC       |       双缓冲采样、DMA/中断可切换、双任务       | [ADC](./ADC/MOC.md)                                     |
+| ADC | 通用双缓冲版与 FOC Injected/DMA 版 | [ADC](./ADC/MOC.md) |
+| TIME | 毫秒时基与 FOC 微秒/HRTIM 时基 | [TIME](./TIME/MOC.md) |
 |      屏幕      |             LCD/OLED屏幕驱动与接入             | [屏幕](./屏幕/MOC.md)                                   |
 |    代码架构    |        RTOS 解耦框架与表驱法裸机框架        | [代码架构](./代码架构/MOC.md)                           |
 |   外设库模板   |     照 Flash 抽象出的外设库骨架，写新外设照它    | [_模板](./_模板/MOC.md)                                 |

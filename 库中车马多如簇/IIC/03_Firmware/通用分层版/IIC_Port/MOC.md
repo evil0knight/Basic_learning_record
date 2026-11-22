@@ -1,6 +1,6 @@
 # I2C Bus / Port
 
-[← MCU 平台](../MOC.md) | [← BSP](../../../05_bsp/MOC.md)
+[← IIC 总览](../../../MOC.md) | [← 03_Firmware 索引](../../MOC.md) | [← 主页](../../../../../index.md)
 
 > 先配置总线槽位，再用 Port 接口访问器件。
 
@@ -15,7 +15,7 @@
 | [i2c_port_bare.h](./port/bare/i2c_port_bare.h) / [i2c_port_bare.c](./port/bare/i2c_port_bare.c) | 裸机 Port：请求队列、超时、软件槽位执行        |
 | [i2c_port_os.h](./port/os/i2c_port_os.h) / [i2c_port_os.c](./port/os/i2c_port_os.c)             | RTOS Port：每总线注册 mutex/sema，内部加锁     |
 | [user_isr_handlers.c](../01_app/app_isr_handlers/user_isr_handlers.c)                        | HAL I2C 中断入口，转发到 Bus                   |
-| [GPIO Port](../gpio/MOC.md)                                                                  | 软件 I2C 所需的直接 GPIO 接口                  |
+| [GPIO Port](../../../../代码架构/firmware/04_platform/platform_mcu/gpio/MOC.md)                                                                  | 软件 I2C 所需的直接 GPIO 接口                  |
 
 ## 分层
 
@@ -111,7 +111,7 @@ core_i2c_mem_read(CORE_I2C_PORT_ENCODER1, 0x50U, reg, CORE_I2C_MEM_ADDR_8BIT,
 
 ## 移植与使用
 
-> 这一节已并入 **[移植与使用指南](../移植指南.md)**，那里有完整清单：
+> 这一节已并入 **[移植与使用指南](../../../移植指南.md)**，那里有完整清单：
 >
 > 1. 复制哪些文件、`port/bare` 与 `port/os` 怎么二选一
 > 2. 目录怎么摆（`../../../gpio/...` 是硬编码相对路径）
@@ -326,11 +326,11 @@ MX_I2Cx_Init
 ```
 
 RTOS 还需要先执行 `user_os_resources_init()`，完整顺序见
-[移植指南 第 8 节](../移植指南.md#8-初始化顺序)。
+[移植指南 第 8 节](../../../移植指南.md#8-初始化顺序)。
 
 ## 注意
 
-这些是**使用约定**，移植步骤见[移植指南](../移植指南.md)。
+这些是**使用约定**，移植步骤见[移植指南](../../../移植指南.md)。
 
 1. 锁归 Port 管，驱动层不要自己再包 mutex；同一总线的并发由 `core_i2c_register_mutex()` 注册的那把锁串行化。
 2. 未注册 mutex 时 Port 不加锁，适合单任务场景；未注册 sema 时同步接口退回 Bus 阻塞传输。

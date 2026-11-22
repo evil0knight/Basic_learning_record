@@ -39,7 +39,7 @@ void app_periph_register(void)
 }
 ```
 
-> 裸机（无 RTOS）：EEPROM 是同步 A 类，adapter 直接同步调 Driver，天然支持裸机。在 `main()` 里直接调 `bsp_adapter_eeprom_register()`（代替 `app_periph_register()`），再调 `bsp_wrapper_eeprom_init/read/write`。I2C Port 的 lock 配置（软件 I2C 关中断、硬件 I2C 填 NULL）见 [IIC Port](../IIC/IIC_Port/MOC.md)。
+> 裸机（无 RTOS）：EEPROM 是同步 A 类，adapter 直接同步调 Driver，天然支持裸机。在 `main()` 里直接调 `bsp_adapter_eeprom_register()`（代替 `app_periph_register()`），再调 `bsp_wrapper_eeprom_init/read/write`。I2C Port 的 lock 配置（软件 I2C 关中断、硬件 I2C 填 NULL）见 [IIC Port](../IIC/03_Firmware/通用分层版/IIC_Port/MOC.md)。
 
 3. 上层通过统一接口读写（`addr` 为器件内字节地址，AT24C02 范围 0~255）：
 

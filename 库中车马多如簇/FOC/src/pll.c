@@ -50,7 +50,7 @@
 #include <stddef.h>
 
 #include "PID.h"
-#include "sin_lut.h"
+#include "../inc/sin_lut.h"
 
 //********************************Includes***********************************//
 

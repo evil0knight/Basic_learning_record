@@ -41,7 +41,7 @@
 
 //********************************Includes***********************************//
 
-#include "sin_lut.h"
+#include "../inc/sin_lut.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -370,3 +370,4 @@ sin_lut_status_t sin_lut_sincos(
 
     return SIN_LUT_OK;
 }
+

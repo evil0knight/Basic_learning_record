@@ -43,7 +43,7 @@
 
 //********************************Includes***********************************//
 
-#include "sin_lut.h"
+#include "../inc/sin_lut.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -154,3 +154,4 @@ park_status_t park_transform_sc(
 
     return PARK_OK;
 }
+
